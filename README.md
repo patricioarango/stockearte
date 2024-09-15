@@ -25,13 +25,9 @@ TIENDA
 - nombre 
 - dirección (varchar 255 incluye calle y número)
 - ciudad (varchar 255)
-- id provincia
+-  provincia (varchar 255)
 - habilitado (boolean)
-
-PROVINCIA (db harcodeada en db)
-- id provincia
-- nombre
-  
+ 
 PRODUDCTO
 - id producto
 - nombre
