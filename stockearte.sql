@@ -59,6 +59,7 @@ CREATE TABLE `product_color` (
 CREATE TABLE `product_stock` (
 `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `id_product` INT(11) UNSIGNED NOT NULL,
+  `id_store` INT(11) UNSIGNED NOT NULL,
   `id_product_color`INT(11) UNSIGNED NOT NULL,
    `id_product_size`INT(11) UNSIGNED NOT NULL,
   `stock` INT(11) DEFAULT NULL,
