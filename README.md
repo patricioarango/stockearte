@@ -1,6 +1,9 @@
 # stockearte
 DSSD-Stockearte-Grupo16
 
+## conexión db remota
+https://trello.com/c/6kH1vAE0/11-conexi%C3%B3n-a-base-de-datos-remota
+
 ## estructura de datos
 ROL
 - id rol
