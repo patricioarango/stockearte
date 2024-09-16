@@ -1,8 +1,15 @@
 from app import create_app
-from flask import render_template
+from flask import Flask, render_template, request, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
 
 
 app = create_app('flask.cfg')
+
+#creo conexion momentanea con base de datos local
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
 
 @app.route("/", methods=["GET"])
 def index():
