@@ -1,0 +1,7 @@
+/home/patricio/Documents/unla/gRPCProject/springbootserver/target/generated-sources/protobuf/java/com/arango/helloworld/stubs/HelloReply.java
+/home/patricio/Documents/unla/gRPCProject/springbootserver/target/generated-sources/protobuf/java/com/arango/helloworld/stubs/HelloReplyOrBuilder.java
+/home/patricio/Documents/unla/gRPCProject/springbootserver/target/generated-sources/protobuf/java/com/arango/helloworld/stubs/HelloRequestOrBuilder.java
+/home/patricio/Documents/unla/gRPCProject/springbootserver/target/generated-sources/protobuf/java/com/arango/helloworld/stubs/HelloWorldProto.java
+/home/patricio/Documents/unla/gRPCProject/springbootserver/target/generated-sources/protobuf/grpc-java/com/arango/helloworld/stubs/GreeterGrpc.java
+/home/patricio/Documents/unla/gRPCProject/springbootserver/target/generated-sources/protobuf/java/com/arango/helloworld/stubs/HelloRequest.java
+/home/patricio/Documents/unla/gRPCProject/springbootserver/src/main/java/com/arango/springbootserver/SpringbootserverApplication.java
