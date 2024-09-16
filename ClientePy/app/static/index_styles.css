@@ -1,0 +1,17 @@
+@charset "ISO-8859-1";
+
+.center {
+    display: block;
+    margin-left: 200px;
+    margin-right: 200px;
+    width: 70%;
+}
+
+.nav-bk {
+    background: #000000;
+}
+
+.table {
+    border: 1px solid;
+    border-color: #d8d6d6;
+}

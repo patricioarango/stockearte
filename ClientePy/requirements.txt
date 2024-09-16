@@ -1,0 +1,6 @@
+Flask
+flask_table
+Flask-RESTful
+grpcio
+grpcio-tools
+python-dotenv
