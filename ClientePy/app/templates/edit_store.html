@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Editar Tienda</title>
+    <title>G16 - Stockearte</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" />
     <meta charset="utf-8" />
@@ -35,6 +35,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="/store_list">Tienda</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="/users">Usuario</a>
+              </li>
             </ul>
         </div>
     </nav>
@@ -74,9 +77,8 @@
             <div class="col-md-6 text-right">
                 <a href="{{ url_for('store_list') }}" class="btn btn-secondary">Cancelar</a>
                 <button type="submit" class="btn btn-primary">Guardar</button>
-                <a href="{{ url_for('delete_store', id_store=store.id_store) }}" class="btn btn-md btn-danger">Eliminar registro</a>
-            </div>
-          </div>
+                <div class="row">
+                  <div class="col-md-6 text-right">
       </form>
     </div>
     <script>
