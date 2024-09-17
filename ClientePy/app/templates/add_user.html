@@ -65,25 +65,21 @@
                 <input type="password" id="password" name="password" class="form-control" required>
                 <div class="invalid-feedback">Por favor, ingrese una contraseña.</div>
             </div>
-            <div class="mb-3">
-                <label for="id_rol" class="form-label">Rol</label>
-                <select id="id_rol" name="id_rol" class="form-select" required>
-                    <option value="">Seleccione un Rol</option>
-                    {% for rol in roles %}
-                        <option value="{{ rol.id_rol }}">{{ rol.rol }}</option>
-                    {% endfor %}
-                </select>
-                <div class="invalid-feedback">Por favor, seleccione un rol.</div>
-            </div>
+            <input type="hidden" id="id_rol" name="id_rol">
             <div class="mb-3">
                 <label for="id_store" class="form-label">Tienda</label>
-                <select id="id_store" name="id_store" class="form-select" required>
+                <select id="id_store" name="id_store" class="form-select" required onchange="setRole()">
                     <option value="">Seleccione una Tienda</option>
                     {% for store in stores %}
-                        <option value="{{ store.id_store }}">{{ store.store }}</option>
+                        <option value="{{ store.id_store }}" data-store-name="{{ store.store }}">{{ store.store }}</option>
                     {% endfor %}
                 </select>
                 <div class="invalid-feedback">Por favor, seleccione una tienda.</div>
+            </div>
+             <!-- Campo para mostrar el rol asignado -->
+             <div class="mb-3">
+                <label for="rol_display" class="form-label">Rol Asignado</label>
+                <input type="text" id="rol_display" class="form-control" disabled>
             </div>
             <div class="mb-3">
                 <button type="submit" class="btn btn-primary">Agregar</button>
@@ -93,6 +89,42 @@
     </div>
     
     <script>
+         function setRole() {
+    // Obtén el valor de la tienda seleccionada y su nombre
+    var storeSelect = document.getElementById('id_store');
+    var selectedStoreValue = storeSelect.value;
+    var selectedStoreName = storeSelect.options[storeSelect.selectedIndex].getAttribute('data-store-name');
+
+    // Normalizar el nombre de la tienda y comprobar con una expresión regular
+    var normalizedStoreName = selectedStoreName.toLowerCase();
+
+    // Expresión regular para buscar "casa central" sin importar espacios, guiones o guiones bajos
+    var casaCentralRegex = /casa[\s_-]*central/;
+
+    // Establece el valor del rol según la tienda seleccionada
+    var roleInput = document.getElementById('id_rol');
+    var roleDisplay = document.getElementById('rol_display');
+
+    // Debugging: Verificar el valor de la tienda seleccionada
+    console.log('Tienda seleccionada:', selectedStoreName);
+
+    // Comparar usando la expresión regular
+    if (casaCentralRegex.test(normalizedStoreName)) {
+        roleInput.value = '1'; // Asignar ID de rol 1
+        roleDisplay.value = 'Admin'; // Mostrar nombre del rol
+    } else if (selectedStoreValue !== '') {
+        roleInput.value = '2'; // Asignar ID de rol 2
+        roleDisplay.value = 'Manager'; // Mostrar nombre del rol
+    } else {
+        // Si no se selecciona una tienda, limpiar el campo de rol
+        roleInput.value = '';
+        roleDisplay.value = '';
+    }
+
+    // Debugging: Verificar el valor y el texto del rol asignado
+    console.log('ID de rol asignado:', roleInput.value);
+    console.log('Rol mostrado:', roleDisplay.value);
+}
         // Example starter JavaScript for disabling form submissions if there are invalid fields
         (function () {
           'use strict'
