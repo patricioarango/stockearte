@@ -10,11 +10,14 @@ import services.IUserService;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service("userService")
+@Service
 public class UserService implements IUserService {
-    @Autowired
-    private IUserRepository userRepository;
 
+    private IUserRepository userRepository;
+    @Autowired
+    public UserService(final IUserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
     public UserDTO findById(int id)
     {
         User user = userRepository.findById(id);
