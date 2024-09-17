@@ -12,7 +12,7 @@ ROL
 USUARIO:
 - id usuario
 - id rol
-- nombre 
+- username
 - contraseña
 - nombre
 - apellido
