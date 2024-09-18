@@ -27,4 +27,4 @@ def user():
         print(response)
 
 if __name__ == '__main__':
-    user()
+    hello()

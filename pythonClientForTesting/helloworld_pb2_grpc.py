@@ -36,7 +36,7 @@ class GreeterStub(object):
             channel: A grpc.Channel.
         """
         self.SayHello = channel.unary_unary(
-                '/helloworld.Greeter/SayHello',
+                '/helloworldstubs.Greeter/SayHello',
                 request_serializer=helloworld__pb2.HelloRequest.SerializeToString,
                 response_deserializer=helloworld__pb2.HelloReply.FromString,
                 _registered_method=True)
@@ -63,9 +63,9 @@ def add_GreeterServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'helloworld.Greeter', rpc_method_handlers)
+            'helloworldstubs.Greeter', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('helloworld.Greeter', rpc_method_handlers)
+    server.add_registered_method_handlers('helloworldstubs.Greeter', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -87,7 +87,7 @@ class Greeter(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/helloworld.Greeter/SayHello',
+            '/helloworldstubs.Greeter/SayHello',
             helloworld__pb2.HelloRequest.SerializeToString,
             helloworld__pb2.HelloReply.FromString,
             options,
