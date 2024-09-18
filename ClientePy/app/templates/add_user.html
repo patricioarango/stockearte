@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>G16 - Stockearte</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" />
+    <meta charset="utf-8" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='index_styles.css')}}"
+    />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <a class="navbar-brand d-flex gap-lg-1 mx-lg-3" href="/home">
+          <img src="{{ url_for('static', filename='stockearte-light.png') }}" alt="Stockearte" style="vertical-align: Stickman; margin: 0px 35px" />
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#collapsibleNavbar"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse d-flex align-items-center" id="collapsibleNavbar">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/store_list">Tienda</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/users">Usuario</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+    <div class="container mt-5">
+        <h1 class="mb-4">Agregar Usuario</h1>
+        <form method="post" class="needs-validation" novalidate>
+            <div class="mb-3">
+                <label for="username" class="form-label">Nombre de usuario</label>
+                <input type="text" id="username" name="username" class="form-control" required>
+                <div class="invalid-feedback">Por favor, ingrese el nombre de usuario.</div>
+            </div>
+            <div class="mb-3">
+                <label for="name" class="form-label">Nombre</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+                <div class="invalid-feedback">Por favor, ingrese el nombre.</div>
+            </div>
+            <div class="mb-3">
+                <label for="lastname" class="form-label">Apellido</label>
+                <input type="text" id="lastname" name="lastname" class="form-control" required>
+                <div class="invalid-feedback">Por favor, ingrese el apellido.</div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Contraseña</label>
+                <input type="password" id="password" name="password" class="form-control" required>
+                <div class="invalid-feedback">Por favor, ingrese una contraseña.</div>
+            </div>
+            <input type="hidden" id="id_rol" name="id_rol">
+            <div class="mb-3">
+                <label for="id_store" class="form-label">Tienda</label>
+                <select id="id_store" name="id_store" class="form-select" required onchange="setRole()">
+                    <option value="">Seleccione una Tienda</option>
+                    {% for store in stores %}
+                        <option value="{{ store.id_store }}" data-store-name="{{ store.store }}">{{ store.store }}</option>
+                    {% endfor %}
+                </select>
+                <div class="invalid-feedback">Por favor, seleccione una tienda.</div>
+            </div>
+             <!-- Campo para mostrar el rol asignado -->
+             <div class="mb-3">
+                <label for="rol_display" class="form-label">Rol Asignado</label>
+                <input type="text" id="rol_display" class="form-control" disabled>
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Agregar</button>
+                <a href="{{ url_for('list_users') }}" class="btn btn-secondary">Volver a la lista</a>
+            </div>
+        </form>
+    </div>
+    
+    <script>
+         function setRole() {
+    // Obtén el valor de la tienda seleccionada y su nombre
+    var storeSelect = document.getElementById('id_store');
+    var selectedStoreValue = storeSelect.value;
+    var selectedStoreName = storeSelect.options[storeSelect.selectedIndex].getAttribute('data-store-name');
+
+    // Normalizar el nombre de la tienda y comprobar con una expresión regular
+    var normalizedStoreName = selectedStoreName.toLowerCase();
+
+    // Expresión regular para buscar "casa central" sin importar espacios, guiones o guiones bajos
+    var casaCentralRegex = /casa[\s_-]*central/;
+
+    // Establece el valor del rol según la tienda seleccionada
+    var roleInput = document.getElementById('id_rol');
+    var roleDisplay = document.getElementById('rol_display');
+
+    // Debugging: Verificar el valor de la tienda seleccionada
+    console.log('Tienda seleccionada:', selectedStoreName);
+
+    // Comparar usando la expresión regular
+    if (casaCentralRegex.test(normalizedStoreName)) {
+        roleInput.value = '1'; // Asignar ID de rol 1
+        roleDisplay.value = 'Admin'; // Mostrar nombre del rol
+    } else if (selectedStoreValue !== '') {
+        roleInput.value = '2'; // Asignar ID de rol 2
+        roleDisplay.value = 'Manager'; // Mostrar nombre del rol
+    } else {
+        // Si no se selecciona una tienda, limpiar el campo de rol
+        roleInput.value = '';
+        roleDisplay.value = '';
+    }
+
+    // Debugging: Verificar el valor y el texto del rol asignado
+    console.log('ID de rol asignado:', roleInput.value);
+    console.log('Rol mostrado:', roleDisplay.value);
+}
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (function () {
+          'use strict'
+  
+          // Fetch all the forms we want to apply custom Bootstrap validation styles to
+          var forms = document.querySelectorAll('.needs-validation')
+  
+          // Loop over them and prevent submission
+          Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+              form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                  event.preventDefault()
+                  event.stopPropagation()
+                }
+  
+                form.classList.add('was-validated')
+              }, false)
+            })
+        })()
+    </script>
+</body>
+</html>
