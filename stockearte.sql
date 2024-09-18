@@ -12,7 +12,6 @@ CREATE TABLE `rol` (
   `id_rol` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `rol` VARCHAR(255) DEFAULT NULL,
   `enabled` BOOLEAN DEFAULT TRUE,
-
   PRIMARY KEY (`id_rol`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
@@ -24,7 +23,6 @@ CREATE TABLE `store` (
   `city` VARCHAR(255) DEFAULT NULL,
   `state` VARCHAR(255) DEFAULT NULL,
   `enabled` BOOLEAN DEFAULT TRUE,
-
   PRIMARY KEY (`id_store`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
@@ -48,46 +46,16 @@ CREATE TABLE `product` (
   `code` VARCHAR(10) DEFAULT NULL,
   `img` VARCHAR(255) DEFAULT NULL,
   `enabled` BOOLEAN DEFAULT TRUE,
-
-  PRIMARY KEY (`id_product`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
-
-CREATE TABLE `product_size` (
-  `id_product_size` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_product` INT(11) UNSIGNED NOT NULL,
   `size` VARCHAR(255) DEFAULT NULL,
-  `enabled` BOOLEAN DEFAULT TRUE,
-  PRIMARY KEY (`id_product_size`),
-  FOREIGN KEY (`id_product`) REFERENCES `product` (`id_product`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
-
-CREATE TABLE `product_color` (
-  `id_product_color` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_product` INT(11) UNSIGNED NOT NULL,
   `color` VARCHAR(255) DEFAULT NULL,
-  `enabled` BOOLEAN DEFAULT TRUE,
-  PRIMARY KEY (`id_product_color`),
-  FOREIGN KEY (`id_product`) REFERENCES `product` (`id_product`)
+  PRIMARY KEY (`id_product`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `product_stock` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `id_product` INT(11) UNSIGNED NOT NULL,
   `id_store` INT(11) UNSIGNED NOT NULL,
-  `id_product_color` INT(11) UNSIGNED NOT NULL,
-  `id_product_size` INT(11) UNSIGNED NOT NULL,
-  `stock` INT(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`id_product`) REFERENCES `product` (`id_product`),
-  FOREIGN KEY (`id_store`) REFERENCES `store` (`id_store`),
-  FOREIGN KEY (`id_product_color`) REFERENCES `product_color` (`id_product_color`),
-  FOREIGN KEY (`id_product_size`) REFERENCES `product_size` (`id_product_size`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8;
-
-CREATE TABLE `product_store` (
-  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_product` INT(11) UNSIGNED NOT NULL,
-  `id_store` INT(11) UNSIGNED NOT NULL,
+  `stock` INT(11) DEFAULT 0,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`id_product`) REFERENCES `product` (`id_product`),
   FOREIGN KEY (`id_store`) REFERENCES `store` (`id_store`)
