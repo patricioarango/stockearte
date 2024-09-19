@@ -2,12 +2,7 @@ package com.stockearte.server.entities;
 
 import java.util.Objects;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,6 +27,14 @@ public class User{
 
 	@Column(name = "password", nullable = false, length = 255)
 	private String password;
+
+	@ManyToOne
+	@JoinColumn(name="id_role", nullable=true)
+	private Role role;
+
+	@ManyToOne
+	@JoinColumn(name="id_store", nullable=true)
+	private Store store;
 
 	@Column(name = "enabled", nullable = false)
 	private Boolean enabled;
