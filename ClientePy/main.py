@@ -2,6 +2,8 @@ from app import create_app
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
+import random
+import string
 
 app = create_app('flask.cfg')
 
@@ -134,6 +136,56 @@ def edit_user(id_user):
     roles = Rol.query.all()
     stores = Store.query.all()
     return render_template('edit_user.html', user=user,roles=roles,stores=stores)
+
+# Modelos
+
+class Product(db.Model):
+    __tablename__ = 'product'
+    id_product = db.Column(db.Integer, primary_key=True)
+    product = db.Column(db.String(255))
+    code = db.Column(db.String(10))
+    img = db.Column(db.String(255))
+    enabled = db.Column(db.Boolean, default=True)
+    size = db.Column(db.String(255)) 
+    color = db.Column(db.String(255))  
+
+# Función para generar códigos de producto
+def generate_product_code(length=10):
+    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+
+# Rutas de producto
+
+@app.route('/add_product', methods=['GET', 'POST'])
+def add_product():
+    if request.method == 'POST':
+        # Obtener los datos del formulario
+        nombre = request.form.get('product')
+        img = request.form.get('img')
+        codigo = generate_product_code()
+        color = request.form.get('color')
+        size = request.form.get('size')
+        
+        # Crear el nuevo producto
+        producto = Product(product=nombre, code=codigo, img=img, color=color, size=size)
+
+        try:
+            db.session.add(producto)
+            db.session.commit()  
+            return redirect(url_for('productos'))
+        except Exception as e:
+            db.session.rollback() 
+            return f"Error al agregar el producto: {str(e)}", 500
+
+    return render_template('add_product.html')
+
+@app.route('/product', methods=['GET'])
+def productos():
+    productos = Product.query.all()
+    return render_template('product.html', productos=productos)
+
+
+
+
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
