@@ -53,6 +53,7 @@
                 <tr>
                     <th>Nombre</th>
                     <th>Código</th>
+                    <th>Tienda</th>
                     <th>Talle</th>
                     <th>Color</th>
                     <th>Acciones</th>
@@ -63,6 +64,7 @@
                 <tr>
                     <td>{{ producto.product }}</td>
                     <td>{{ producto.code }}</td>
+                    <td> {{ producto.stocks[0].store.store }} </td>
                     <td>{{ producto.size }}</td>
                     <td>{{ producto.color }}</td>
                     <td>

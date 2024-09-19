@@ -85,15 +85,18 @@
             </div>
             
             <div class="mb-3">
-                <label for="stores" class="form-label">Tiendas y Stock:</label>
-                {% for tienda in tiendas %}
-                <div class="mb-3">
-                    <label class="form-label">{{ tienda.store }}</label>
-                    <input type="hidden" name="tiendas" value="{{ tienda.id_store }}">
-                    <input type="number" class="form-control" name="stock_{{ tienda.id_store }}" value="{{ stock_dict.get(tienda.id_store, 0) }}" min="0">
-                </div>
-                {% endfor %}
+             
+                    <label for="store" class="form-label">Stock:</label>
+                    <label class="form-label">{{ tiendas | selectattr('id_store', 'equalto', tienda_id) | map(attribute='store') | first }}</label>
+                    <input type="hidden" name="tienda" value="{{ tienda_id }}">
+                    <!-- Mostrar solo el stock del producto para la tienda asignada -->
+                    <input type="number" class="form-control" name="stock" value="{{ stock }}" min="0">
+            
             </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="enabled" name="enabled" {% if producto.enabled %}checked{% endif %}>
+                <label class="form-check-label" for="enabled">Habilitado</label>
+              </div>
             
             <button type="submit" class="btn btn-primary">Guardar Cambios</button>
         </form>

@@ -8,7 +8,7 @@ import string
 app = create_app('flask.cfg')
 
 #creo conexion momentanea con base de datos local
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:110902@localhost:3306/stockearte'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -164,6 +164,18 @@ class ProductStock(db.Model):
 @app.route('/product', methods=['GET'])
 def productos():
     productos = Product.query.all()
+    
+    # Traer las tiendas asociadas con cada producto
+    productos_con_tiendas = []
+    for producto in productos:
+        # Obtener la primera tienda asociada (si hay)
+        stock = ProductStock.query.filter_by(id_product=producto.id_product).first()
+        tienda = stock.store.store if stock else "Sin tienda"
+        productos_con_tiendas.append({
+            'producto': producto,
+            'tienda': tienda
+        })
+    
     return render_template('product.html', productos=productos)
 
 
@@ -183,19 +195,33 @@ def add_product():
         codigo = generate_product_code()
         color = request.form.get('color')
         size = request.form.get('size')
+        tienda_id = request.form.get('tienda')  # Obtener el ID de la tienda seleccionada
         
         # Crear el nuevo producto
         producto = Product(product=nombre, code=codigo, img=img, color=color, size=size)
 
         try:
+            # Agregar el nuevo producto
             db.session.add(producto)
-            db.session.commit()  
+            db.session.commit()  # Necesario para generar el ID del producto
+
+            # Asignar el producto a la tienda seleccionada con stock 0
+            producto_stock = ProductStock(
+                id_product=producto.id_product,
+                id_store=tienda_id,
+                stock=0  # Stock inicial 0
+            )
+            db.session.add(producto_stock)
+            db.session.commit()  # Guardar la relación del producto con la tienda
+
             return redirect(url_for('productos'))
         except Exception as e:
             db.session.rollback() 
             return f"Error al agregar el producto: {str(e)}", 500
 
-    return render_template('add_product.html')
+    tiendas = Store.query.all()  # Obtener todas las tiendas para el formulario
+    return render_template('add_product.html', tiendas=tiendas)
+
 
 @app.route('/edit_product/<int:id>', methods=['GET', 'POST'])
 def edit_product(id):
@@ -213,13 +239,12 @@ def edit_product(id):
         existing_stocks = ProductStock.query.filter_by(id_product=producto.id_product).all()
         existing_stock_dict = {stock.id_store: stock for stock in existing_stocks}
 
-        tiendas = request.form.getlist('tiendas')
+        tienda_id = request.form.get('tienda')
+        stock = request.form.get('stock')
 
-        # Insertar o actualizar stock
-        for tienda_id in tiendas:
-            stock = request.form.get(f'stock_{tienda_id}')
-            tienda_id = int(tienda_id)  # Convertir a entero
-            stock = int(stock) if stock else 0  # Convertir a entero, o establecer 0 si está vacío
+        if tienda_id:
+            tienda_id = int(tienda_id)
+            stock = int(stock) if stock else 0
 
             if tienda_id in existing_stock_dict:
                 # Actualizar stock existente
@@ -238,13 +263,13 @@ def edit_product(id):
         return redirect(url_for('productos'))
 
     tiendas = Store.query.all()
-    
-    # Obtener stock actual para el producto
-    stocks = ProductStock.query.filter_by(id_product=id).all()
-    stock_dict = {stock.id_store: stock.stock for stock in stocks}
-    
-    return render_template('edit_product.html', producto=producto, tiendas=tiendas, stock_dict=stock_dict)
 
+    # Obtener el stock actual para el producto
+    stock_entry = ProductStock.query.filter_by(id_product=id).first()
+    stock = stock_entry.stock if stock_entry else 0
+    tienda_id = stock_entry.id_store if stock_entry else None
+
+    return render_template('edit_product.html', producto=producto, tiendas=tiendas, stock=stock, tienda_id=tienda_id)
 
 
 
