@@ -1,0 +1,23 @@
+spring.application.name: stockearte
+spring.output.ansi.enabled: always
+
+management.endpoints.web.exposure.include: metrics
+management.endpoint.metrics.enabled: true
+
+# spring.datasource.url
+spring.datasource.url: jdbc:mysql://localhost:3306/stockearte
+
+# spring.datasource.username
+spring.datasource.username : root
+
+# spring.datasource.password
+spring.datasource.password : root
+
+# spring.jpa.show-sql
+spring.jpa.show-sql : true
+
+# spring.jpa.hibernate.ddl-auto
+spring.jpa.hibernate.ddl-auto : update
+
+# spring.jpa.properties.dialect
+spring.jpa.properties.dialect : org.hibernate.dialect.MySQL5Dialect

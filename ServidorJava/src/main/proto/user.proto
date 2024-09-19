@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package model;
+
+option java_package = "com.stockearte.model";
+option java_outer_classname = "UserProto";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+service UsersService {
+  rpc ValidateUser(User) returns (User) {}
+  rpc GetUser(User) returns (User) {}
+  rpc FindAll(google.protobuf.Empty) returns (Users) {}
+  rpc AddUser(User) returns (User) {}  
+}
+
+message Users {
+  repeated User user = 1;
+}
+
+message User {
+  int32 idUser = 1;
+  string username = 2;
+  string name = 3;
+  string lastname = 4;
+  string password = 5;
+  bool enabled = 6;
+}
