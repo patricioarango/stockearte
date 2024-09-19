@@ -55,6 +55,7 @@
                     <th>Código</th>
                     <th>Talle</th>
                     <th>Color</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -64,6 +65,11 @@
                     <td>{{ producto.code }}</td>
                     <td>{{ producto.size }}</td>
                     <td>{{ producto.color }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_product', id=producto.id_product) }}">
+                            <img src="{{ url_for('static', filename='detalle.png') }}" alt="Editar" class="img-fluid" style="max-width: 30px;">
+                        </a>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

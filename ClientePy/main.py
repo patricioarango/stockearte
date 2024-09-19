@@ -137,8 +137,7 @@ def edit_user(id_user):
     stores = Store.query.all()
     return render_template('edit_user.html', user=user,roles=roles,stores=stores)
 
-# Modelos
-
+# Modelos de Producto
 class Product(db.Model):
     __tablename__ = 'product'
     id_product = db.Column(db.Integer, primary_key=True)
@@ -148,6 +147,26 @@ class Product(db.Model):
     enabled = db.Column(db.Boolean, default=True)
     size = db.Column(db.String(255)) 
     color = db.Column(db.String(255))  
+
+    # Relación con stock
+    stocks = db.relationship('ProductStock', backref='product', lazy='joined', cascade='all, delete-orphan')
+
+class ProductStock(db.Model):
+    __tablename__ = 'product_stock'
+    id = db.Column(db.Integer, primary_key=True)
+    id_product = db.Column(db.Integer, db.ForeignKey('product.id_product'))
+    id_store = db.Column(db.Integer, db.ForeignKey('store.id_store'))
+    stock = db.Column(db.Integer)
+
+    # Relaciones
+    store = db.relationship('Store', backref='product_stocks')
+
+@app.route('/product', methods=['GET'])
+def productos():
+    productos = Product.query.all()
+    return render_template('product.html', productos=productos)
+
+
 
 # Función para generar códigos de producto
 def generate_product_code(length=10):
@@ -178,10 +197,54 @@ def add_product():
 
     return render_template('add_product.html')
 
-@app.route('/product', methods=['GET'])
-def productos():
-    productos = Product.query.all()
-    return render_template('product.html', productos=productos)
+@app.route('/edit_product/<int:id>', methods=['GET', 'POST'])
+def edit_product(id):
+    producto = Product.query.get_or_404(id)
+    
+    if request.method == 'POST':
+        producto.product = request.form['product']
+        producto.code = request.form['code']
+        producto.img = request.form['img']
+        producto.color = request.form['color']
+        producto.size = request.form['size']
+        producto.enabled = 'enabled' in request.form
+
+        # Limpiar stocks existentes
+        existing_stocks = ProductStock.query.filter_by(id_product=producto.id_product).all()
+        existing_stock_dict = {stock.id_store: stock for stock in existing_stocks}
+
+        tiendas = request.form.getlist('tiendas')
+
+        # Insertar o actualizar stock
+        for tienda_id in tiendas:
+            stock = request.form.get(f'stock_{tienda_id}')
+            tienda_id = int(tienda_id)  # Convertir a entero
+            stock = int(stock) if stock else 0  # Convertir a entero, o establecer 0 si está vacío
+
+            if tienda_id in existing_stock_dict:
+                # Actualizar stock existente
+                existing_stock = existing_stock_dict[tienda_id]
+                existing_stock.stock = stock
+            else:
+                # Crear nuevo stock
+                producto_stock = ProductStock(
+                    id_product=producto.id_product,
+                    id_store=tienda_id,
+                    stock=stock
+                )
+                db.session.add(producto_stock)
+
+        db.session.commit()
+        return redirect(url_for('productos'))
+
+    tiendas = Store.query.all()
+    
+    # Obtener stock actual para el producto
+    stocks = ProductStock.query.filter_by(id_product=id).all()
+    stock_dict = {stock.id_store: stock.stock for stock in stocks}
+    
+    return render_template('edit_product.html', producto=producto, tiendas=tiendas, stock_dict=stock_dict)
+
 
 
 
