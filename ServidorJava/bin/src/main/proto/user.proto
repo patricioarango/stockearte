@@ -12,7 +12,7 @@ service UsersService {
   rpc ValidateUser(User) returns (User) {}
   rpc GetUser(User) returns (User) {}
   rpc FindAll(google.protobuf.Empty) returns (Users) {}
-  rpc AddUser(User) returns (User) {}  
+  rpc AddUser(User) returns (User) {}
 }
 
 message Users {

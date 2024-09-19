@@ -42,6 +42,8 @@ public class UserService extends UsersServiceGrpc.UsersServiceImplBase {
         .setName(user.getName())
         .setLastname(user.getLastname())
         .setPassword(user.getPassword())
+                .setIdRole(user.getRole().getRoleName())
+                .setIdStore(user.getStore().getIdStore())
         .setEnabled(user.getEnabled())
         .build();
         responseObserver.onNext(a);
