@@ -2,6 +2,7 @@ package com.stockearte.server.entities;
 
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
 
@@ -19,6 +20,9 @@ public class Product {
     @Column(name = "product", nullable = false, length = 255)
     private String productName;
 
+    @Column(name = "code", nullable = false, length = 255)
+    private String productCode;
+
     @Column(name = "color", nullable = false, length = 255)
     private String color;
 
@@ -28,8 +32,8 @@ public class Product {
     @Column(name = "stock", nullable = true, length = 11)
     private int stock;
 
-    @ManyToMany(mappedBy = "products")
-    private Set<Store> storeProducts;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Store> storeProducts = new HashSet<Store>();
 
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;

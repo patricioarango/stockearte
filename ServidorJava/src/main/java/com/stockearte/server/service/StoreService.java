@@ -44,7 +44,7 @@ public class StoreService extends StoreServiceGrpc.StoreServiceImplBase {
 
     @Override
     public void getStore(StoreProto.Store request,StreamObserver<StoreProto.Store> responseObserver){
-        Store store = storeRepository.findById(request.getIdStore());
+        Store store = storeRepository.findByIdStore(request.getIdStore());
         if (store==null) {
             StoreProto.Store a = StoreProto.Store.newBuilder()
                     .build();

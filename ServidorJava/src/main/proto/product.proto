@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package model;
+
+option java_package = "com.stockearte.model";
+option java_outer_classname = "ProductProto";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+service ProductService {
+  rpc GetProduct(Product) returns (Product) {}
+  rpc FindAll(google.protobuf.Empty) returns (Products) {}
+  rpc SaveStore(Product) returns (Product) {}
+}
+
+message Products {
+  repeated Product product = 1;
+}
+
+message Product {
+  int32 idProduct = 1;
+  string product = 2;
+  string code = 3;
+  string color = 4;
+  string size = 5;
+  int32 stock = 6;
+  bool enabled = 7;
+}

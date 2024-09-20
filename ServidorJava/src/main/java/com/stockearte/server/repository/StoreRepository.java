@@ -10,6 +10,6 @@ import java.util.List;
 @Repository("storeRepository")
 public interface StoreRepository extends JpaRepository<Store, Serializable> {
     public abstract List<Store> findAll();
-    public abstract Store findById(int id);
+    public abstract Store findByIdStore(int id);
 
 }
