@@ -1,14 +1,14 @@
 package com.stockearte.server.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "store")
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Store {
@@ -30,6 +30,12 @@ public class Store {
 
     @Column(name = "state", nullable = false, length = 255)
     private String state;
+
+    @ManyToMany
+    @JoinTable(name = "product_store",
+            joinColumns = @JoinColumn(name = "id_store"),
+            inverseJoinColumns = @JoinColumn(name = "id_product"))
+    private Set<Product> products;
 
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
