@@ -90,8 +90,10 @@ public class UserService extends UsersServiceGrpc.UsersServiceImplBase {
     @Override
     public void addUser(UserProto.User request, StreamObserver<UserProto.User> responseObserver) {
        
+        User userDb = new User();
+
         try {
-			usuarioRepository.save(new User(request.getUsername(),request.getName(),request.getLastname(),request.getPassword(),request.getEnabled()));
+        userDb = usuarioRepository.save(new User(request.getUsername(),request.getName(),request.getLastname(),request.getPassword(),request.getEnabled()));
 		} catch (Exception e) {
 			try {
                 throw new Exception("Error: el usuario ya existe");
@@ -101,7 +103,7 @@ public class UserService extends UsersServiceGrpc.UsersServiceImplBase {
             }
 		}
         UserProto.User a = UserProto.User.newBuilder()
-        .setIdUser(request.getIdUser())
+        .setIdUser(userDb.getIdUser())
         .setUsername(request.getUsername())
         .setName(request.getName())
         .setLastname(request.getLastname())
