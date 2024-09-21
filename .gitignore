@@ -1,3 +1,6 @@
 .idea/
 ServidorJava\bin\src\main\generated\
+ServidorJava\src\main\generated\
+ServidorJava\target\
 pythonClientForTesting\__pycache__\
+ClientePy\__pycache__\

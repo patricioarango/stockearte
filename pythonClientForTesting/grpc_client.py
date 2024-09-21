@@ -3,8 +3,8 @@ import helloworld_pb2
 import helloworld_pb2_grpc
 import user_pb2
 import user_pb2_grpc
-import product_pb2
-import product_pb2_grpc
+import store_pb2
+import store_pb2_grpc
 import role_pb2
 import role_pb2_grpc
 
@@ -51,5 +51,21 @@ def addproduct():
         response = stub.SaveProduct(request)
         print(response) 
 
+def addstore():
+    with grpc.insecure_channel('localhost:9090') as channel:
+        stub = store_pb2_grpc.StoreServiceStub(channel)
+        request = store_pb2.Store(idStore=3,storeName="store2 edit versoin",code="code2",address="address",city="city",state="state",enabled=True)
+        response = stub.SaveStore(request)
+        print(response)         
+
+def adduser():
+    with grpc.insecure_channel('localhost:9090') as channel:
+        stub = user_pb2_grpc.UsersServiceStub(channel)
+        rolereq = role_pb2.Role(idRole=2);
+        storereq = store_pb2.Store(idStore=2);
+        request = user_pb2.User(idUser=2,username="user2",name="manager edit",lastname="lastedit",password="pass",role=rolereq,store=storereq,enabled=True)
+        response = stub.AddUser(request)
+        print(response)
+
 if __name__ == '__main__':
-    roles()
+    adduser()
