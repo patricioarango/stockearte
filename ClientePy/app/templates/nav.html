@@ -12,19 +12,30 @@
     </button>
     <div class="collapse navbar-collapse d-flex align-items-center" id="collapsibleNavbar">
       <ul class="navbar-nav">
+        {% if session['roleName'] == 'admin' %}
           <li class="nav-item">
-              <a class="nav-link" href="/store_list">Tienda</a>
+              <a class="nav-link" href="/store_list">Tiendas</a>
           </li>
+        {% endif %}
+        {% if session['roleName'] == 'admin' %}
           <li class="nav-item">
-            <a class="nav-link" href="/users">Usuario</a>
+            <a class="nav-link" href="/users">Usuarios</a>
         </li>
+        {% endif %}
+        {% if session['roleName'] == 'admin' %}
         <li class="nav-item">
           <a class="nav-link" href="/product">Productos</a>
         </li>
+        {% endif %}
+        {% if session['roleName'] == 'manager' %}
+        <li class="nav-item">
+          <a class="nav-link" href="/my_products">Mis Productos</a>
+        </li>
+        {% endif %}
         </ul>
         <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-                <a class="nav-link" href="#">Patricio Arango</a>
+                <a class="nav-link" href="#">{{session['name']}} {{session['lastname']}} Rol: {{session['roleName']}}</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/logout">Logout</a>

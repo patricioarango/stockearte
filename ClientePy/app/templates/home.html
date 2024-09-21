@@ -18,6 +18,7 @@
 </div>
 <div class="container">
     <div class="row">
+        {% if session['roleName'] == 'admin' %}
         <div class="col">
             <div class="card" style="width: 18rem;">
                 <img src="https://picsum.photos/id/1/300/150" class="card-img-top" alt="...">
@@ -28,6 +29,8 @@
                 </div>
               </div>
         </div>
+        {% endif %}
+        {% if session['roleName'] == 'admin' %}
         <div class="col">
             <div class="card" style="width: 18rem;">
                 <img src="https://picsum.photos/id/20/300/150" class="card-img-top" alt="...">
@@ -38,16 +41,20 @@
                 </div>
               </div>
         </div>
+        {% endif %}
+        {% if session['roleName'] == 'manager' %}
         <div class="col">
             <div class="card" style="width: 18rem;">
                 <img src="https://picsum.photos/id/25/300/150" class="card-img-top" alt="...">
                 <div class="card-body">
-                  <h5 class="card-title">Mis Tiendas -para rol manager</h5>
+                  <h5 class="card-title">Mis Productos</h5>
                   <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                  <a href="/store_list" class="btn btn-success">VER</a>
+                  <a href="/my_products" class="btn btn-success">VER</a>
                 </div>
               </div>
         </div>
+        {% endif %}
+        {% if session['roleName'] == 'admin' %}
         <div class="col">
             <div class="card" style="width: 18rem;">
                 <img src="https://picsum.photos/id/60/300/150" class="card-img-top" alt="...">
@@ -58,6 +65,7 @@
                 </div>
               </div>
         </div>
+        {% endif %}
     </div>
 </div>
 
