@@ -51,6 +51,7 @@ public class User{
 
 	public User(String username, String name, String lastname, String password, Boolean enabled) {
 		this.username = username;
+		this.name = name;
 		this.lastname = lastname;
 		this.password = password;
 		this.enabled = enabled;

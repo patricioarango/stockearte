@@ -1,0 +1,57 @@
+@charset "ISO-8859-1";
+
+header.masthead {
+	padding-top: 10rem;
+	padding-bottom: calc(10rem - 4.5rem);
+	background: url("../static/bg-masthead.jpg");
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: cover;
+	background-position: center center;
+}
+
+@media ( min-width : 1200px) {
+	header.masthead {
+		height: 100vh;
+		min-height: 40rem;
+		padding-top: 4.5rem;
+		padding-bottom: 0;
+	}
+}
+
+body {
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+	background-attachment: fixed;
+}
+
+.login-form {
+	background: #FFFFFF;
+	margin-top: 40px;
+	margin-bottom: 20px;
+	padding: 70px;
+	color: #CACFD2;
+}
+
+.login-heading {
+	text-align: center;
+	margin-top: 20px;
+}
+
+.btn-login {
+	color: rgb(255, 255, 255);
+}
+
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
