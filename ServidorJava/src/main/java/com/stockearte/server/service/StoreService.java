@@ -77,7 +77,7 @@ public class StoreService extends StoreServiceGrpc.StoreServiceImplBase {
         storereq.setStoreCode(request.getCode());
         storereq.setAddress(request.getAddress());
         storereq.setCity(request.getCity());
-        storereq.getState(request.getState());
+        storereq.setState(request.getState());
         storereq.setEnabled(request.getEnabled());
         Store store = storeRepository.save(storereq);
 

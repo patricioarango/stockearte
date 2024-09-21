@@ -11,7 +11,7 @@ import "google/protobuf/wrappers.proto";
 service ProductService {
   rpc GetProduct(Product) returns (Product) {}
   rpc FindAll(google.protobuf.Empty) returns (Products) {}
-  rpc SaveStore(Product) returns (Product) {}
+  rpc SaveProduct(Product) returns (Product) {}
 }
 
 message Products {

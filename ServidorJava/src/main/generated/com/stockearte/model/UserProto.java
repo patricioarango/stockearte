@@ -861,7 +861,25 @@ public final class UserProto {
         getPasswordBytes();
 
     /**
-     * <code>bool enabled = 6;</code>
+     * <code>string role = 6;</code>
+     * @return The role.
+     */
+    java.lang.String getRole();
+    /**
+     * <code>string role = 6;</code>
+     * @return The bytes for role.
+     */
+    com.google.protobuf.ByteString
+        getRoleBytes();
+
+    /**
+     * <code>int32 idStore = 7;</code>
+     * @return The idStore.
+     */
+    int getIdStore();
+
+    /**
+     * <code>bool enabled = 8;</code>
      * @return The enabled.
      */
     boolean getEnabled();
@@ -883,6 +901,7 @@ public final class UserProto {
       name_ = "";
       lastname_ = "";
       password_ = "";
+      role_ = "";
     }
 
     @java.lang.Override
@@ -944,7 +963,18 @@ public final class UserProto {
               password_ = s;
               break;
             }
-            case 48: {
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              role_ = s;
+              break;
+            }
+            case 56: {
+
+              idStore_ = input.readInt32();
+              break;
+            }
+            case 64: {
 
               enabled_ = input.readBool();
               break;
@@ -1135,10 +1165,56 @@ public final class UserProto {
       }
     }
 
-    public static final int ENABLED_FIELD_NUMBER = 6;
+    public static final int ROLE_FIELD_NUMBER = 6;
+    private volatile java.lang.Object role_;
+    /**
+     * <code>string role = 6;</code>
+     * @return The role.
+     */
+    public java.lang.String getRole() {
+      java.lang.Object ref = role_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        role_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string role = 6;</code>
+     * @return The bytes for role.
+     */
+    public com.google.protobuf.ByteString
+        getRoleBytes() {
+      java.lang.Object ref = role_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        role_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int IDSTORE_FIELD_NUMBER = 7;
+    private int idStore_;
+    /**
+     * <code>int32 idStore = 7;</code>
+     * @return The idStore.
+     */
+    public int getIdStore() {
+      return idStore_;
+    }
+
+    public static final int ENABLED_FIELD_NUMBER = 8;
     private boolean enabled_;
     /**
-     * <code>bool enabled = 6;</code>
+     * <code>bool enabled = 8;</code>
      * @return The enabled.
      */
     public boolean getEnabled() {
@@ -1174,8 +1250,14 @@ public final class UserProto {
       if (!getPasswordBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, password_);
       }
+      if (!getRoleBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, role_);
+      }
+      if (idStore_ != 0) {
+        output.writeInt32(7, idStore_);
+      }
       if (enabled_ != false) {
-        output.writeBool(6, enabled_);
+        output.writeBool(8, enabled_);
       }
       unknownFields.writeTo(output);
     }
@@ -1202,9 +1284,16 @@ public final class UserProto {
       if (!getPasswordBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, password_);
       }
+      if (!getRoleBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, role_);
+      }
+      if (idStore_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(7, idStore_);
+      }
       if (enabled_ != false) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(6, enabled_);
+          .computeBoolSize(8, enabled_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1231,6 +1320,10 @@ public final class UserProto {
           .equals(other.getLastname())) return false;
       if (!getPassword()
           .equals(other.getPassword())) return false;
+      if (!getRole()
+          .equals(other.getRole())) return false;
+      if (getIdStore()
+          != other.getIdStore()) return false;
       if (getEnabled()
           != other.getEnabled()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
@@ -1254,6 +1347,10 @@ public final class UserProto {
       hash = (53 * hash) + getLastname().hashCode();
       hash = (37 * hash) + PASSWORD_FIELD_NUMBER;
       hash = (53 * hash) + getPassword().hashCode();
+      hash = (37 * hash) + ROLE_FIELD_NUMBER;
+      hash = (53 * hash) + getRole().hashCode();
+      hash = (37 * hash) + IDSTORE_FIELD_NUMBER;
+      hash = (53 * hash) + getIdStore();
       hash = (37 * hash) + ENABLED_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getEnabled());
@@ -1400,6 +1497,10 @@ public final class UserProto {
 
         password_ = "";
 
+        role_ = "";
+
+        idStore_ = 0;
+
         enabled_ = false;
 
         return this;
@@ -1433,6 +1534,8 @@ public final class UserProto {
         result.name_ = name_;
         result.lastname_ = lastname_;
         result.password_ = password_;
+        result.role_ = role_;
+        result.idStore_ = idStore_;
         result.enabled_ = enabled_;
         onBuilt();
         return result;
@@ -1500,6 +1603,13 @@ public final class UserProto {
         if (!other.getPassword().isEmpty()) {
           password_ = other.password_;
           onChanged();
+        }
+        if (!other.getRole().isEmpty()) {
+          role_ = other.role_;
+          onChanged();
+        }
+        if (other.getIdStore() != 0) {
+          setIdStore(other.getIdStore());
         }
         if (other.getEnabled() != false) {
           setEnabled(other.getEnabled());
@@ -1867,16 +1977,122 @@ public final class UserProto {
         return this;
       }
 
+      private java.lang.Object role_ = "";
+      /**
+       * <code>string role = 6;</code>
+       * @return The role.
+       */
+      public java.lang.String getRole() {
+        java.lang.Object ref = role_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          role_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string role = 6;</code>
+       * @return The bytes for role.
+       */
+      public com.google.protobuf.ByteString
+          getRoleBytes() {
+        java.lang.Object ref = role_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          role_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string role = 6;</code>
+       * @param value The role to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRole(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        role_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string role = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRole() {
+        
+        role_ = getDefaultInstance().getRole();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string role = 6;</code>
+       * @param value The bytes for role to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRoleBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        role_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int idStore_ ;
+      /**
+       * <code>int32 idStore = 7;</code>
+       * @return The idStore.
+       */
+      public int getIdStore() {
+        return idStore_;
+      }
+      /**
+       * <code>int32 idStore = 7;</code>
+       * @param value The idStore to set.
+       * @return This builder for chaining.
+       */
+      public Builder setIdStore(int value) {
+        
+        idStore_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 idStore = 7;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearIdStore() {
+        
+        idStore_ = 0;
+        onChanged();
+        return this;
+      }
+
       private boolean enabled_ ;
       /**
-       * <code>bool enabled = 6;</code>
+       * <code>bool enabled = 8;</code>
        * @return The enabled.
        */
       public boolean getEnabled() {
         return enabled_;
       }
       /**
-       * <code>bool enabled = 6;</code>
+       * <code>bool enabled = 8;</code>
        * @param value The enabled to set.
        * @return This builder for chaining.
        */
@@ -1887,7 +2103,7 @@ public final class UserProto {
         return this;
       }
       /**
-       * <code>bool enabled = 6;</code>
+       * <code>bool enabled = 8;</code>
        * @return This builder for chaining.
        */
       public Builder clearEnabled() {
@@ -1970,16 +2186,17 @@ public final class UserProto {
     java.lang.String[] descriptorData = {
       "\n\nuser.proto\022\005model\032\033google/protobuf/emp" +
       "ty.proto\032\036google/protobuf/wrappers.proto" +
-      "\"\"\n\005Users\022\031\n\004user\030\001 \003(\0132\013.model.User\"k\n\004" +
-      "User\022\016\n\006idUser\030\001 \001(\005\022\020\n\010username\030\002 \001(\t\022\014" +
-      "\n\004name\030\003 \001(\t\022\020\n\010lastname\030\004 \001(\t\022\020\n\010passwo" +
-      "rd\030\005 \001(\t\022\017\n\007enabled\030\006 \001(\0102\273\001\n\014UsersServi" +
-      "ce\022*\n\014ValidateUser\022\013.model.User\032\013.model." +
-      "User\"\000\022%\n\007GetUser\022\013.model.User\032\013.model.U" +
-      "ser\"\000\0221\n\007FindAll\022\026.google.protobuf.Empty" +
-      "\032\014.model.Users\"\000\022%\n\007AddUser\022\013.model.User" +
-      "\032\013.model.User\"\000B!\n\024com.stockearte.modelB" +
-      "\tUserProtob\006proto3"
+      "\"\"\n\005Users\022\031\n\004user\030\001 \003(\0132\013.model.User\"\212\001\n" +
+      "\004User\022\016\n\006idUser\030\001 \001(\005\022\020\n\010username\030\002 \001(\t\022" +
+      "\014\n\004name\030\003 \001(\t\022\020\n\010lastname\030\004 \001(\t\022\020\n\010passw" +
+      "ord\030\005 \001(\t\022\014\n\004role\030\006 \001(\t\022\017\n\007idStore\030\007 \001(\005" +
+      "\022\017\n\007enabled\030\010 \001(\0102\273\001\n\014UsersService\022*\n\014Va" +
+      "lidateUser\022\013.model.User\032\013.model.User\"\000\022%" +
+      "\n\007GetUser\022\013.model.User\032\013.model.User\"\000\0221\n" +
+      "\007FindAll\022\026.google.protobuf.Empty\032\014.model" +
+      ".Users\"\000\022%\n\007AddUser\022\013.model.User\032\013.model" +
+      ".User\"\000B!\n\024com.stockearte.modelB\tUserPro" +
+      "tob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -1998,7 +2215,7 @@ public final class UserProto {
     internal_static_model_User_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_model_User_descriptor,
-        new java.lang.String[] { "IdUser", "Username", "Name", "Lastname", "Password", "Enabled", });
+        new java.lang.String[] { "IdUser", "Username", "Name", "Lastname", "Password", "Role", "IdStore", "Enabled", });
     com.google.protobuf.EmptyProto.getDescriptor();
     com.google.protobuf.WrappersProto.getDescriptor();
   }

@@ -22,7 +22,7 @@ message Store {
   int32 idStore = 1;
   string store = 2;
   string code = 3;
-  string adress = 4;
+  string address = 4;
   string city = 5;
   string state = 6;
   bool enabled = 7;

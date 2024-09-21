@@ -10,6 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import net.devh.boot.grpc.server.service.GrpcService;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 @GrpcService
 public class ProductService extends ProductServiceGrpc.ProductServiceImplBase {
 
@@ -33,7 +37,7 @@ public class ProductService extends ProductServiceGrpc.ProductServiceImplBase {
             productsdb.add(productProto);
         }
         ProductProto.Products a = ProductProto.Products.newBuilder()
-                .addAllStore(productsdb)
+                .addAllProduct(productsdb)
                 .build();
         responseObserver.onNext(a);
         responseObserver.onCompleted();
