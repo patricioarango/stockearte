@@ -29,6 +29,9 @@ public class Product {
     @Column(name = "size", nullable = false, length = 255)
     private String size;
 
+    @Column(name = "img", nullable = false, length = 255)
+    private String img;
+
     @Column(name = "stock", nullable = true, length = 11)
     private int stock;
 

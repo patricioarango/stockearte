@@ -24,6 +24,7 @@ message Product {
   string code = 3;
   string color = 4;
   string size = 5;
-  int32 stock = 6;
-  bool enabled = 7;
+  string img = 6;
+  int32 stock = 7;
+  bool enabled = 8;
 }

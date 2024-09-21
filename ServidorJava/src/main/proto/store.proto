@@ -20,7 +20,7 @@ message Stores {
 
 message Store {
   int32 idStore = 1;
-  string store = 2;
+  string storeName = 2;
   string code = 3;
   string address = 4;
   string city = 5;

@@ -31,6 +31,7 @@ public class ProductService extends ProductServiceGrpc.ProductServiceImplBase {
                     .setCode(product.getProductCode())
                     .setColor(product.getColor())
                     .setSize(product.getSize())
+                    .setImg(product.getImg())
                     .setStock(product.getStock())
                     .setEnabled(product.getEnabled())
                     .build();
@@ -58,6 +59,7 @@ public class ProductService extends ProductServiceGrpc.ProductServiceImplBase {
                     .setCode(product.getProductCode())
                     .setColor(product.getColor())
                     .setSize(product.getSize())
+                    .setImg(product.getImg())
                     .setStock(product.getStock())
                     .setEnabled(product.getEnabled())
                     .build();
@@ -78,6 +80,7 @@ public class ProductService extends ProductServiceGrpc.ProductServiceImplBase {
         productreq.setProductCode(request.getCode());
         productreq.setColor(request.getColor());
         productreq.setSize(request.getSize());
+        productreq.setImg(request.getImg());
         productreq.setStock(request.getStock());
         productreq.setEnabled(request.getEnabled());
         Product product = productRepository.save(productreq);

@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package model;
+
+option java_package = "com.stockearte.model";
+option java_outer_classname = "RoleProto";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+
+message Roles {
+  repeated Role role = 1;
+}
+
+message Role {
+  int32 idRole = 1;
+  string roleName = 2;
+} 
+
+service RoleService {
+  rpc FindAll(google.protobuf.Empty) returns (Roles) {}
+}

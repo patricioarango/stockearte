@@ -5,10 +5,14 @@ import java.util.Objects;
 import javax.persistence.*;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "user")
+@Getter
+@Setter
 @Data @NoArgsConstructor
 public class User{
 	
