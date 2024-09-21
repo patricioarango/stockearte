@@ -26,7 +26,7 @@ public class StoreService extends StoreServiceGrpc.StoreServiceImplBase {
         for(Store store : storeRepository.findAll()) {
             StoreProto.Store storeProto = StoreProto.Store.newBuilder()
                     .setIdStore(store.getIdStore())
-                    .setStore(store.getStoreName())
+                    .setStoreName(store.getStoreName())
                     .setCode(store.getStoreCode())
                     .setAddress(store.getAddress())
                     .setCity(store.getCity())
@@ -53,7 +53,7 @@ public class StoreService extends StoreServiceGrpc.StoreServiceImplBase {
         } else {
             StoreProto.Store a = StoreProto.Store.newBuilder()
                     .setIdStore(store.getIdStore())
-                    .setStore(store.getStoreName())
+                    .setStoreName(store.getStoreName())
                     .setCode(store.getStoreCode())
                     .setAddress(store.getAddress())
                     .setCity(store.getCity())
@@ -73,7 +73,7 @@ public class StoreService extends StoreServiceGrpc.StoreServiceImplBase {
         {
             storereq.setIdStore(request.getIdStore());
         }
-        storereq.setStoreName(request.getStore());
+        storereq.setStoreName(request.getStoreName());
         storereq.setStoreCode(request.getCode());
         storereq.setAddress(request.getAddress());
         storereq.setCity(request.getCity());
@@ -83,7 +83,7 @@ public class StoreService extends StoreServiceGrpc.StoreServiceImplBase {
 
         StoreProto.Store a = StoreProto.Store.newBuilder()
                 .setIdStore(store.getIdStore())
-                .setStore(store.getStoreName())
+                .setStoreName(store.getStoreName())
                 .setCode(store.getStoreCode())
                 .setAddress(store.getAddress())
                 .setCity(store.getCity())

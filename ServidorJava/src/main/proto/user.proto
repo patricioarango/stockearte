@@ -7,6 +7,8 @@ option java_outer_classname = "UserProto";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
+import "store.proto";
+import "role.proto";
 
 service UsersService {
   rpc ValidateUser(User) returns (User) {}
@@ -25,7 +27,7 @@ message User {
   string name = 3;
   string lastname = 4;
   string password = 5;
-  string role = 6;
-  int32 idStore = 7;
+  Role role = 6;
+  Store store = 7;
   bool enabled = 8;
 }

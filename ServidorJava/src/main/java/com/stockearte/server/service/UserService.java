@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import com.stockearte.server.entities.User;
 import com.stockearte.server.repository.UserRepository;
 import com.stockearte.model.UserProto;
+import com.stockearte.model.StoreProto;
+import com.stockearte.model.RoleProto;
 import com.stockearte.model.UsersServiceGrpc;
 import com.google.protobuf.Empty;
 
@@ -42,8 +44,10 @@ public class UserService extends UsersServiceGrpc.UsersServiceImplBase {
         .setName(user.getName())
         .setLastname(user.getLastname())
         .setPassword(user.getPassword())
-        .setRole(user.getRole().getRoleName())
-        .setIdStore(user.getStore().getIdStore())
+        .setRole(RoleProto.Role.newBuilder().setIdRole(user.getRole().getIdRole())
+                                    .setRoleName(user.getRole().getRoleName()).build())
+        .setStore(StoreProto.Store.newBuilder().setIdStore(user.getStore().getIdStore())
+                                    .setStoreName(user.getStore().getStoreName()).build())
         .setEnabled(user.getEnabled())
         .build();
         responseObserver.onNext(a);
@@ -57,8 +61,17 @@ public class UserService extends UsersServiceGrpc.UsersServiceImplBase {
         User user =usuarioRepository.findByIdUser(request.getIdUser());
 
         UserProto.User a = UserProto.User.newBuilder()
-                    .setIdUser(user.getIdUser())
-                    .build();
+        .setIdUser(user.getIdUser())
+        .setUsername(user.getUsername())
+        .setName(user.getName())
+        .setLastname(user.getLastname())
+        .setPassword(user.getPassword())
+        .setRole(RoleProto.Role.newBuilder().setIdRole(user.getRole().getIdRole())
+                    .setRoleName(user.getRole().getRoleName()).build())
+        .setStore(StoreProto.Store.newBuilder().setIdStore(user.getStore().getIdStore())
+                    .setStoreName(user.getStore().getStoreName()).build())
+        .setEnabled(user.getEnabled())
+        .build();
 
         responseObserver.onNext(a);
         responseObserver.onCompleted();
@@ -71,12 +84,17 @@ public class UserService extends UsersServiceGrpc.UsersServiceImplBase {
 
         for (User user : usuarioRepository.findAll()) {
             UserProto.User userProto = UserProto.User.newBuilder()
-                    .setIdUser(user.getIdUser())
-                    .setUsername(user.getUsername())
-                    .setName(user.getName())
-                    .setLastname(user.getLastname())
-                    .setEnabled(user.getEnabled())
-                    .build();
+                        .setIdUser(user.getIdUser())
+                        .setUsername(user.getUsername())
+                        .setName(user.getName())
+                        .setLastname(user.getLastname())
+                        .setPassword(user.getPassword())
+                        .setRole(RoleProto.Role.newBuilder().setIdRole(user.getRole().getIdRole())
+                                    .setRoleName(user.getRole().getRoleName()).build())
+                        .setStore(StoreProto.Store.newBuilder().setIdStore(user.getStore().getIdStore())
+                                    .setStoreName(user.getStore().getStoreName()).build())
+                        .setEnabled(user.getEnabled())
+                        .build();
             userdb.add(userProto);
         }
 
@@ -108,6 +126,8 @@ public class UserService extends UsersServiceGrpc.UsersServiceImplBase {
         .setName(request.getName())
         .setLastname(request.getLastname())
         .setPassword(request.getPassword())
+        .setRole(RoleProto.Role.newBuilder().setIdRole(request.getRole().getIdRole()))
+        .setStore(StoreProto.Store.newBuilder().setIdStore(request.getStore().getIdStore()))
         .setEnabled(request.getEnabled())
         .build();
         responseObserver.onNext(a);

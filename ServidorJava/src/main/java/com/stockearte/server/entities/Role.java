@@ -2,13 +2,19 @@ package com.stockearte.server.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+import lombok.Setter;
+
 @Entity
 @Table(name = "role")
 @Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Role {
