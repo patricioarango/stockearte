@@ -1,14 +1,27 @@
 from app import create_app
-from flask import Flask, render_template, request, redirect, url_for
+#from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+
+from flask import Flask, render_template, request, flash, redirect,session, json
 
 import random
 import string
+import os,grpc
+
+from user_pb2 import User
+
+from user_pb2_grpc import UsersServiceStub
+
+import logging
+
+from google.protobuf.json_format import MessageToJson
+
+logger = logging.getLogger(__name__)
 
 app = create_app('flask.cfg')
 
 #creo conexion momentanea con base de datos local
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:110902@localhost:3306/stockearte'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -27,18 +40,29 @@ class Store(db.Model):
         return f'<Store id={self.id_store} store={self.store} enabled={self.enabled}>'
 
 # Modelo para la tabla 'user'
-class User(db.Model):
-    __tablename__ = 'user'
-    id_user = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(255), nullable=True)
-    name = db.Column(db.String(255), nullable=True)
-    lastname = db.Column(db.String(255), nullable=True)
-    password = db.Column(db.String(255), nullable=True)
-    enabled = db.Column(db.Boolean, default=True)
-    id_rol = db.Column(db.Integer, nullable=True)
-    id_store = db.Column(db.Integer, nullable=True)
+
+#class User(db.Model):
+  #  __tablename__ = 'user'
+    # id_user = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    # username = db.Column(db.String(255), nullable=True)
+    # name = db.Column(db.String(255), nullable=True)
+    # lastname = db.Column(db.String(255), nullable=True)
+    # password = db.Column(db.String(255), nullable=True)
+    # enabled = db.Column(db.Boolean, default=True)
+    # id_rol = db.Column(db.Integer, nullable=True)
+    # id_store = db.Column(db.Integer, nullable=True)
     
-    
+# class User(db.Model):
+#     __tablename__ = 'user'
+#     idUser = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     username = db.Column(db.String(255), nullable=True)
+#     name = db.Column(db.String(255), nullable=True)
+#     lastname = db.Column(db.String(255), nullable=True)
+#     password = db.Column(db.String(255), nullable=True)
+#     enabled = db.Column(db.Boolean, default=True)
+#         # id_rol = db.Column(db.Integer, nullable=True)
+#         # id_store = db.Column(db.Integer, nullable=True)
+
 # Modelo para la tabla 'rol'
 class Rol(db.Model):
     __tablename__ = 'rol'
@@ -49,9 +73,41 @@ class Rol(db.Model):
     def __repr__(self):
         return f'<Rol id={self.id_rol} rol={self.rol} enabled={self.enabled}>'
 
+
+
+@app.route("/login", methods=['POST'])
+def login():
+    logger.info("/login  %s",request.form['username'])
+    
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        stub = UsersServiceStub(channel)
+        response = stub.ValidateUser(User(username=request.form['username'],password=request.form['password']))
+        user=MessageToJson(response)
+    
+    logger.info("user : %s",response.username)
+   
+    if user=="{}":
+        flash('Datos incorrectos','danger')
+        return redirect('/')
+    else:
+        session['user_id']=response.idUser
+        session['username']=response.username
+        session['name']=response.name
+        session['lastname']=response.lastname
+        return render_template('index.html', username=response.username)
+
+@app.route("/logout",methods = ['GET'])
+def logout():
+    logger.info("/logout")
+    session.pop('user_id', None)
+    session.pop('username', None)
+    session.pop('name', None)
+    session.pop('lastname', None)
+    return redirect('/')
+
 @app.route("/", methods=["GET"])
 def index():
-    return render_template('index.html')
+    return render_template('login.html')
 
 @app.route("/home", methods=["GET"])
 def  home():
@@ -95,10 +151,16 @@ def edit_store(id_store):
 # Ruta para listar usuarios
 @app.route('/users')
 def list_users():
-    users = User.query.all()
-    stores = Store.query.all()
-    print(stores)
-    return render_template('list_users.html', users=users,stores=stores)
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        stub = UsersServiceStub(channel)
+        response = stub.FindAll(User()) 
+    #users = User.query.all()
+    #stores = Store.query.all()
+    #print(stores)
+    print("Greeter client received: " + str(response))    
+    return render_template('list_users.html', users=response.user)
+
+
 
 # Ruta para agregar un nuevo usuario
 @app.route('/users/add', methods=['GET', 'POST'])
@@ -120,7 +182,7 @@ def add_user():
     return render_template('add_user.html',roles=roles,stores=stores)
 
 # Ruta para editar un usuario
-@app.route('/users/edit/<int:id_user>', methods=['GET', 'POST'])
+@app.route('/users/edit/<int:idUser>', methods=['GET', 'POST'])
 def edit_user(id_user):
     user = User.query.get_or_404(id_user)
     if request.method == 'POST':
@@ -270,10 +332,6 @@ def edit_product(id):
     tienda_id = stock_entry.id_store if stock_entry else None
 
     return render_template('edit_product.html', producto=producto, tiendas=tiendas, stock=stock, tienda_id=tienda_id)
-
-
-
-
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
