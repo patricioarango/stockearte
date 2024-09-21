@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.stockearte.server.entities.User;
 import com.stockearte.server.repository.UserRepository;
+import com.stockearte.server.repository.RoleRepository;
+import com.stockearte.server.repository.StoreRepository;
 import com.stockearte.model.UserProto;
 import com.stockearte.model.StoreProto;
 import com.stockearte.model.RoleProto;
@@ -26,12 +28,20 @@ public class UserService extends UsersServiceGrpc.UsersServiceImplBase {
 	@Autowired
 	@Qualifier("userRepository")
 	private UserRepository usuarioRepository;
+
+    @Autowired
+	@Qualifier("roleRepository")
+	private RoleRepository roleRepository;
+
+    @Autowired
+	@Qualifier("storeRepository")
+	private StoreRepository storeRepository;
     
     @Override
     public void validateUser(UserProto.User request, StreamObserver<UserProto.User> responseObserver) {
 
     User user= usuarioRepository.validateUser(request.getUsername(),request.getPassword());
-
+        
     if (user==null) {
         UserProto.User a = UserProto.User.newBuilder()
         .build();
@@ -111,7 +121,18 @@ public class UserService extends UsersServiceGrpc.UsersServiceImplBase {
         User userDb = new User();
 
         try {
-        userDb = usuarioRepository.save(new User(request.getUsername(),request.getName(),request.getLastname(),request.getPassword(),request.getEnabled()));
+            if(request.getIdUser() > 0)
+            {
+                userDb.setIdUser(request.getIdUser());
+            }    
+            userDb.setUsername(request.getUsername());
+            userDb.setName(request.getName());
+            userDb.setLastname(request.getLastname());  
+            userDb.setPassword(request.getPassword());
+            userDb.setRole(roleRepository.findByIdRole(request.getRole().getIdRole()));
+            userDb.setStore(storeRepository.findByIdStore(request.getStore().getIdStore()));
+            userDb.setEnabled(request.getEnabled());
+            userDb = usuarioRepository.save(userDb);
 		} catch (Exception e) {
 			try {
                 throw new Exception("Error: el usuario ya existe");
@@ -120,6 +141,8 @@ public class UserService extends UsersServiceGrpc.UsersServiceImplBase {
                 e1.printStackTrace();
             }
 		}
+
+
         UserProto.User a = UserProto.User.newBuilder()
         .setIdUser(userDb.getIdUser())
         .setUsername(request.getUsername())

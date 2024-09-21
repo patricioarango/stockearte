@@ -4,7 +4,7 @@ import grpc
 import warnings
 
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
-import user_pb2 as user__pb2
+import store_pb2 as store__pb2
 
 GRPC_GENERATED_VERSION = '1.66.1'
 GRPC_VERSION = grpc.__version__
@@ -19,14 +19,14 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in user_pb2_grpc.py depends on'
+        + f' but the generated code in store_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class UsersServiceStub(object):
+class StoreServiceStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -35,38 +35,27 @@ class UsersServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.ValidateUser = channel.unary_unary(
-                '/model.UsersService/ValidateUser',
-                request_serializer=user__pb2.User.SerializeToString,
-                response_deserializer=user__pb2.User.FromString,
-                _registered_method=True)
-        self.GetUser = channel.unary_unary(
-                '/model.UsersService/GetUser',
-                request_serializer=user__pb2.User.SerializeToString,
-                response_deserializer=user__pb2.User.FromString,
+        self.GetStore = channel.unary_unary(
+                '/model.StoreService/GetStore',
+                request_serializer=store__pb2.Store.SerializeToString,
+                response_deserializer=store__pb2.Store.FromString,
                 _registered_method=True)
         self.FindAll = channel.unary_unary(
-                '/model.UsersService/FindAll',
+                '/model.StoreService/FindAll',
                 request_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-                response_deserializer=user__pb2.Users.FromString,
+                response_deserializer=store__pb2.Stores.FromString,
                 _registered_method=True)
-        self.AddUser = channel.unary_unary(
-                '/model.UsersService/AddUser',
-                request_serializer=user__pb2.User.SerializeToString,
-                response_deserializer=user__pb2.User.FromString,
+        self.SaveStore = channel.unary_unary(
+                '/model.StoreService/SaveStore',
+                request_serializer=store__pb2.Store.SerializeToString,
+                response_deserializer=store__pb2.Store.FromString,
                 _registered_method=True)
 
 
-class UsersServiceServicer(object):
+class StoreServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def ValidateUser(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def GetUser(self, request, context):
+    def GetStore(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -78,48 +67,43 @@ class UsersServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def AddUser(self, request, context):
+    def SaveStore(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_UsersServiceServicer_to_server(servicer, server):
+def add_StoreServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'ValidateUser': grpc.unary_unary_rpc_method_handler(
-                    servicer.ValidateUser,
-                    request_deserializer=user__pb2.User.FromString,
-                    response_serializer=user__pb2.User.SerializeToString,
-            ),
-            'GetUser': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetUser,
-                    request_deserializer=user__pb2.User.FromString,
-                    response_serializer=user__pb2.User.SerializeToString,
+            'GetStore': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetStore,
+                    request_deserializer=store__pb2.Store.FromString,
+                    response_serializer=store__pb2.Store.SerializeToString,
             ),
             'FindAll': grpc.unary_unary_rpc_method_handler(
                     servicer.FindAll,
                     request_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
-                    response_serializer=user__pb2.Users.SerializeToString,
+                    response_serializer=store__pb2.Stores.SerializeToString,
             ),
-            'AddUser': grpc.unary_unary_rpc_method_handler(
-                    servicer.AddUser,
-                    request_deserializer=user__pb2.User.FromString,
-                    response_serializer=user__pb2.User.SerializeToString,
+            'SaveStore': grpc.unary_unary_rpc_method_handler(
+                    servicer.SaveStore,
+                    request_deserializer=store__pb2.Store.FromString,
+                    response_serializer=store__pb2.Store.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'model.UsersService', rpc_method_handlers)
+            'model.StoreService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('model.UsersService', rpc_method_handlers)
+    server.add_registered_method_handlers('model.StoreService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class UsersService(object):
+class StoreService(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def ValidateUser(request,
+    def GetStore(request,
             target,
             options=(),
             channel_credentials=None,
@@ -132,36 +116,9 @@ class UsersService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/model.UsersService/ValidateUser',
-            user__pb2.User.SerializeToString,
-            user__pb2.User.FromString,
-            options,
-            channel_credentials,
-            insecure,
-            call_credentials,
-            compression,
-            wait_for_ready,
-            timeout,
-            metadata,
-            _registered_method=True)
-
-    @staticmethod
-    def GetUser(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(
-            request,
-            target,
-            '/model.UsersService/GetUser',
-            user__pb2.User.SerializeToString,
-            user__pb2.User.FromString,
+            '/model.StoreService/GetStore',
+            store__pb2.Store.SerializeToString,
+            store__pb2.Store.FromString,
             options,
             channel_credentials,
             insecure,
@@ -186,9 +143,9 @@ class UsersService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/model.UsersService/FindAll',
+            '/model.StoreService/FindAll',
             google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
-            user__pb2.Users.FromString,
+            store__pb2.Stores.FromString,
             options,
             channel_credentials,
             insecure,
@@ -200,7 +157,7 @@ class UsersService(object):
             _registered_method=True)
 
     @staticmethod
-    def AddUser(request,
+    def SaveStore(request,
             target,
             options=(),
             channel_credentials=None,
@@ -213,9 +170,9 @@ class UsersService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/model.UsersService/AddUser',
-            user__pb2.User.SerializeToString,
-            user__pb2.User.FromString,
+            '/model.StoreService/SaveStore',
+            store__pb2.Store.SerializeToString,
+            store__pb2.Store.FromString,
             options,
             channel_credentials,
             insecure,
