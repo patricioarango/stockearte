@@ -29,7 +29,8 @@ logger = logging.getLogger(__name__)
 app = create_app('flask.cfg')
 
 #creo conexion momentanea con base de datos local
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://avnadmin:AVNS_ylqtAU8JPG7TNXz0mDD@mysql-1d36c064-pato-ef11.a.aivencloud.com:25628/stockeartedb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -81,8 +82,15 @@ class Rol(db.Model):
     def __repr__(self):
         return f'<Rol id={self.id_rol} rol={self.rol} enabled={self.enabled}>'
 
-
-
+def checkSessionAdmin():
+    if 'user_id' not in session or session['roleName']!='admin':
+        return redirect('/login')
+    
+@app.route("/nuevohome", methods=['GET'])
+def nuevohome():
+    checkSessionAdmin();
+    return render_template('home.html')
+    
 @app.route("/login", methods=['POST'])
 def login():
     logger.info("/login  %s",request.form['username'])
@@ -100,9 +108,10 @@ def login():
     else:
         session['user_id']=response.idUser
         session['username']=response.username
+        session['roleName']=response.role.roleName
         session['name']=response.name
         session['lastname']=response.lastname
-        return render_template('index.html', username=response.username)
+        return redirect('/nuevohome')
 
 @app.route("/logout",methods = ['GET'])
 def logout():
