@@ -24,9 +24,11 @@ _sym_db = _symbol_database.Default()
 
 from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 from google.protobuf import wrappers_pb2 as google_dot_protobuf_dot_wrappers__pb2
+import store_pb2 as store__pb2
+import role_pb2 as role__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nuser.proto\x12\x05model\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/wrappers.proto\"\"\n\x05Users\x12\x19\n\x04user\x18\x01 \x03(\x0b\x32\x0b.model.User\"\x8a\x01\n\x04User\x12\x0e\n\x06idUser\x18\x01 \x01(\x05\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x10\n\x08lastname\x18\x04 \x01(\t\x12\x10\n\x08password\x18\x05 \x01(\t\x12\x0c\n\x04role\x18\x06 \x01(\t\x12\x0f\n\x07idStore\x18\x07 \x01(\x05\x12\x0f\n\x07\x65nabled\x18\x08 \x01(\x08\x32\xbb\x01\n\x0cUsersService\x12*\n\x0cValidateUser\x12\x0b.model.User\x1a\x0b.model.User\"\x00\x12%\n\x07GetUser\x12\x0b.model.User\x1a\x0b.model.User\"\x00\x12\x31\n\x07\x46indAll\x12\x16.google.protobuf.Empty\x1a\x0c.model.Users\"\x00\x12%\n\x07\x41\x64\x64User\x12\x0b.model.User\x1a\x0b.model.User\"\x00\x42!\n\x14\x63om.stockearte.modelB\tUserProtob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\nuser.proto\x12\x05model\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1egoogle/protobuf/wrappers.proto\x1a\x0bstore.proto\x1a\nrole.proto\"\"\n\x05Users\x12\x19\n\x04user\x18\x01 \x03(\x0b\x32\x0b.model.User\"\xa3\x01\n\x04User\x12\x0e\n\x06idUser\x18\x01 \x01(\x05\x12\x10\n\x08username\x18\x02 \x01(\t\x12\x0c\n\x04name\x18\x03 \x01(\t\x12\x10\n\x08lastname\x18\x04 \x01(\t\x12\x10\n\x08password\x18\x05 \x01(\t\x12\x19\n\x04role\x18\x06 \x01(\x0b\x32\x0b.model.Role\x12\x1b\n\x05store\x18\x07 \x01(\x0b\x32\x0c.model.Store\x12\x0f\n\x07\x65nabled\x18\x08 \x01(\x08\x32\xbb\x01\n\x0cUsersService\x12*\n\x0cValidateUser\x12\x0b.model.User\x1a\x0b.model.User\"\x00\x12%\n\x07GetUser\x12\x0b.model.User\x1a\x0b.model.User\"\x00\x12\x31\n\x07\x46indAll\x12\x16.google.protobuf.Empty\x1a\x0c.model.Users\"\x00\x12%\n\x07\x41\x64\x64User\x12\x0b.model.User\x1a\x0b.model.User\"\x00\x42!\n\x14\x63om.stockearte.modelB\tUserProtob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -34,10 +36,10 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'user_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'\n\024com.stockearte.modelB\tUserProto'
-  _globals['_USERS']._serialized_start=82
-  _globals['_USERS']._serialized_end=116
-  _globals['_USER']._serialized_start=119
-  _globals['_USER']._serialized_end=257
-  _globals['_USERSSERVICE']._serialized_start=260
-  _globals['_USERSSERVICE']._serialized_end=447
+  _globals['_USERS']._serialized_start=107
+  _globals['_USERS']._serialized_end=141
+  _globals['_USER']._serialized_start=144
+  _globals['_USER']._serialized_end=307
+  _globals['_USERSSERVICE']._serialized_start=310
+  _globals['_USERSSERVICE']._serialized_end=497
 # @@protoc_insertion_point(module_scope)

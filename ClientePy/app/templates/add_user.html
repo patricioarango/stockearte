@@ -68,13 +68,13 @@
                 <input type="password" id="password" name="password" class="form-control" required>
                 <div class="invalid-feedback">Por favor, ingrese una contraseña.</div>
             </div>
-            <input type="hidden" id="id_rol" name="id_rol">
+            <input type="hidden" id="idRole" name="idRole">
             <div class="mb-3">
-                <label for="id_store" class="form-label">Tienda</label>
-                <select id="id_store" name="id_store" class="form-select" required onchange="setRole()">
+                <label for="idStore" class="form-label">Tienda</label>
+                <select id="idStore" name="idStore" class="form-select" required onchange="setRole()">
                     <option value="">Seleccione una Tienda</option>
                     {% for store in stores %}
-                        <option value="{{ store.id_store }}" data-store-name="{{ store.store }}">{{ store.store }}</option>
+                        <option value="{{ store.idStore }}" data-store-name="{{ store.storeName }}">{{ store.storeName }}</option>
                     {% endfor %}
                 </select>
                 <div class="invalid-feedback">Por favor, seleccione una tienda.</div>
@@ -94,7 +94,7 @@
     <script>
          function setRole() {
     // Obtén el valor de la tienda seleccionada y su nombre
-    var storeSelect = document.getElementById('id_store');
+    var storeSelect = document.getElementById('idStore');
     var selectedStoreValue = storeSelect.value;
     var selectedStoreName = storeSelect.options[storeSelect.selectedIndex].getAttribute('data-store-name');
 
@@ -105,7 +105,7 @@
     var casaCentralRegex = /casa[\s_-]*central/;
 
     // Establece el valor del rol según la tienda seleccionada
-    var roleInput = document.getElementById('id_rol');
+    var roleInput = document.getElementById('idRole');
     var roleDisplay = document.getElementById('rol_display');
 
     // Debugging: Verificar el valor de la tienda seleccionada

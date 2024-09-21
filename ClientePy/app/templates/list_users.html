@@ -60,11 +60,7 @@
           {% for user in users %}
           <tr>
             <td>{{ user.username }}</td>
-            {% for store in stores %}
-            {% if store.id_store == user.id_store %}
-                <td>{{ store.store}}</td>
-            {% endif %}
-            {% endfor %}
+            <td>{{user.store.storeName}}</td>
             <td>
                 {% if user.enabled %}
                   Habilitado

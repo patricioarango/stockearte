@@ -2,7 +2,7 @@ from app import create_app
 #from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
-from flask import Flask, render_template, request, flash, redirect,session, json
+from flask import Flask, render_template, request, flash, redirect, session, json, url_for, redirect
 
 import random
 import string
@@ -11,6 +11,14 @@ import os,grpc
 from user_pb2 import User
 
 from user_pb2_grpc import UsersServiceStub
+
+from store_pb2 import Store
+
+from store_pb2_grpc import StoreServiceStub
+
+from role_pb2 import Role
+
+from role_pb2_grpc import RoleServiceStub
 
 import logging
 
@@ -26,18 +34,18 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-class Store(db.Model):
-    __tablename__ = 'store'
-    id_store = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    store = db.Column(db.String(255), nullable=True)
-    code = db.Column(db.String(255), nullable=True)
-    address = db.Column(db.String(255), nullable=True)
-    city = db.Column(db.String(255), nullable=True)
-    state = db.Column(db.String(255), nullable=True)
-    enabled = db.Column(db.Boolean, default=True)
+# class Store(db.Model):
+#     __tablename__ = 'store'
+#     id_store = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     store = db.Column(db.String(255), nullable=True)
+#     code = db.Column(db.String(255), nullable=True)
+#     address = db.Column(db.String(255), nullable=True)
+#     city = db.Column(db.String(255), nullable=True)
+#     state = db.Column(db.String(255), nullable=True)
+#     enabled = db.Column(db.Boolean, default=True)
     
-    def __repr__(self):
-        return f'<Store id={self.id_store} store={self.store} enabled={self.enabled}>'
+#     def __repr__(self):
+#         return f'<Store id={self.id_store} store={self.store} enabled={self.enabled}>'
 
 # Modelo para la tabla 'user'
 
@@ -115,8 +123,11 @@ def  home():
 
 @app.route('/store_list')
 def store_list():
-    stores = Store.query.all()
-    return render_template('store_list.html', stores=stores)
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        stub = StoreServiceStub(channel)
+        response = stub.FindAll(Store()) 
+        print(response)
+    return render_template('store_list.html', stores=response.store)
 
 # Ruta para agregar una nueva tienda
 @app.route('/add', methods=['GET', 'POST'])
@@ -134,8 +145,8 @@ def add_store():
     return render_template('add_store.html')
 
 # Ruta para editar una tienda
-@app.route('/edit/<int:id_store>', methods=['GET', 'POST'])
-def edit_store(id_store):
+@app.route('/edit/<int:idStore>', methods=['GET', 'POST'])
+def edit_store(idStore):
     store = Store.query.get_or_404(id_store)
     if request.method == 'POST':
         store.store = request.form['store']
@@ -157,47 +168,96 @@ def list_users():
     #users = User.query.all()
     #stores = Store.query.all()
     #print(stores)
-    print("Greeter client received: " + str(response))    
+   # print("Greeter client received: " + str(response))    
     return render_template('list_users.html', users=response.user)
-
-
 
 # Ruta para agregar un nuevo usuario
 @app.route('/users/add', methods=['GET', 'POST'])
 def add_user():
-    if request.method == 'POST':
-        username = request.form['username']
-        name = request.form['name']
-        lastname = request.form['lastname']
-        password = request.form['password']
-        id_rol = request.form['id_rol']
-        id_store = request.form['id_store']
-        new_user = User(username=username,name=name, lastname=lastname, password=password, id_rol=id_rol, id_store=id_store)
-        db.session.add(new_user)
-        db.session.commit()
-        return redirect(url_for('list_users'))
-    
-    roles = Rol.query.all()
-    stores = Store.query.all()
-    return render_template('add_user.html',roles=roles,stores=stores)
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        print(os.getenv("SERVIDOR-GRPC"))
+
+        # Crear el stub para UsersService
+        user_stub = UsersServiceStub(channel)
+
+        # Crear el stub para StoreService
+        store_stub = StoreServiceStub(channel)
+        # Obtener todas las tiendas
+        stores_response = store_stub.FindAll(Store())
+        stores = stores_response.store  # Asumiendo que 'store' es una lista en la respuesta
+        
+        # Crear el stub para RoleService
+        role_stub = RoleServiceStub(channel)
+        # Obtener todos los roles
+        roles_response = role_stub.FindAll(Role())
+        roles = roles_response.role  # Asumiendo que 'role' es una lista en la respuesta
+
+        if request.method == 'POST':
+            role_id = int(request.form['idRole'])
+            store_id = int(request.form['idStore'])
+            # Crear la solicitud para el nuevo usuario
+            new_user = User(
+                username=request.form['username'],
+                name=request.form['name'],
+                lastname=request.form['lastname'],
+                password=request.form['password'],
+                enabled='enabled' in request.form,
+                role=Role(idRole=role_id),  # Usar la clase Role correctamente
+                store=Store(idStore=store_id)  # Cambia esto según tu implementación de Store
+            )
+
+            # Llamar al método gRPC para agregar el nuevo usuario
+            try:
+                response = user_stub.AddUser(new_user)
+                print("Usuario agregado: ", response)
+                return redirect(url_for('list_users'))
+            except grpc.RpcError as e:
+                print("Error al agregar el usuario: ", e)
+
+        return render_template('add_user.html', stores=stores, roles=roles)
+
 
 # Ruta para editar un usuario
 @app.route('/users/edit/<int:idUser>', methods=['GET', 'POST'])
-def edit_user(id_user):
-    user = User.query.get_or_404(id_user)
-    if request.method == 'POST':
-        user.username = request.form['username']
-        user.name = request.form['name']
-        user.lastname = request.form['lastname']
-        user.password = request.form['password']
-        user.id_rol = request.form['id_rol']
-        user.id_store = request.form['id_store']
-        user.enabled = 'enabled' in request.form
-        db.session.commit()
-        return redirect(url_for('list_users'))
-    roles = Rol.query.all()
-    stores = Store.query.all()
-    return render_template('edit_user.html', user=user,roles=roles,stores=stores)
+def edit_user(idUser):
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        print(os.getenv("SERVIDOR_GRPC"))
+
+        # Crear el stub para UsersService
+        user_stub = UsersServiceStub(channel)
+        # Obtener el usuario
+        response = user_stub.GetUser(User(idUser=idUser))
+
+        # Crear el stub para StoreService
+        store_stub = StoreServiceStub(channel)
+        # Obtener todas las tiendas
+        stores_response = store_stub.FindAll(Store())
+        stores = stores_response.store # Asumiendo que 'store' es una lista en la respuesta
+        
+        # Crear el stub para StoreService
+        role_stub = RoleServiceStub(channel)
+        # Obtener todas las tiendas
+        roles_response = role_stub.FindAll(Role())
+        roles = roles_response.role # Asumiendo que 'store' es una lista en la respuesta
+
+        print("respues de roles: ",roles)
+
+        if request.method == 'POST':
+            # Crear la solicitud para el usuario actualizado
+            updated_user = User(
+                idUser=idUser,
+                username=request.form['username'],
+                name=request.form['name'],
+                lastname=request.form['lastname'],
+                password=request.form['password'],
+                enabled='enabled' in request.form
+            )
+            user_stub.AddUser(updated_user)
+            return redirect(url_for('list_users'))
+
+        print("respuesta ", response)
+        return render_template('edit_user.html', user=response, stores=stores, roles=roles)
+
 
 # Modelos de Producto
 class Product(db.Model):
