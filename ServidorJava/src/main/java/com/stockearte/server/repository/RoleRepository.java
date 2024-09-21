@@ -11,4 +11,5 @@ import com.stockearte.server.entities.Role;
 @Repository("roleRepository")
 public interface  RoleRepository extends JpaRepository<Role,Serializable>{
     public abstract List<Role> findAll();
+    public abstract Role findByIdRole(int id);
 }

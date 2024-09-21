@@ -129,35 +129,66 @@ def store_list():
         print(response)
     return render_template('store_list.html', stores=response.store)
 
-# Ruta para agregar una nueva tienda
-@app.route('/add', methods=['GET', 'POST'])
+@app.route('/stores/add', methods=['GET', 'POST'])
 def add_store():
-    if request.method == 'POST':
-        store_name = request.form['store']
-        code = request.form['code']
-        address = request.form['address']
-        city = request.form['city']
-        state = request.form['state']
-        new_store = Store(store=store_name, code=code, address=address, city=city, state=state)
-        db.session.add(new_store)
-        db.session.commit()
-        return redirect(url_for('store_list'))
-    return render_template('add_store.html')
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        print(os.getenv("SERVIDOR-GRPC"))
+        store_stub = StoreServiceStub(channel)
 
-# Ruta para editar una tienda
-@app.route('/edit/<int:idStore>', methods=['GET', 'POST'])
+        if request.method == 'POST':
+            store_name = request.form['storeName']
+            code = request.form['code']
+            address = request.form['address']
+            city = request.form['city']
+            state = request.form['state']
+
+            new_store = Store(
+                storeName=store_name,
+                code=code,
+                address=address,
+                city=city,
+                state=state,
+                enabled=True
+            )
+            # Llamar al método gRPC para agregar la nueva tienda
+            try:
+                response = store_stub.SaveStore(new_store)
+                print("Tienda agregada: ", response)
+                return redirect(url_for('store_list'))
+            except grpc.RpcError as e:
+                print("Error al agregar la tienda: ", e)
+
+        return render_template('add_store.html')
+    
+@app.route('/edit/store/<int:idStore>', methods=['GET', 'POST'])
 def edit_store(idStore):
-    store = Store.query.get_or_404(id_store)
-    if request.method == 'POST':
-        store.store = request.form['store']
-        store.code = request.form['code']
-        store.address = request.form['address']
-        store.city = request.form['city']
-        store.state = request.form['state']
-        store.enabled = 'enabled' in request.form
-        db.session.commit()
-        return redirect(url_for('store_list'))
-    return render_template('edit_store.html', store=store)
+    # Conectar con el servidor gRPC
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        store_stub = StoreServiceStub(channel)
+        
+        # Obtener detalles de la tienda a editar
+        response = store_stub.GetStore(Store(idStore=idStore))
+
+        if request.method == 'POST':
+            # Recolectar los datos del formulario
+            updated_store = Store(
+                idStore=idStore,
+                storeName=request.form['storeName'],
+                code=request.form['code'],
+                address=request.form['address'],
+                city=request.form['city'],
+                state=request.form['state'],
+                enabled='enabled' in request.form  # Checkbox para 'enabled'
+            )
+            # Enviar los datos actualizados mediante gRPC
+            store_stub.SaveStore(updated_store)
+
+            # Redirigir a la lista de tiendas después de la actualización
+            return redirect(url_for('store_list'))
+
+        # Renderizar el formulario de edición con los datos actuales de la tienda
+        return render_template('edit_store.html', store=response)
+
 
 # Ruta para listar usuarios
 @app.route('/users')
@@ -165,10 +196,6 @@ def list_users():
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         stub = UsersServiceStub(channel)
         response = stub.FindAll(User()) 
-    #users = User.query.all()
-    #stores = Store.query.all()
-    #print(stores)
-   # print("Greeter client received: " + str(response))    
     return render_template('list_users.html', users=response.user)
 
 # Ruta para agregar un nuevo usuario
@@ -176,37 +203,29 @@ def list_users():
 def add_user():
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         print(os.getenv("SERVIDOR-GRPC"))
-
-        # Crear el stub para UsersService
         user_stub = UsersServiceStub(channel)
 
-        # Crear el stub para StoreService
         store_stub = StoreServiceStub(channel)
-        # Obtener todas las tiendas
         stores_response = store_stub.FindAll(Store())
-        stores = stores_response.store  # Asumiendo que 'store' es una lista en la respuesta
+        stores = stores_response.store 
         
-        # Crear el stub para RoleService
         role_stub = RoleServiceStub(channel)
-        # Obtener todos los roles
         roles_response = role_stub.FindAll(Role())
-        roles = roles_response.role  # Asumiendo que 'role' es una lista en la respuesta
+        roles = roles_response.role  
 
         if request.method == 'POST':
             role_id = int(request.form['idRole'])
             store_id = int(request.form['idStore'])
-            # Crear la solicitud para el nuevo usuario
             new_user = User(
                 username=request.form['username'],
                 name=request.form['name'],
                 lastname=request.form['lastname'],
                 password=request.form['password'],
-                enabled='enabled' in request.form,
-                role=Role(idRole=role_id),  # Usar la clase Role correctamente
-                store=Store(idStore=store_id)  # Cambia esto según tu implementación de Store
+                enabled=True,
+                role=Role(idRole=role_id), 
+                store=Store(idStore=store_id) 
             )
 
-            # Llamar al método gRPC para agregar el nuevo usuario
             try:
                 response = user_stub.AddUser(new_user)
                 print("Usuario agregado: ", response)
@@ -223,34 +242,32 @@ def edit_user(idUser):
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         print(os.getenv("SERVIDOR_GRPC"))
 
-        # Crear el stub para UsersService
         user_stub = UsersServiceStub(channel)
-        # Obtener el usuario
         response = user_stub.GetUser(User(idUser=idUser))
 
-        # Crear el stub para StoreService
         store_stub = StoreServiceStub(channel)
-        # Obtener todas las tiendas
         stores_response = store_stub.FindAll(Store())
-        stores = stores_response.store # Asumiendo que 'store' es una lista en la respuesta
+        stores = stores_response.store 
         
-        # Crear el stub para StoreService
         role_stub = RoleServiceStub(channel)
-        # Obtener todas las tiendas
         roles_response = role_stub.FindAll(Role())
-        roles = roles_response.role # Asumiendo que 'store' es una lista en la respuesta
+        roles = roles_response.role 
 
         print("respues de roles: ",roles)
 
         if request.method == 'POST':
-            # Crear la solicitud para el usuario actualizado
+            role_id = int(request.form['idRole'])
+            store_id = int(request.form['idStore'])
+
             updated_user = User(
                 idUser=idUser,
                 username=request.form['username'],
                 name=request.form['name'],
                 lastname=request.form['lastname'],
                 password=request.form['password'],
-                enabled='enabled' in request.form
+                enabled='enabled' in request.form,
+                role=Role(idRole=role_id), 
+                store=Store(idStore=store_id) 
             )
             user_stub.AddUser(updated_user)
             return redirect(url_for('list_users'))
