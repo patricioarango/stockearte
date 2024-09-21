@@ -1,0 +1,73 @@
+{% include "doctype.html" %}
+<body class="h-100">
+    {% include "nav.html" %}
+    <div class="container h-100">
+        <div class="row h-100">
+            <div class="col-12">
+                
+            </div>
+        </div>
+    </div>
+    
+<div class="container">
+    <div class="col-12">
+        <h1 class="text-center"><a class="navbar-brand d-flex gap-lg-1 mx-lg-3" href="/home">
+            <img src="{{ url_for('static', filename='stockearte.png') }}" alt="Stockearte" style="vertical-align: Stickman; margin: 0px 35px" />
+          </a></h1>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        {% if session['roleName'] == 'admin' %}
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img src="https://picsum.photos/id/1/300/150" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Usuarios</h5>
+                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <a href="/users" class="btn btn-primary">VER</a>
+                </div>
+              </div>
+        </div>
+        {% endif %}
+        {% if session['roleName'] == 'admin' %}
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img src="https://picsum.photos/id/20/300/150" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Tiendas</h5>
+                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <a href="/store_list" class="btn btn-success">VER</a>
+                </div>
+              </div>
+        </div>
+        {% endif %}
+        {% if session['roleName'] == 'manager' %}
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img src="https://picsum.photos/id/25/300/150" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Mis Productos</h5>
+                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <a href="/my_products" class="btn btn-success">VER</a>
+                </div>
+              </div>
+        </div>
+        {% endif %}
+        {% if session['roleName'] == 'admin' %}
+        <div class="col">
+            <div class="card" style="width: 18rem;">
+                <img src="https://picsum.photos/id/60/300/150" class="card-img-top" alt="...">
+                <div class="card-body">
+                  <h5 class="card-title">Productos</h5>
+                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                  <a href="/product" class="btn btn-warning">VER</a>
+                </div>
+              </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>
