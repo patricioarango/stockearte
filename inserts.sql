@@ -11,13 +11,15 @@ VALUES
     
 INSERT INTO stockearte.`store` (`store`,`address`,`city`, `state`,`code`, `enabled`)
 VALUES
-	('Adidas Sur','Donovan y General Chamiso 1234', 'Gerli',  'Buenos Aires', '123ABC' , 1),
+	('Casa Central','Yrigoyen 1234', 'San Telmo',  'CABA', '222AAA' , 1),
+    ('Adidas Sur','Donovan y General Chamiso 1234', 'Gerli',  'Buenos Aires', '123ABC' , 1),
 	('Adidas Patagonia','Av. Siempre Viva 5678', 'Arlen',  'Tierra del fuego', '654ZXY' , 1);    
     
 INSERT INTO stockearte.`user` (`username`,`name`, `lastname`,`password`, `enabled`,`id_role`, `id_store`)
 VALUES
-	('admin','Carlos', 'Archundia',  'admin', 1 , 1, 2),
-	('user', 'Cornelio', 'Del Rancho', 'user', 1, 2, 1);
+	('admin','Carlos', 'Archundia',  'admin', 1 , 1, 1),
+	('user', 'Cornelio', 'Del Rancho', 'user', 1, 2, 2),
+    ('manager', 'Armando', 'Barrera', 'manager', 1, 2, 2);
         
    
 INSERT INTO product (product, code, color, size, img, enabled) VALUES
