@@ -157,5 +157,30 @@ public class UserService extends UsersServiceGrpc.UsersServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void findByUsernameOrStoreName(UserProto.FindSearch request,StreamObserver<UserProto.Users> responseObserver) {
+        List<UserProto.User> usersdb = new ArrayList<>();
+        for(User user : usuarioRepository.findByUsernameOrStoreName(request.getSearch())) {
+            UserProto.User userProto = UserProto.User.newBuilder()
+                        .setIdUser(user.getIdUser())
+                        .setUsername(user.getUsername())
+                        .setName(user.getName())
+                        .setLastname(user.getLastname())
+                        .setPassword(user.getPassword())
+                        .setRole(RoleProto.Role.newBuilder().setIdRole(user.getRole().getIdRole())
+                                    .setRoleName(user.getRole().getRoleName()).build())
+                        .setStore(StoreProto.Store.newBuilder().setIdStore(user.getStore().getIdStore())
+                                    .setStoreName(user.getStore().getStoreName()).build())
+                        .setEnabled(user.getEnabled())
+                        .build();
+            usersdb.add(userProto);
+        }
+        UserProto.Users a = UserProto.Users.newBuilder()
+                .addAllUser(usersdb)
+                .build();
+        responseObserver.onNext(a);
+        responseObserver.onCompleted();
+    }    
+
 }
 

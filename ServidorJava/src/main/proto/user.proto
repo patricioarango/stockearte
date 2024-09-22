@@ -14,7 +14,12 @@ service UsersService {
   rpc ValidateUser(User) returns (User) {}
   rpc GetUser(User) returns (User) {}
   rpc FindAll(google.protobuf.Empty) returns (Users) {}
-  rpc AddUser(User) returns (User) {}  
+  rpc AddUser(User) returns (User) {}
+  rpc findByUsernameOrStoreName(FindSearch) returns (Users) {}  
+}
+
+message FindSearch {
+  string search = 1;
 }
 
 message Users {
