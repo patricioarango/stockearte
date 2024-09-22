@@ -32,7 +32,6 @@ public class ProductService extends ProductServiceGrpc.ProductServiceImplBase {
                     .setColor(product.getColor())
                     .setSize(product.getSize())
                     .setImg(product.getImg())
-                    .setStock(product.getStock())
                     .setEnabled(product.getEnabled())
                     .build();
             productsdb.add(productProto);
@@ -60,7 +59,6 @@ public class ProductService extends ProductServiceGrpc.ProductServiceImplBase {
                     .setColor(product.getColor())
                     .setSize(product.getSize())
                     .setImg(product.getImg())
-                    .setStock(product.getStock())
                     .setEnabled(product.getEnabled())
                     .build();
             responseObserver.onNext(a);
@@ -81,7 +79,6 @@ public class ProductService extends ProductServiceGrpc.ProductServiceImplBase {
         productreq.setColor(request.getColor());
         productreq.setSize(request.getSize());
         productreq.setImg(request.getImg());
-        productreq.setStock(request.getStock());
         productreq.setEnabled(request.getEnabled());
         Product product = productRepository.save(productreq);
 
@@ -91,10 +88,33 @@ public class ProductService extends ProductServiceGrpc.ProductServiceImplBase {
                 .setCode(product.getProductCode())
                 .setColor(product.getColor())
                 .setSize(product.getSize())
-                .setStock(product.getStock())
+                .setImg(product.getImg())
                 .setEnabled(product.getEnabled())
                 .build();
         responseObserver.onNext(a);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void findProductsByStore(ProductProto.StoreRequest request,StreamObserver<ProductProto.Products> responseObserver) {
+        List<ProductProto.Product> productsdb = new ArrayList<>();
+        for(Product product : productRepository.findProductsByStore(request.getIdStore())) {
+            ProductProto.Product productProto = ProductProto.Product.newBuilder()
+                    .setIdProduct(product.getIdProduct())
+                    .setProduct(product.getProductName())
+                    .setCode(product.getProductCode())
+                    .setColor(product.getColor())
+                    .setSize(product.getSize())
+                    .setImg(product.getImg())
+                    .setEnabled(product.getEnabled())
+                    .build();
+            productsdb.add(productProto);
+        }
+        ProductProto.Products a = ProductProto.Products.newBuilder()
+                .addAllProduct(productsdb)
+                .build();
+        responseObserver.onNext(a);
+        responseObserver.onCompleted();
+    }
+
 }

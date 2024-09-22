@@ -47,7 +47,7 @@ def product():
 def addproduct():
     with grpc.insecure_channel('localhost:9090') as channel:
         stub = product_pb2_grpc.ProductServiceStub(channel)
-        request = product_pb2.Product(product="producto2",code="code2",color="azul",size="M",img="url_imagen",stock=0,enabled=True)
+        request = product_pb2.Product(product="producto2",code="code2",color="azul",size="M",img="url_imagen",enabled=True)
         response = stub.SaveProduct(request)
         print(response) 
 

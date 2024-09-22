@@ -32,11 +32,8 @@ public class Product {
     @Column(name = "img", nullable = false, length = 255)
     private String img;
 
-    @Column(name = "stock", nullable = true, length = 11)
-    private int stock;
-
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Store> storeProducts = new HashSet<Store>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProductStock> productStock = new HashSet<>();
 
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;

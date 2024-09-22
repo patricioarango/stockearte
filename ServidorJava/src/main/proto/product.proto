@@ -12,6 +12,11 @@ service ProductService {
   rpc GetProduct(Product) returns (Product) {}
   rpc FindAll(google.protobuf.Empty) returns (Products) {}
   rpc SaveProduct(Product) returns (Product) {}
+  rpc FindProductsByStore(StoreRequest) returns (Products) {}
+}
+
+message StoreRequest {
+  int32 idStore = 1;
 }
 
 message Products {
@@ -25,6 +30,5 @@ message Product {
   string color = 4;
   string size = 5;
   string img = 6;
-  int32 stock = 7;
-  bool enabled = 8;
+  bool enabled = 7;
 }
