@@ -31,11 +31,8 @@ public class Store {
     @Column(name = "state", nullable = false, length = 255)
     private String state;
 
-    @ManyToMany
-    @JoinTable(name = "product_store",
-            joinColumns = @JoinColumn(name = "id_store"),
-            inverseJoinColumns = @JoinColumn(name = "id_product"))
-    private Set<Product> products;
+    @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProductStock> productStock;
 
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
