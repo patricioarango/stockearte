@@ -117,4 +117,26 @@ public class ProductService extends ProductServiceGrpc.ProductServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    @Override
+    public void findProductByCode(ProductProto.ProductCodeRequest request,StreamObserver<ProductProto.Product> responseObserver){
+        Product product = productRepository.findByProductCode(request.getCode());
+        if (product==null) {
+            ProductProto.Product a = ProductProto.Product.newBuilder()
+                    .build();
+            responseObserver.onNext(a);
+            responseObserver.onCompleted();
+        } else {
+            ProductProto.Product a = ProductProto.Product.newBuilder()
+                    .setIdProduct(product.getIdProduct())
+                    .setProduct(product.getProductName())
+                    .setCode(product.getProductCode())
+                    .setColor(product.getColor())
+                    .setSize(product.getSize())
+                    .setImg(product.getImg())
+                    .setEnabled(product.getEnabled())
+                    .build();
+            responseObserver.onNext(a);
+            responseObserver.onCompleted();
+        }
+    }
 }

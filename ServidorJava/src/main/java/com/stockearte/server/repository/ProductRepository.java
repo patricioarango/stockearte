@@ -14,8 +14,10 @@ import com.stockearte.server.entities.Product;
 public interface ProductRepository extends JpaRepository<Product, Serializable> {
     public abstract Product findByIdProduct(int id);
     public abstract List<Product> findAll();
-
+    
     @Query("SELECT ps.product FROM ProductStock ps WHERE ps.store.idStore = :idStore")
     public abstract List<Product> findProductsByStore(@Param("idStore") int idStore);   
+
+    public abstract Product findByProductCode(String productCode);
 }
 
