@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <a class="navbar-brand d-flex gap-lg-1 mx-lg-3" href="/nuevohome">
+      <img src="{{ url_for('static', filename='stockearte-light.png') }}" alt="Stockearte" style="vertical-align: Stickman; margin: 0px 35px" />
+    </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-toggle="collapse"
+      data-target="#collapsibleNavbar"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse d-flex align-items-center" id="collapsibleNavbar">
+      <ul class="navbar-nav">
+        {% if session['roleName'] == 'admin' %}
+          <li class="nav-item">
+              <a class="nav-link" href="/store_list">Tiendas</a>
+          </li>
+        {% endif %}
+        {% if session['roleName'] == 'admin' %}
+          <li class="nav-item">
+            <a class="nav-link" href="/users">Usuarios</a>
+        </li>
+        {% endif %}
+        {% if session['roleName'] == 'admin' %}
+        <li class="nav-item">
+          <a class="nav-link" href="/product">Productos</a>
+        </li>
+        {% endif %}
+        {% if session['roleName'] == 'manager' %}
+        <li class="nav-item">
+          <a class="nav-link" href="/my_products">Mis Productos</a>
+        </li>
+        {% endif %}
+        </ul>
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#">{{session['name']}} {{session['lastname']}} Rol: {{session['roleName']}}</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Logout</a>
+            </li>
+      </ul>
+  </div>
+  </nav>
