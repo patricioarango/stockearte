@@ -23,9 +23,9 @@ VALUES
         
    
 INSERT INTO product (product, code, color, size, img, enabled) VALUES
-('Camiseta Deportiva', 'PROD001', 'Rojo', 'M', 'camiseta_roja.jpg', true),
-('Pantalón Jeans', 'PROD002', 'Azul', '32', 'jeans_azules.jpg', true),
-('Zapatillas Running', 'PROD003', 'Negro', '42', 'zapatillas_negras.jpg', true);
+('Camiseta Deportiva', 'PROD001', 'Rojo', 'M', 'https://highrunner.com.ar/wp-content/uploads/2023/05/CD054.jpg', true),
+('Pantalón Jeans', 'PROD002', 'Azul', '32', 'https://www.grupooxicas.com/3082-thickbox_default/pantalon-jean-far-west-indigo-14-onzas-talles-del-38-al-60.jpg', true),
+('Zapatillas Running', 'PROD003', 'Negro', '42', 'https://media2.solodeportes.com.ar/media/catalog/product/cache/7c4f9b393f0b8cb75f2b74fe5e9e52aa/z/a/zapatillas-running-adidas-runfalcon-3-0-negra-90497022-100010hq3790001-1.jpg', true);
 
 INSERT INTO product_stock (stock, id_product, id_store) VALUES
 (50, 1, 1),

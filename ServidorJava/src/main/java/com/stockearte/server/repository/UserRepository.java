@@ -18,4 +18,8 @@ public interface UserRepository extends JpaRepository<User, Serializable> {
 	
 	public abstract User findByIdUser(int idUser);
 	public abstract List<User> findAll();
+
+	@Query("SELECT u FROM User u WHERE u.username LIKE %:search% OR u.store.storeName LIKE %:search%")
+	public abstract List<User> findByUsernameOrStoreName(@Param("search") String search);
+
 }
