@@ -66,15 +66,7 @@
                     <option value="XL">XL</option>
                 </select>
             </div>
-            <div class="mb-3">
-                <label for="tienda" class="form-label">Tienda</label>
-                <select class="form-control" id="tienda" name="tienda" required>
-                    <option value="">Selecciona una tienda</option>
-                    {% for tienda in tiendas %}
-                        <option value="{{ tienda.id_store }}">{{ tienda.store }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+
             <button type="submit" class="btn btn-primary">Agregar Producto</button>
         </form>
     </div>
