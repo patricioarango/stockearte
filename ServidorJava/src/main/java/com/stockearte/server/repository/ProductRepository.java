@@ -19,5 +19,8 @@ public interface ProductRepository extends JpaRepository<Product, Serializable> 
     public abstract List<Product> findProductsByStore(@Param("idStore") int idStore);   
 
     public abstract Product findByProductCode(String productCode);
+
+    @Query("SELECT p FROM Product p WHERE p.productName LIKE %:search% OR p.productCode LIKE %:search% OR p.color LIKE %:search% OR p.size LIKE %:search%")
+	public abstract List<Product> findByAttributes(@Param("search") String search);
 }
 

@@ -12,6 +12,14 @@ service StoreService {
   rpc GetStore(Store) returns (Store) {}
   rpc FindAll(google.protobuf.Empty) returns (Stores) {}
   rpc SaveStore(Store) returns (Store) {}
+  rpc FindByCodeAndEnabled(FindRequest) returns (Stores) {}
+  rpc FindStoreByCode(Store) returns (Store) {}
+}
+
+message FindRequest {
+  //Tipos de datos para que puedan ser opcionales
+  google.protobuf.StringValue code = 1; 
+  google.protobuf.BoolValue enabled = 2; 
 }
 
 message Stores {

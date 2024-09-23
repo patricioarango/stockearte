@@ -139,4 +139,27 @@ public class ProductService extends ProductServiceGrpc.ProductServiceImplBase {
             responseObserver.onCompleted();
         }
     }
+
+    @Override
+    public void findByAttributes(ProductProto.FindSearch request,StreamObserver<ProductProto.Products> responseObserver) {
+        List<ProductProto.Product> productsdb = new ArrayList<>();
+        for(Product product : productRepository.findByAttributes(request.getSearch())) {
+            ProductProto.Product productProto = ProductProto.Product.newBuilder()
+                    .setIdProduct(product.getIdProduct())
+                    .setProduct(product.getProductName())
+                    .setCode(product.getProductCode())
+                    .setColor(product.getColor())
+                    .setSize(product.getSize())
+                    .setImg(product.getImg())
+                    .setEnabled(product.getEnabled())
+                    .build();
+            productsdb.add(productProto);
+        }
+        ProductProto.Products a = ProductProto.Products.newBuilder()
+                .addAllProduct(productsdb)
+                .build();
+        responseObserver.onNext(a);
+        responseObserver.onCompleted();
+    }
+
 }

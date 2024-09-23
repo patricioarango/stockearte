@@ -14,6 +14,11 @@ service ProductService {
   rpc SaveProduct(Product) returns (Product) {}
   rpc FindProductsByStore(StoreRequest) returns (Products) {}
   rpc FindProductByCode(ProductCodeRequest) returns (Product) {}
+  rpc findByAttributes(FindSearch) returns (Products) {}  
+}
+
+message FindSearch {
+  string search = 1;
 }
 
 message ProductCodeRequest {

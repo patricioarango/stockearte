@@ -93,4 +93,64 @@ public class StoreService extends StoreServiceGrpc.StoreServiceImplBase {
         responseObserver.onNext(a);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void findByCodeAndEnabled(StoreProto.FindRequest request,StreamObserver<StoreProto.Stores> responseObserver) {
+        String code = request.hasCode() ? request.getCode().getValue() : null;
+        Boolean enabled = request.hasEnabled() ? request.getEnabled().getValue() : null;
+        
+        List<Store> stores;
+        if (code != null && enabled != null) {
+            stores = storeRepository.findByCodeAndEnabled(code, enabled);
+        } else if (code != null) {
+            stores = storeRepository.findByStoreCode(code);
+        } else if (enabled != null) {
+            stores = storeRepository.findByEnabled(enabled);
+        } else {
+            stores = storeRepository.findAll(); 
+        }
+        
+        List<StoreProto.Store> storesdb = new ArrayList<>();
+        for(Store store : stores) {
+            StoreProto.Store storeProto = StoreProto.Store.newBuilder()
+                    .setIdStore(store.getIdStore())
+                    .setStoreName(store.getStoreName())
+                    .setCode(store.getStoreCode())
+                    .setAddress(store.getAddress())
+                    .setCity(store.getCity())
+                    .setState(store.getState())
+                    .setEnabled(store.getEnabled())
+                    .build();
+            storesdb.add(storeProto);
+        }
+        StoreProto.Stores a = StoreProto.Stores.newBuilder()
+                .addAllStore(storesdb)
+                .build();
+        responseObserver.onNext(a);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void findStoreByCode(StoreProto.Store request,StreamObserver<StoreProto.Store> responseObserver){
+        Store store = storeRepository.findFirstByStoreCode(request.getCode());
+        if (store==null) {
+            StoreProto.Store a = StoreProto.Store.newBuilder()
+                    .build();
+            responseObserver.onNext(a);
+            responseObserver.onCompleted();
+        } else {
+            StoreProto.Store a = StoreProto.Store.newBuilder()
+                    .setIdStore(store.getIdStore())
+                    .setStoreName(store.getStoreName())
+                    .setCode(store.getStoreCode())
+                    .setAddress(store.getAddress())
+                    .setCity(store.getCity())
+                    .setState(store.getState())
+                    .setEnabled(store.getEnabled())
+                    .build();
+            responseObserver.onNext(a);
+            responseObserver.onCompleted();
+        }
+    }
+
 }
