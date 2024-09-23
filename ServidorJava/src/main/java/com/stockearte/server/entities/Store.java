@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Table(name = "store")
@@ -30,9 +31,9 @@ public class Store {
 
     @Column(name = "state", nullable = false, length = 255)
     private String state;
-
+    
     @OneToMany(mappedBy = "store", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ProductStock> productStock;
+    private Set<ProductStock> productStock = new HashSet<>();
 
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
