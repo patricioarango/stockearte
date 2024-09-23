@@ -69,9 +69,7 @@
                 {% endif %}
               </td>     
             <td>
-                <a href="{{ url_for('edit_user', idUser=user.idUser) }}">
-                    <img src="{{ url_for('static', filename='detalle.png') }}" alt="Editar" class="img-fluid" style="max-width: 30px;">
-                  </a>
+                <a href="{{ url_for('edit_user', idUser=user.idUser) }}" type="button" class="btn btn-danger">Editar</a>
             </td>
           </tr>
           {% endfor %}

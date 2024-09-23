@@ -38,7 +38,8 @@ public class ProductStockService extends ProductStockServiceGrpc.ProductStockSer
                     .setIdProductStock(productStock.getIdProductStock())
                     .setStock(productStock.getStock())
                     .setProduct(ProductProto.Product.newBuilder().setIdProduct(productStock.getProduct().getIdProduct())
-                                .setProduct(productStock.getProduct().getProductName()).build())
+                                .setProduct(productStock.getProduct().getProductName())
+                                .setCode(productStock.getProduct().getProductCode()).setColor(productStock.getProduct().getColor()).setSize(productStock.getProduct().getSize()).build())
                     .setStore(StoreProto.Store.newBuilder().setIdStore(productStock.getStore().getIdStore())
                                 .setStoreName(productStock.getStore().getStoreName()).build())
                     .build();
@@ -119,6 +120,7 @@ public class ProductStockService extends ProductStockServiceGrpc.ProductStockSer
                     .setProduct(ProductProto.Product.newBuilder()
                         .setIdProduct(productStock.getProduct().getIdProduct())
                         .setProduct(productStock.getProduct().getProductName())
+                        .setCode(productStock.getProduct().getProductCode()).setColor(productStock.getProduct().getColor()).     setSize(productStock.getProduct().getSize())
                         .build())
                     .setStore(StoreProto.Store.newBuilder()
                         .setIdStore(productStock.getStore().getIdStore())
