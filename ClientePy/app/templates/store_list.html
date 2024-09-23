@@ -65,12 +65,15 @@
                 {% else %}
                   Deshabilitada
                 {% endif %}
+                <td>
+                  <div class="d-flex align-items-center justify-content-between">
+                      <a href="{{ url_for('edit_store', idStore=store.idStore) }}">
+                          <img src="{{ url_for('static', filename='detalle.png') }}" alt="Editar" class="img-fluid" style="max-width: 30px;">
+                      </a>
+                      <a href="{{ url_for('add_product_to_store', idStore=store.idStore) }}" class="btn btn-success mx-2">Agregar Producto</a>
+                  </div>
               </td>
-            <td>
-                <a href="{{ url_for('edit_store', idStore=store.idStore) }}">
-                    <img src="{{ url_for('static', filename='detalle.png') }}" alt="Editar" class="img-fluid" style="max-width: 30px;">
-                  </a>
-            </td>
+
           </tr>
           {% endfor %}
         </tbody>

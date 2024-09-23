@@ -21,9 +21,9 @@ from role_pb2 import Role
 
 from role_pb2_grpc import RoleServiceStub
 
-from product_pb2 import Product  # Define tus mensajes gRPC para Product
+from product_pb2 import Product  
 
-from product_pb2_grpc import ProductServiceStub  # Define tu servicio gRPC para Product
+from product_pb2_grpc import ProductServiceStub  
 
 from productStock_pb2 import ProductStock
 
@@ -325,13 +325,9 @@ def product():
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         product_stub = ProductServiceStub(channel)
         response = product_stub.FindAll(Product())  # Llamada gRPC para obtener todos los productos
-        
-        #stock_stub = ProductStockServiceStub(channel)
-        #stock_response = stock_stub.GetStockByProductAndStore(Product(idProduct=idProduct),Store(idStore=idStore))
-        #stock = stock_response.stock
 
         print(response)
-        #print(stock)
+    
     return render_template('product.html', productos=response.product)
 
 
@@ -378,8 +374,7 @@ def add_product():
 def edit_product(id):
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         stub = ProductServiceStub(channel)
-        
-
+    
         producto = stub.GetProduct(Product(idProduct=id))  
         
         if request.method == 'POST':
@@ -388,16 +383,50 @@ def edit_product(id):
             producto.color = request.form['color']
             producto.size = request.form['size']
             producto.enabled = 'enabled' in request.form
-
-          
+            
             try:
                 stub.SaveProduct(producto)  
                 return redirect(url_for('product'))
             except grpc.RpcError as e:
                 return f"Error al actualizar el producto: {str(e)}", 500
 
-       
         return render_template('edit_product.html', producto=producto, )
+
+from google.protobuf.empty_pb2 import Empty
+
+@app.route('/add_product_to_store/<int:idStore>', methods=['GET', 'POST'])
+def add_product_to_store(idStore):
+    product_list = []
+
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        stub = ProductServiceStub(channel)
+        try:
+            response = stub.FindAll(Empty())
+            product_list = response.product
+        except grpc.RpcError as e:
+            print("Error al obtener productos: ", e)
+            return f"Error al obtener productos: {str(e)}", 500
+
+    if request.method == 'POST':
+        selected_product_ids = request.form.getlist('product_ids')
+
+        with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+            stub = ProductStockServiceStub(channel)
+            for selected_product_id in selected_product_ids:
+                product_stock_request = ProductStock(
+                    product=Product(idProduct=int(selected_product_id)),
+                    store=Store(idStore=idStore),
+                    stock=0
+                )
+                try:
+                    stub.SaveProductStock(product_stock_request)
+                except grpc.RpcError as e:
+                    print(f"Error al guardar el stock del producto {selected_product_id}: ", e)
+                    return f"Error al guardar el stock del producto: {str(e)}", 500
+
+        return redirect(url_for('store_list'))
+
+    return render_template('add_product_to_store.html', idStore=idStore, products=product_list)
 
 
 
