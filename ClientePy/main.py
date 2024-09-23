@@ -25,7 +25,7 @@ from product_pb2 import Product
 
 from product_pb2_grpc import ProductServiceStub  
 
-from productStock_pb2 import ProductStock
+from productStock_pb2 import ProductStock, ProductsStock, ProductAndStoreRequest
 
 from productStock_pb2_grpc import ProductStockServiceStub
 
@@ -103,25 +103,30 @@ def nuevohome():
     
 @app.route("/login", methods=['POST'])
 def login():
-    logger.info("/login  %s",request.form['username'])
+    logger.info("/login  %s", request.form['username'])
     
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         stub = UsersServiceStub(channel)
-        response = stub.ValidateUser(User(username=request.form['username'],password=request.form['password']))
-        user=MessageToJson(response)
+        response = stub.ValidateUser(User(username=request.form['username'], password=request.form['password']))
+        user = MessageToJson(response)
     
-    logger.info("user : %s",response.username)
+    logger.info("user : %s", response.username)
    
-    if user=="{}":
-        flash('Datos incorrectos','danger')
+    if user == "{}":
+        flash('Datos incorrectos', 'danger')
         return redirect('/')
     else:
-        session['user_id']=response.idUser
-        session['username']=response.username
-        session['roleName']=response.role.roleName
-        session['name']=response.name
-        session['lastname']=response.lastname
+        session['user_id'] = response.idUser
+        session['username'] = response.username
+        session['roleName'] = response.role.roleName
+        session['name'] = response.name
+        session['lastname'] = response.lastname
+        session['user_store_id'] = response.store.idStore  # Asegúrate de que esto existe en la respuesta
+
+        print("Contenido de la sesión:", session)
+
         return redirect('/nuevohome')
+
 
 @app.route("/logout",methods = ['GET'])
 def logout():
@@ -293,6 +298,10 @@ def edit_user(idUser):
 
         print("respuesta ", response)
         return render_template('edit_user.html', user=response, stores=stores, roles=roles)
+    
+    
+    
+
 
 
 # Modelos de Producto
@@ -429,6 +438,56 @@ def add_product_to_store(idStore):
     return render_template('add_product_to_store.html', idStore=idStore, products=product_list)
 
 
+@app.route('/my_products')
+def store_products():
+    user_store_id = session.get('user_store_id')
+    
+    print("ID de tienda del usuario:", user_store_id)  # Verificar el ID
+    productos_tienda = get_products_by_store(user_store_id)
+    
+    print("Productos en la tienda:", productos_tienda)
+
+    return render_template('my_products.html', productos=productos_tienda)
+
+def get_products_by_store(store_id):
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        product_stock_stub = ProductStockServiceStub(channel)
+        store_request = ProductAndStoreRequest(idStore=store_id)
+        try:
+            response = product_stock_stub.FindAllByStore(store_request)  
+            products = []
+            for product_stock in response.productStock:
+                product = product_stock.product
+                products.append({
+                    'idProduct': product.idProduct,
+                    'productName': product.product,
+                    'code': product.code,
+                    'size': product.size,
+                    'color': product.color
+                })
+            return products
+        except grpc.RpcError as e:
+            print(f"Error al obtener productos de la tienda: {str(e)}")
+            return []
+
+@app.route('/edit_stock/<int:id>', methods=['GET', 'POST'])
+def edit_stock(id):
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        stub = ProductStockServiceStub(channel)
+
+        stock_response = stub.GetProductStock(ProductAndStoreRequest(idProduct=id))
+        
+        if request.method == 'POST':
+            nuevo_stock = int(request.form['stock'])
+            stock_response.stock = nuevo_stock
+            
+            try:
+                stub.SaveProductStock(stock_response)
+                return redirect(url_for('store_products'))
+            except grpc.RpcError as e:
+                return f"Error al actualizar el stock: {str(e)}", 500
+        
+        return render_template('edit_stock.html', producto=stock_response)
 
 
 if __name__ == '__main__':

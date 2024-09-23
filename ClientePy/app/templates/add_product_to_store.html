@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,15 +9,10 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <a class="navbar-brand d-flex gap-lg-1 mx-lg-3" href="/nuevohome">
-          <img src="{{ url_for('static', filename='stockearte-light.png') }}" alt="Stockearte" style="vertical-align: Stickman; margin: 0px 35px" />
+            <img src="{{ url_for('static', filename='stockearte-light.png') }}" alt="Stockearte" style="vertical-align: Stickman; margin: 0px 35px" />
         </a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#collapsibleNavbar"
-        >
-          <span class="navbar-toggler-icon"></span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse d-flex align-items-center" id="collapsibleNavbar">
             <ul class="navbar-nav">
@@ -25,8 +20,8 @@
                     <a class="nav-link" href="/store_list">Tienda</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="/users">Usuario</a>
-              </li>
+                    <a class="nav-link" href="/users">Usuario</a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="/product">Productos</a>
                 </li>
@@ -35,18 +30,23 @@
     </nav>
     <div class="container mt-4">
         <h1 class="mt-3">Agregar Producto a la Tienda</h1>
-        <form method="POST">
-            <label for="products">Selecciona productos:</label>
-            <div>
-                {% for product in products %}
-                    <div>
-                        <input type="checkbox" id="product_{{ product.idProduct }}" name="product_ids" value="{{ product.idProduct }}">
-                        <label for="product_{{ product.idProduct }}">{{ product.product }}</label>
-                    </div>
-                {% endfor %}
-            </div>
-            <button type="submit">Agregar Productos</button>
-        </form>
+        
+        {% if products %}
+            <form method="POST">
+                <label for="products">Selecciona productos:</label>
+                <div>
+                    {% for product in products %}
+                        <div>
+                            <input type="checkbox" id="product_{{ product.idProduct }}" name="product_ids" value="{{ product.idProduct }}">
+                            <label for="product_{{ product.idProduct }}">{{ product.product }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Agregar Productos</button>
+            </form>
+        {% else %}
+            <p>No hay productos disponibles para agregar.</p>
+        {% endif %}
     </div>
 </body>
 </html>
