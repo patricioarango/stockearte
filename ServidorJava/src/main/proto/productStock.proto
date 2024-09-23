@@ -14,6 +14,7 @@ service ProductStockService {
   rpc GetProductStock(ProductStock) returns (ProductStock) {}
   rpc GetStockByProductAndStore(ProductAndStoreRequest) returns (ProductStock) {}
   rpc SaveProductStock(ProductStock) returns (ProductStock) {}
+  rpc FindAllByStore(ProductAndStoreRequest) returns (ProductsStock) {}
 }
 
 message ProductsStock {
