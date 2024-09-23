@@ -53,6 +53,11 @@
                 <div class="invalid-feedback">Por favor, ingrese el nombre del producto.</div>
             </div>
             <div class="mb-3">
+                <label for="code" class="form-label">Código:</label>
+                <input type="text" class="form-control" id="code" name="code" value="{{ producto.code }}" required>
+                <div class="invalid-feedback">Por favor, ingrese el código.</div>
+            </div>
+            <div class="mb-3">
                 <label for="img" class="form-label">Imagen URL:</label>
                 <input type="text" class="form-control" id="img" name="img" value="{{ producto.img }}" required>
                 <div class="invalid-feedback">Por favor, ingrese la URL de la imagen.</div>
@@ -79,7 +84,15 @@
                 </select>
             </div>
             
-           
+            <div class="mb-3">
+             
+                    <label for="store" class="form-label">Stock:</label>
+                    <label class="form-label">{{ tiendas | selectattr('id_store', 'equalto', tienda_id) | map(attribute='store') | first }}</label>
+                    <input type="hidden" name="tienda" value="{{ tienda_id }}">
+                    <!-- Mostrar solo el stock del producto para la tienda asignada -->
+                    <input type="number" class="form-control" name="stock" value="{{ stock }}" min="0">
+            
+            </div>
             <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="enabled" name="enabled" {% if producto.enabled %}checked{% endif %}>
                 <label class="form-check-label" for="enabled">Habilitado</label>
