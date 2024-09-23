@@ -8,6 +8,7 @@ import random
 import string
 import os,grpc
 
+
 from user_pb2 import User
 
 from user_pb2_grpc import UsersServiceStub
@@ -20,6 +21,14 @@ from role_pb2 import Role
 
 from role_pb2_grpc import RoleServiceStub
 
+from product_pb2 import Product  # Define tus mensajes gRPC para Product
+
+from product_pb2_grpc import ProductServiceStub  # Define tu servicio gRPC para Product
+
+from productStock_pb2 import ProductStock
+
+from productStock_pb2_grpc import ProductStockServiceStub 
+
 import logging
 
 from google.protobuf.json_format import MessageToJson
@@ -30,7 +39,7 @@ app = create_app('flask.cfg')
 
 #creo conexion momentanea con base de datos local
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:110902@localhost:3306/stockearte'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://avnadmin:AVNS_ylqtAU8JPG7TNXz0mDD@mysql-1d36c064-pato-ef11.a.aivencloud.com:25628/stockeartedb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -217,7 +226,7 @@ def add_user():
 
         store_stub = StoreServiceStub(channel)
         stores_response = store_stub.FindAll(Store())
-        stores = stores_response.store 
+        stores = stores_response.store
         
         role_stub = RoleServiceStub(channel)
         roles_response = role_stub.FindAll(Role())
@@ -287,138 +296,111 @@ def edit_user(idUser):
 
 
 # Modelos de Producto
-class Product(db.Model):
-    __tablename__ = 'product'
-    id_product = db.Column(db.Integer, primary_key=True)
-    product = db.Column(db.String(255))
-    code = db.Column(db.String(10))
-    img = db.Column(db.String(255))
-    enabled = db.Column(db.Boolean, default=True)
-    size = db.Column(db.String(255)) 
-    color = db.Column(db.String(255))  
+#class Product(db.Model):
+#    __tablename__ = 'product'
+#    id_product = db.Column(db.Integer, primary_key=True)
+#    product = db.Column(db.String(255))
+#    code = db.Column(db.String(10))
+#    img = db.Column(db.String(255))
+#    enabled = db.Column(db.Boolean, default=True)
+#    size = db.Column(db.String(255)) 
+#    color = db.Column(db.String(255))  
 
     # Relación con stock
-    stocks = db.relationship('ProductStock', backref='product', lazy='joined', cascade='all, delete-orphan')
+#    stocks = db.relationship('ProductStock', backref='product', lazy='joined', cascade='all, delete-orphan')
 
-class ProductStock(db.Model):
-    __tablename__ = 'product_stock'
-    id = db.Column(db.Integer, primary_key=True)
-    id_product = db.Column(db.Integer, db.ForeignKey('product.id_product'))
-    id_store = db.Column(db.Integer, db.ForeignKey('store.id_store'))
-    stock = db.Column(db.Integer)
+#class ProductStock(db.Model):
+#    __tablename__ = 'product_stock'
+#    id = db.Column(db.Integer, primary_key=True)
+#    id_product = db.Column(db.Integer, db.ForeignKey('product.id_product'))
+#    id_store = db.Column(db.Integer, db.ForeignKey('store.id_store'))
+#    stock = db.Column(db.Integer)
 
     # Relaciones
-    store = db.relationship('Store', backref='product_stocks')
-
-@app.route('/product', methods=['GET'])
-def productos():
-    productos = Product.query.all()
-    
-    # Traer las tiendas asociadas con cada producto
-    productos_con_tiendas = []
-    for producto in productos:
-        # Obtener la primera tienda asociada (si hay)
-        stock = ProductStock.query.filter_by(id_product=producto.id_product).first()
-        tienda = stock.store.store if stock else "Sin tienda"
-        productos_con_tiendas.append({
-            'producto': producto,
-            'tienda': tienda
-        })
-    
-    return render_template('product.html', productos=productos)
+#    store = db.relationship('Store', backref='product_stocks')
 
 
+@app.route('/product')
+def product():
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        product_stub = ProductServiceStub(channel)
+        response = product_stub.FindAll(Product())  # Llamada gRPC para obtener todos los productos
+        
+        #stock_stub = ProductStockServiceStub(channel)
+        #stock_response = stock_stub.GetStockByProductAndStore(Product(idProduct=idProduct),Store(idStore=idStore))
+        #stock = stock_response.stock
 
-# Función para generar códigos de producto
+        print(response)
+        #print(stock)
+    return render_template('product.html', productos=response.product)
+
+
+ #Función para generar códigos de producto
 def generate_product_code(length=10):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
 
-# Rutas de producto
-
 @app.route('/add_product', methods=['GET', 'POST'])
 def add_product():
-    if request.method == 'POST':
-        # Obtener los datos del formulario
-        nombre = request.form.get('product')
-        img = request.form.get('img')
-        codigo = generate_product_code()
-        color = request.form.get('color')
-        size = request.form.get('size')
-        tienda_id = request.form.get('tienda')  # Obtener el ID de la tienda seleccionada
-        
-        # Crear el nuevo producto
-        producto = Product(product=nombre, code=codigo, img=img, color=color, size=size)
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        product_stub = ProductServiceStub(channel)
 
-        try:
-            # Agregar el nuevo producto
-            db.session.add(producto)
-            db.session.commit()  # Necesario para generar el ID del producto
-
-            # Asignar el producto a la tienda seleccionada con stock 0
-            producto_stock = ProductStock(
-                id_product=producto.id_product,
-                id_store=tienda_id,
-                stock=0  # Stock inicial 0
+        if request.method == 'POST':
+          
+            nombre = request.form.get('product')
+            img = request.form.get('img')
+            codigo = generate_product_code()  
+            color = request.form.get('color')
+            size = request.form.get('size')
+            
+           
+            nuevo_producto = Product(
+                product=nombre,
+                code=codigo,
+                img=img,
+                color=color,
+                size=size,
+                enabled=True 
             )
-            db.session.add(producto_stock)
-            db.session.commit()  # Guardar la relación del producto con la tienda
 
-            return redirect(url_for('productos'))
-        except Exception as e:
-            db.session.rollback() 
-            return f"Error al agregar el producto: {str(e)}", 500
+            try:
+                producto_response = product_stub.SaveProduct(nuevo_producto)
+                print("Producto agregado: ", producto_response)
 
-    tiendas = Store.query.all()  # Obtener todas las tiendas para el formulario
-    return render_template('add_product.html', tiendas=tiendas)
+                return redirect(url_for('product'))
+            
+            except grpc.RpcError as e:
+                print("Error al agregar el producto: ", e)
+                return f"Error al agregar el producto: {str(e)}", 500
 
+        return render_template('add_product.html')
 
 @app.route('/edit_product/<int:id>', methods=['GET', 'POST'])
 def edit_product(id):
-    producto = Product.query.get_or_404(id)
-    
-    if request.method == 'POST':
-        producto.product = request.form['product']
-        producto.code = request.form['code']
-        producto.img = request.form['img']
-        producto.color = request.form['color']
-        producto.size = request.form['size']
-        producto.enabled = 'enabled' in request.form
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        stub = ProductServiceStub(channel)
+        
 
-        # Limpiar stocks existentes
-        existing_stocks = ProductStock.query.filter_by(id_product=producto.id_product).all()
-        existing_stock_dict = {stock.id_store: stock for stock in existing_stocks}
+        producto = stub.GetProduct(Product(idProduct=id))  
+        
+        if request.method == 'POST':
+            producto.product = request.form['product']
+            producto.img = request.form['img']
+            producto.color = request.form['color']
+            producto.size = request.form['size']
+            producto.enabled = 'enabled' in request.form
 
-        tienda_id = request.form.get('tienda')
-        stock = request.form.get('stock')
+          
+            try:
+                stub.SaveProduct(producto)  
+                return redirect(url_for('product'))
+            except grpc.RpcError as e:
+                return f"Error al actualizar el producto: {str(e)}", 500
 
-        if tienda_id:
-            tienda_id = int(tienda_id)
-            stock = int(stock) if stock else 0
+       
+        return render_template('edit_product.html', producto=producto, )
 
-            if tienda_id in existing_stock_dict:
-                # Actualizar stock existente
-                existing_stock = existing_stock_dict[tienda_id]
-                existing_stock.stock = stock
-            else:
-                # Crear nuevo stock
-                producto_stock = ProductStock(
-                    id_product=producto.id_product,
-                    id_store=tienda_id,
-                    stock=stock
-                )
-                db.session.add(producto_stock)
 
-        db.session.commit()
-        return redirect(url_for('productos'))
 
-    tiendas = Store.query.all()
-
-    # Obtener el stock actual para el producto
-    stock_entry = ProductStock.query.filter_by(id_product=id).first()
-    stock = stock_entry.stock if stock_entry else 0
-    tienda_id = stock_entry.id_store if stock_entry else None
-
-    return render_template('edit_product.html', producto=producto, tiendas=tiendas, stock=stock, tienda_id=tienda_id)
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
