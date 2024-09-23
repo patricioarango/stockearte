@@ -141,7 +141,7 @@ public class ProductService extends ProductServiceGrpc.ProductServiceImplBase {
     }
 
     @Override
-    public void findByAttributes(ProductProto.FindSearch request,StreamObserver<ProductProto.Products> responseObserver) {
+    public void findByAttributes(ProductProto.FindProductSearch request,StreamObserver<ProductProto.Products> responseObserver) {
         List<ProductProto.Product> productsdb = new ArrayList<>();
         for(Product product : productRepository.findByAttributes(request.getSearch())) {
             ProductProto.Product productProto = ProductProto.Product.newBuilder()
