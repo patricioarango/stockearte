@@ -122,7 +122,6 @@ def store_list():
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         stub = StoreServiceStub(channel)
         response = stub.FindAll(Store()) 
-        print(response)
     return render_template('store_list.html', stores=response.store)
 
 @app.route('/stores/add', methods=['GET', 'POST'])
@@ -131,7 +130,11 @@ def add_store():
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         print(os.getenv("SERVIDOR-GRPC"))
         store_stub = StoreServiceStub(channel)
-
+        code_error = ""
+        store_name = ""
+        address = ""
+        city = ""
+        state = ""
         if request.method == 'POST':
             store_name = request.form['storeName']
             code = request.form['code']
@@ -149,13 +152,17 @@ def add_store():
                 enabled=True
             )
             try:
-                response = store_stub.SaveStore(new_store)
-                print("Tienda agregada: ", response)
-                return redirect( url_for('edit_store', idStore=response.idStore))
+                codeExists = store_stub.FindStoreByCode(Store(code=code))
+                if codeExists.idStore > 0:
+                    new_store.code = ""
+                    code_error = "El código ingresado ya existía. Por favor, ingrese un nuevo código"
+                else: 
+                    response = store_stub.SaveStore(new_store)
+                    return redirect(url_for('store_list'))
             except grpc.RpcError as e:
                 print("Error al agregar la tienda: ", e)
 
-        return render_template('add_store.html')
+        return render_template('add_store.html',store_name=store_name,address=address,city=city,state=state,code_error=code_error)
     
 @app.route('/edit/store/<int:idStore>', methods=['GET', 'POST'])
 def edit_store(idStore):
@@ -188,7 +195,9 @@ def list_users():
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         stub = UsersServiceStub(channel)
         response = stub.FindAll(User()) 
-    return render_template('list_users.html', users=response.user)
+        store_stub = StoreServiceStub(channel)
+        stores_response = store_stub.FindAll(Store())
+    return render_template('list_users.html', users=response.user,tiendas=stores_response.store)
 
 # Ruta para agregar un nuevo usuario
 @app.route('/users/add', methods=['GET', 'POST'])
