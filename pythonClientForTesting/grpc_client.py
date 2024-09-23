@@ -9,6 +9,8 @@ import role_pb2
 import role_pb2_grpc
 import productStock_pb2
 import productStock_pb2_grpc
+import product_pb2
+import product_pb2_grpc
 
 def hello():
     # Connect to the gRPC server
@@ -49,14 +51,14 @@ def product():
 def addproduct():
     with grpc.insecure_channel('localhost:9090') as channel:
         stub = product_pb2_grpc.ProductServiceStub(channel)
-        request = product_pb2.Product(product="producto2",code="code2",color="azul",size="M",img="url_imagen",enabled=True)
+        request = product_pb2.Product(idProduct=1,product="producto1 edit verion",code="cosasasade2",color="azul",size="M",img="url_imagen",enabled=True)
         response = stub.SaveProduct(request)
         print(response) 
 
 def addstore():
     with grpc.insecure_channel('localhost:9090') as channel:
         stub = store_pb2_grpc.StoreServiceStub(channel)
-        request = store_pb2.Store(idStore=3,storeName="store2 edit versoin",code="code2",address="address",city="city",state="state",enabled=True)
+        request = store_pb2.Store(idStore=3,storeName="store2 4am",code="code2",address="address",city="city",state="state",enabled=True)
         response = stub.SaveStore(request)
         print(response)         
 
@@ -77,4 +79,4 @@ def productosByStore():
         print(response)
 
 if __name__ == '__main__':
-    productosByStore()
+    addstore()
