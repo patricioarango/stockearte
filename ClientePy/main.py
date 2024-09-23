@@ -21,7 +21,7 @@ from role_pb2 import Role
 
 from role_pb2_grpc import RoleServiceStub
 
-from product_pb2 import Product  
+from product_pb2 import Product, ProductCodeRequest  
 
 from product_pb2_grpc import ProductServiceStub  
 
@@ -39,8 +39,8 @@ app = create_app('flask.cfg')
 
 #creo conexion momentanea con base de datos local
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://avnadmin:AVNS_ylqtAU8JPG7TNXz0mDD@mysql-1d36c064-pato-ef11.a.aivencloud.com:25628/stockeartedb'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://avnadmin:AVNS_ylqtAU8JPG7TNXz0mDD@mysql-1d36c064-pato-ef11.a.aivencloud.com:25628/stockeartedb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -299,7 +299,9 @@ def add_product():
                 size=size,
                 enabled=True 
             )
-
+            codeExists = product_stub.FindProductByCode(ProductCodeRequest(code=codigo))
+            if codeExists.idProduct > 0:
+                nuevo_producto.code = generate_product_code()
             try:
                 producto_response = product_stub.SaveProduct(nuevo_producto)
                 print("Producto agregado: ", producto_response)
