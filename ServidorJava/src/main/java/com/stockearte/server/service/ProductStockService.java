@@ -107,4 +107,31 @@ public class ProductStockService extends ProductStockServiceGrpc.ProductStockSer
         responseObserver.onCompleted();
     }
     
+    @Override
+    public void findAllByStore(ProductStockProto.ProductAndStoreRequest request,StreamObserver<ProductStockProto.ProductsStock> responseObserver){
+        
+        List<ProductStock> productStocks = productStockRepository.findByStore_IdStore(request.getIdStore());
+        List<ProductStockProto.ProductStock> productStockList = new ArrayList<>();
+        for(ProductStock productStock: productStocks){
+            ProductStockProto.ProductStock a = ProductStockProto.ProductStock.newBuilder()
+                    .setIdProductStock(productStock.getIdProductStock())
+                    .setStock(productStock.getStock())
+                    .setProduct(ProductProto.Product.newBuilder()
+                        .setIdProduct(productStock.getProduct().getIdProduct())
+                        .setProduct(productStock.getProduct().getProductName())
+                        .build())
+                    .setStore(StoreProto.Store.newBuilder()
+                        .setIdStore(productStock.getStore().getIdStore())
+                        .setStoreName(productStock.getStore().getStoreName())
+                        .build())
+                    .build();
+            productStockList.add(a);
+        }
+        ProductStockProto.ProductsStock productsStock = ProductStockProto.ProductsStock.newBuilder()
+                .addAllProductStock(productStockList)
+                .build();
+        responseObserver.onNext(productsStock);
+        responseObserver.onCompleted();
+        
+    }
 }
