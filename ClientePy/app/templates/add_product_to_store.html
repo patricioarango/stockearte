@@ -56,9 +56,12 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div>
-                    <button type="submit" class="btn btn-primary mt-3">Agregar Producto</button>
-                </div>    
+                <div class="row">
+                    <div class="col-md-6 text-right">
+                        <a href="{{ url_for('store_list') }}" class="btn btn-secondary mt-3">Cancelar</a>
+                        <button type="submit" class="btn btn-primary mt-3">Agregar Producto</button>
+                    </div>
+                </div> 
             </form>
         {% else %}
             <p>No hay productos disponibles para agregar.</p>

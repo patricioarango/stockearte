@@ -52,7 +52,12 @@
                 <label class="form-check-label" for="enabled">Habilitado</label>
               </div>
             
-            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+              <div class="row">
+                <div class="col-md-6 text-right">
+                    <a href="{{ url_for('product') }}" class="btn btn-secondary mt-3">Cancelar</a>
+                    <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
+                </div>
+            </div> 
         </form>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9bF79uW9IY9rL2skkL30/lTCTxG5F2KzLqjKZ9M5p4L5y6G8K7y" crossorigin="anonymous"></script>

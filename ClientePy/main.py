@@ -166,11 +166,11 @@ def edit_store(idStore):
         if request.method == 'POST':
             print("request.form")
             print(request.form)
-            storegrpc.storeName = request.form['storeName'],
-            storegrpc.code = request.form['code'],
-            storegrpc.address = request.form['address'],
-            storegrpc.city = request.form['city'],
-            storegrpc.state = request.form['state'],
+            storegrpc.storeName = request.form['storeName']
+            storegrpc.code = request.form['code']
+            storegrpc.address = request.form['address']
+            storegrpc.city = request.form['city']
+            storegrpc.state = request.form['state']
             storegrpc.enabled = 'enabled' in request.form
             try:
                 store_stub.SaveStore(storegrpc)  
