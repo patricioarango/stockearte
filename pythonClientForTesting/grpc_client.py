@@ -7,6 +7,8 @@ import store_pb2
 import store_pb2_grpc
 import role_pb2
 import role_pb2_grpc
+import productStock_pb2
+import productStock_pb2_grpc
 
 def hello():
     # Connect to the gRPC server
@@ -67,5 +69,12 @@ def adduser():
         response = stub.AddUser(request)
         print(response)
 
+def productosByStore():
+    with grpc.insecure_channel('localhost:9090') as channel:
+        stub = productStock_pb2_grpc.ProductStockServiceStub(channel)
+        request = productStock_pb2.ProductAndStoreRequest(idStore=2)
+        response = stub.FindAllByStore(request)
+        print(response)
+
 if __name__ == '__main__':
-    adduser()
+    productosByStore()
