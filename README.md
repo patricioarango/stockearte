@@ -31,7 +31,7 @@ Ingresar los siguientes comandos en la terminal:
 7. ejecutar inserts.sql en MySQL para tener usuarios creados.
 8. acceder a http://localhost:5000/ 
 
-## Comandos para la modificación de los stubs de python al modificar el servidor
+## Comandos para la modificación de los stubs de python
    
 - python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --pyi_out=. --grpc_python_out=. ../ServidorJava/src/main/proto/user.proto
 - python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --pyi_out=. --grpc_python_out=. ../ServidorJava/src/main/proto/product.proto
