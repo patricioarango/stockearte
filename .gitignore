@@ -13,3 +13,4 @@ __pycache__/
 proveedorPy\app\__pycache__\*.pyc
 proveedorPy\.env
 proveedorPy/.env
+kafka-test-script/*

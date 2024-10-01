@@ -42,6 +42,7 @@ class Article(db.Model):
     id = sa.Column(sa.Integer, primary_key=True)
     id_product = sa.Column(sa.Integer)
     article = sa.Column(sa.String(255))
+    photo_url = sa.Column(sa.String(255))
     id_size = sa.Column(sa.Integer)
     id_color = sa.Column(sa.Integer)
     stock = sa.Column(sa.Integer)    
@@ -52,6 +53,10 @@ with app.app_context():
 @app.route("/", methods=["GET"])
 def index():
     return render_template('home.html')
+
+@app.route("/novedades", methods=["GET"])
+def novedades():
+    return render_template('novedades.html')
 
 @app.route('/product')
 def product():
