@@ -11,3 +11,4 @@ proveedorPy\app\__pycache__\*
 *.pyc
 __pycache__/
 proveedorPy\app\__pycache__\*.pyc
+proveedorPy\.env
