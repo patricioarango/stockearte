@@ -18,18 +18,27 @@ https://excalidraw.com/#room=428675ecde542f67de6a,N7tYjxZP9RnOSL-sh6Vvjg
 - Cliente Python con Flask
 - MySQL
 
-## Inicio proyecto
+## Inicio proyecto ServerJava
 
 Ingresar los siguientes comandos en la terminal:
 
 1. cd ServidorJava 
 2. mvn clean install -DskipTests
 3. mvn spring-boot:run
+
+## Inicio ClientePy
 4. cd ClientePy 
 5. pip install -r requirements.txt
 6. python main.py
 7. ejecutar inserts.sql en MySQL para tener usuarios creados.
 8. acceder a http://localhost:5000/ 
+
+## Inicio Proveedor App
+4. cd proveedorPy 
+5. pip install -r requirements.txt
+6. python main.py
+7. ejecutar inserts.sql en MySQL para tener usuarios creados.
+8. acceder a http://localhost:5001/ 
 
 ## Comandos para la modificación de los stubs de python
    

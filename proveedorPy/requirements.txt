@@ -1,0 +1,9 @@
+Flask
+flask_table
+Flask-RESTful
+flask_sqlalchemy
+grpcio
+grpcio-tools
+python-dotenv
+pymysql
+kafka-python
