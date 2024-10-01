@@ -34,11 +34,11 @@ Ingresar los siguientes comandos en la terminal:
 8. acceder a http://localhost:5000/ 
 
 ## Inicio Proveedor App
-4. cd proveedorPy 
-5. pip install -r requirements.txt
-6. python main.py
-7. ejecutar inserts.sql en MySQL para tener usuarios creados.
-8. acceder a http://localhost:5001/ 
+9. cd proveedorPy 
+10. pip install -r requirements.txt
+11. python main.py
+12. ejecutar inserts.sql en MySQL para tener usuarios creados.
+13. acceder a http://localhost:5001/ 
 
 ## Comandos para la modificación de los stubs de python
    
