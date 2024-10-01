@@ -26,3 +26,11 @@ CREATE TABLE "talle" (
   PRIMARY KEY ("id")
 )
 
+insert into talle (talle) values ('chico');
+insert into talle (talle) values ('mediano');
+insert into talle (talle) values ('grande');
+
+insert into color (color) values ('azul');
+insert into color (color) values ('rojo');
+insert into color (color) values ('negro');
+insert into color (color) values ('verde');
