@@ -4,3 +4,10 @@ ServidorJava\src\main\generated\
 ServidorJava\target\
 pythonClientForTesting\__pycache__\
 ClientePy\__pycache__\
+ClientePy\app\__pycache__\
+proveedorPy\__pycache__\
+proveedorPy\app\__pycache__\
+proveedorPy\app\__pycache__\*
+*.pyc
+__pycache__/
+proveedorPy\app\__pycache__\*.pyc
