@@ -75,7 +75,7 @@ CREATE TABLE `purchase_order` (
 
 CREATE TABLE `order_item` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_purchase_orden` int NOT NULL,
+  `id_purchase_order` int NOT NULL,
   `product_code` varchar(255) DEFAULT NULL,
   `color` varchar(255) DEFAULT NULL,
   `size` varchar(255) DEFAULT NULL,
