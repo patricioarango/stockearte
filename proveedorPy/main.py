@@ -1,6 +1,7 @@
+import datetime
 from app import create_app
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask, render_template, request, flash, redirect, session, json, url_for, redirect
+from flask import Flask, render_template, request, flash, redirect, session, json, url_for, redirect,jsonify
 import random
 import string
 import os,grpc
@@ -25,30 +26,134 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
-class Product(db.Model):
+class Producto(db.Model):
+    __tablename__ = 'producto'
     id = sa.Column(sa.Integer, primary_key=True)
-    product = sa.Column(sa.String(255))
-    product_code = sa.Column(sa.String(255))
+    codigo_producto = sa.Column(sa.String(255))
 
-class Size(db.Model):
+class Talle(db.Model):
+    __tablename__ = 'talle'
     id = sa.Column(sa.Integer, primary_key=True)
-    size = sa.Column(sa.String(255))
+    talle = sa.Column(sa.String(255))
 
 class Color(db.Model):
+    __tablename__ = 'color'
     id = sa.Column(sa.Integer, primary_key=True)
     color = sa.Column(sa.String(255))
 
-class Article(db.Model):
-    id = sa.Column(sa.Integer, primary_key=True)
-    id_product = sa.Column(sa.Integer)
-    article = sa.Column(sa.String(255))
-    photo_url = sa.Column(sa.String(255))
-    id_size = sa.Column(sa.Integer)
+class Articulo(db.Model):
+    __tablename__ = 'articulo'
+    id_producto = sa.Column(sa.Integer, primary_key=True)  
+    articulo = sa.Column(sa.String(255))
+    url_foto = sa.Column(sa.String(255))
+    id_talle = sa.Column(sa.Integer)  
     id_color = sa.Column(sa.Integer)
-    stock = sa.Column(sa.Integer)    
+    stock = sa.Column(sa.Integer)   
+
+class Orden_de_compra(db.Model):
+    __tablename__ = 'orden_de_compra'
+    id = sa.Column(sa.Integer, primary_key=True)
+    id_store = sa.Column(sa.Integer)
+    estado = sa.Column(sa.String(255))
+    observaciones = sa.Column(sa.Text)
+    fecha_creacion = sa.Column(sa.DateTime)
+    fecha = sa.Column(sa.DateTime)
+    procesado = sa.Column(sa.Integer)   
+
+class Orden_de_compra_item(db.Model):
+    __tablename__ = 'orden_de_compra_item'
+    id = sa.Column(sa.Integer, primary_key=True)
+    id_orden_de_compra = sa.Column(sa.Integer)
+    codigo_producto = sa.Column(sa.String(255))
+    color = sa.Column(sa.String(255))
+    talle = sa.Column(sa.String(255))
+    cantidad_solicitada = sa.Column(sa.Integer)  
 
 with app.app_context():
     db.create_all()
+
+def chequearStockIncorrecto(orden_de_compra_items):
+    res = []
+    for item in orden_de_compra_items:
+        if item.cantidad_solicitada <= 0:
+            res.append({'codigo_producto': 'Producto codigo: ' + item.codigo_producto, 'error': 'Cantidad solicitada incorrecta'})
+
+def chequearProductosInexistentes(orden_de_compra_items):
+    res = []
+    for item in orden_de_compra_items:
+        producto = Producto.query.filter_by(codigo_producto = item.codigo_producto).first()
+        if producto is None:    
+            res.append({'codigo_producto': 'Producto codigo: ' + item.codigo_producto, 'error': 'Producto no encontrado'})
+    return res            
+      
+def chequearArticulosInexistentes(ordenes_de_compra_items):
+    res = []
+    for item in ordenes_de_compra_items:
+        color = Color.query.filter_by(color = item.color).first()
+        talle = Talle.query.filter_by(talle = item.talle).first()
+        producto = Producto.query.filter_by(codigo_producto = item.codigo_producto).first()
+        articulo = Articulo.query.filter_by(id_producto = producto.id).filter_by(id_color = color.id).filter_by(id_talle = talle.id).first()
+        if articulo is None:
+            res.append({'codigo_producto': 'Producto codigo: ' + item.codigo_producto, 'error': 'Articulo no encontrado'}) 
+    return res
+
+def chequearArticulosStockInsuficiente(ordenes_de_compra_items):
+    res = []
+    for item in ordenes_de_compra_items:
+        color = Color.query.filter_by(color = item.color).first()
+        talle = Talle.query.filter_by(talle = item.talle).first()
+        producto = Producto.query.filter_by(codigo_producto = item.codigo_producto).first()
+        articulo = Articulo.query.filter_by(id_producto = producto.id).filter_by(id_color = color.id).filter_by(id_talle = talle.id).filter(Articulo.stock >= item.cantidad_solicitada).first()
+        if articulo is None:
+            res.append({'codigo_producto': 'Producto codigo: ' + item.codigo_producto, 'error': 'El stock del articulo es insuficiente'}) 
+    return res
+
+@app.route('/procesar_ordenes_de_compra', methods=["GET"])
+def procesar_ordenes_de_compra():
+    ordenes = Orden_de_compra.query.filter_by(procesado = 0).filter_by(estado = 'SOLICITADA').all()
+    for orden in ordenes:
+        if orden.observaciones is None:
+            orden.observaciones = ""
+        
+        #paso 1 - Chequeo de Stock Incorrecto. Con uno incorrecto ya se rechaza la orden
+        ordenes_items = Orden_de_compra_item.query.filter_by(id_orden_de_compra = orden.id).all()
+        stockIncorrecto = chequearStockIncorrecto(ordenes_items)
+        if stockIncorrecto:
+            orden.estado = 'RECHAZADA'
+            orden.procesado = 1
+            for item in stockIncorrecto:
+                orden.observaciones += item['codigo_producto'] + item['error'] + '\n'
+
+        #paso 2 - Chequeo de productos inexistentes. Con uno ya se rechaza la orden
+        productosInexistentes = chequearProductosInexistentes(ordenes_items)
+        if productosInexistentes:
+            orden.estado = 'RECHAZADA'
+            orden.procesado = 1
+            for item in chequearProductosInexistentes:
+                orden.observaciones += item['codigo_producto'] + item['error'] + '\n'
+
+        #paso 3 - Chequeo Artículo existentes (puedo tener el producto pero no el artículo)
+        
+        articulosInexistentes = chequearArticulosInexistentes(ordenes_items)
+        if articulosInexistentes:
+            orden.estado = 'RECHAZADA'
+            orden.procesado = 1
+            for item in articulosInexistentes:
+                orden.observaciones += item['codigo_producto'] + item['error'] + '\n'
+
+        # solo en caso de que esten todos y los stock sean suficientes, se acepta y despacha
+        # si llego hasta acá es porque todos los articulos pedidos existen  
+        stockInsuficiente = chequearArticulosStockInsuficiente(ordenes_items)
+        if len(stockInsuficiente) > 0:
+            orden.estado = 'ACEPTADA'
+            orden.procesado = 0
+            for item in stockInsuficiente:
+                orden.observaciones += item['codigo_producto'] + item['error'] + '\n'
+
+        orden.fecha = datetime.datetime.now()    
+        db.session.commit()
+    result = {'a': 'b'}
+    return result, 200
 
 @app.route("/", methods=["GET"])
 def index():
@@ -58,84 +163,9 @@ def index():
 def novedades():
     return render_template('novedades.html')
 
-@app.route('/product')
-def product():
-    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
-        product_stub = ProductServiceStub(channel)
-        response = product_stub.FindAll(Product())  
-    return render_template('product.html', productos=response.product)
-
-def generate_product_code(length=10):
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
-
-@app.route('/add_product', methods=['GET', 'POST'])
-def add_product():
-    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
-        product_stub = ProductServiceStub(channel)
-
-        if request.method == 'POST':
-          
-            nombre = request.form.get('product')
-            img = request.form.get('img')
-            codigo = request.form.get('code')  
-            color = request.form.get('color')
-            size = request.form.get('size')
-           
-            nuevo_producto = Product(
-                product=nombre,
-                code=codigo,
-                img=img,
-                color=color,
-                size=size,
-                enabled=True 
-            )
-            codeExists = product_stub.FindProductByCode(ProductCodeRequest(code=codigo))
-            if codeExists.idProduct > 0:
-                nuevo_producto.code = generate_product_code()
-            try:
-                producto_response = product_stub.SaveProduct(nuevo_producto)
-                print("Producto agregado: ", producto_response)
-
-                return redirect(url_for('product'))
-            
-            except grpc.RpcError as e:
-                print("Error al agregar el producto: ", e)
-                return f"Error al agregar el producto: {str(e)}", 500
-
-        return render_template('add_product.html',codigo_producto=generate_product_code())
-
-@app.route('/edit_product/<int:id>', methods=['GET', 'POST'])
-def edit_product(id):
-    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
-        stub = ProductServiceStub(channel)
-    
-        producto = stub.GetProduct(Product(idProduct=id))  
-        
-        if request.method == 'POST':
-            producto.product = request.form['product']
-            producto.img = request.form['img']
-            producto.color = request.form['color']
-            producto.size = request.form['size']
-            producto.enabled = 'enabled' in request.form
-            
-            try:
-                stub.SaveProduct(producto)  
-                return redirect(url_for('product'))
-            except grpc.RpcError as e:
-                return f"Error al actualizar el producto: {str(e)}", 500
-
-        return render_template('edit_product.html', producto=producto, )
-
-from google.protobuf.empty_pb2 import Empty
 
 
 
-
-@app.route('/my_products')
-def store_products():
-    user_store_id = session.get('user_id')
-    productos_tienda = get_products_by_store(user_store_id)
-    return render_template('my_products.html', productos=productos_tienda,idStore=user_store_id)
 
 
 
