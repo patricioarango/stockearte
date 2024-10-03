@@ -31,7 +31,7 @@ CREATE TABLE `orden_de_compra` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
   `observaciones` TEXT DEFAULT NULL,
   `id_store` int DEFAULT NULL,
-  `estado`  ENUM('RECHAZADA','ACEPTADA','SOLICITADA','RECIBIDA') DEFAULT 'SOLICITADA',
+  `estado` varchar(255) DEFAULT 'SOLICITADA',
   `fecha_creacion` DATETIME DEFAULT NULL,
   `fecha` DATETIME DEFAULT NULL,
   `fecha_recepcion` DATETIME DEFAULT NULL,
