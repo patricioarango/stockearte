@@ -42,7 +42,7 @@ CREATE TABLE `orden_de_compra` (
 
 CREATE TABLE `orden_de_compra_item` (
   `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `id_orden_de_pago` int NOT NULL,
+  `id_orden_de_compra` int NOT NULL,
   `codigo_producto` varchar(255) DEFAULT NULL,
   `color` varchar(255) DEFAULT NULL,
   `size` varchar(255) DEFAULT NULL,
