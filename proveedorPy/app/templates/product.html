@@ -3,18 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Agregar Producto</title>
+    <title>Lista de Productos</title>
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
         rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
         crossorigin="anonymous"
     />
+    <link
+    rel="stylesheet"
+    type="text/css"
+    href="{{ url_for('static', filename='index_styles.css') }}">
 </head>
 <body>
     {% include "nav.html" %}
     <div class="container mt-4">
-        <h1 class="mb-4">Agregar Producto</h1>
+        <h1 class="mb-4">Lista de Productos</h1>
+        <a href="{{ url_for('nuevo_producto') }}" class="btn btn-primary mb-3">Agregar Producto</a>
 
         {% with messages = get_flashed_messages() %}
             {% if messages %}
@@ -24,14 +29,23 @@
             {% endif %}
         {% endwith %}
 
-        <form method="POST" action="{{ url_for('nuevo_producto') }}">
-            <div class="mb-3">
-                <label for="codigo_producto" class="form-label">Código de Producto</label>
-                <input type="text" class="form-control" id="codigo_producto" name="codigo_producto" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Agregar Producto</button>
-            <a href="{{ url_for('lista_productos') }}" class="btn btn-secondary">Cancelar</a>
-        </form>
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Código de Producto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos %}
+                <tr>
+                    <td>{{ producto.id }}</td>
+                    <td>{{ producto.codigo_producto }}</td>
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-c0WzWzq1xuMzDykjR5O4J8QY4xSmk5TiwW+OrQnbNzI+0KbdzeFSAI16jsuYh2lZ" crossorigin="anonymous"></script>

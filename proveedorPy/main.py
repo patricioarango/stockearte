@@ -163,6 +163,30 @@ def index():
 def novedades():
     return render_template('novedades.html')
 
+@app.route('/product', methods=['GET'])
+def lista_productos():
+    productos = Producto.query.all()
+    
+    return render_template('product.html', productos=productos)
+
+@app.route('/add_product', methods=['GET', 'POST'])
+def nuevo_producto():
+    if request.method == 'POST':
+        codigo_producto = request.form['codigo_producto']
+        
+        if not codigo_producto:  
+            flash('El código del producto es obligatorio', 'danger')
+            return redirect(url_for('nuevo_producto'))
+
+        nuevo_producto = Producto(codigo_producto=codigo_producto)
+        db.session.add(nuevo_producto)
+        db.session.commit()
+
+        flash('Producto creado exitosamente', 'success')
+
+        return redirect(url_for('lista_productos'))
+
+    return render_template('add_product.html')
 
 
 
