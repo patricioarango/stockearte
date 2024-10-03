@@ -35,7 +35,8 @@ CREATE TABLE `orden_de_compra` (
   `fecha_creacion` DATETIME DEFAULT NULL,
   `fecha` DATETIME DEFAULT NULL,
   `fecha_recepcion` DATETIME DEFAULT NULL,
-  `id_despachon` int DEFAULT NULL,
+  `id_despacho` int DEFAULT NULL,
+   `procesado` int DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
@@ -46,7 +47,6 @@ CREATE TABLE `orden_de_compra_item` (
   `color` varchar(255) DEFAULT NULL,
   `size` varchar(255) DEFAULT NULL,
   `cantidad_solicitada` int DEFAULT NULL,
-   `procesado` int DEFAULT 0,
   PRIMARY KEY (`id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8; 
 
