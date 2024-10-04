@@ -60,3 +60,25 @@ CREATE TABLE `product_stock` (
   FOREIGN KEY (`id_product`) REFERENCES `product` (`id_product`),
   FOREIGN KEY (`id_store`) REFERENCES `store` (`id_store`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `purchase_order` (
+  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `observation` TEXT DEFAULT NULL,
+  `id_store` int DEFAULT NULL,
+  `state`  ENUM('RECHAZADA','ACEPTADA','SOLICITADA','RECIBIDA') DEFAULT 'SOLICITADA',
+  `created_at` DATETIME DEFAULT NULL,
+  `purchase_order_date` DATETIME DEFAULT NULL,
+  `reception_date` DATETIME DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `order_item` (
+  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_purchase_order` int NOT NULL,
+  `product_code` varchar(255) DEFAULT NULL,
+  `color` varchar(255) DEFAULT NULL,
+  `size` varchar(255) DEFAULT NULL,
+  `requested_amount` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
