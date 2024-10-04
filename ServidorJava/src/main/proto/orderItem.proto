@@ -24,4 +24,5 @@ message OrderItem {
     string size = 4;
     int32 requestedAmount = 5;
     PurchaseOrder purchaseOrder = 6;
+    bool send = 7;
 }

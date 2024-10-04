@@ -13,7 +13,9 @@ import com.stockearte.server.repository.PurchaseOrderRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.kafka.core.KafkaTemplate;
 
+import com.google.gson.Gson;
 import com.stockearte.server.entities.PurchaseOrder;
 
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -28,6 +30,9 @@ public class OrderItemService extends OrderItemServiceGrpc.OrderItemServiceImplB
     @Autowired
     @Qualifier("purchaseOrderRepository")
     private PurchaseOrderRepository purchaseOrderRepository;
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate; 
 
     @Override
     public void saveOrderItem(OrderItemProto.OrderItem request,StreamObserver<OrderItemProto.OrderItem> responseObserver){
@@ -55,6 +60,15 @@ public class OrderItemService extends OrderItemServiceGrpc.OrderItemServiceImplB
                 .build();
         responseObserver.onNext(a);
         responseObserver.onCompleted();
+
+        //Kafka orden-de-compra
+        System.out.println("SEND: " + request.getSend()); 
+        //if(request.getSend()){
+            String message = new Gson().toJson("purchaseOrderRepository.findById(request.getPurchaseOrder().getIdPurchaseOrder())");
+            System.out.println("Enviando a Kafka: " + message);
+            kafkaTemplate.send("orden-de-compra",message);    
+        //}
+
     }
 
 }
