@@ -21,3 +21,11 @@ spring.jpa.hibernate.ddl-auto : update
 
 # spring.jpa.properties.dialect
 spring.jpa.properties.dialect : org.hibernate.dialect.MySQL5Dialect
+
+# kafka
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA-SERVER:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
