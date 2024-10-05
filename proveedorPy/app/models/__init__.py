@@ -38,7 +38,8 @@ class Orden_de_compra(db.Model):
     fecha_solicitud = sa.Column(sa.DateTime)
     fecha_procesamiento = sa.Column(sa.DateTime)
     fecha_recepcion = sa.Column(sa.DateTime)
-    procesado = sa.Column(sa.Integer)   
+    procesado = sa.Column(sa.Integer)
+    id_orden_de_despacho =  sa.Column(sa.Integer)   
 
 class Orden_de_compra_item(db.Model):
     __tablename__ = 'orden_de_compra_item'
@@ -47,4 +48,11 @@ class Orden_de_compra_item(db.Model):
     codigo_producto = sa.Column(sa.String(255))
     color = sa.Column(sa.String(255))
     talle = sa.Column(sa.String(255))
-    cantidad_solicitada = sa.Column(sa.Integer)      
+    cantidad_solicitada = sa.Column(sa.Integer)     
+
+class Orden_de_despacho(db.Model):
+    __tablename__ = 'orden_de_despacho'
+    id = sa.Column(sa.Integer, primary_key=True)
+    id_orden_de_compra = sa.Column(sa.Integer)
+    id_odc_externa = sa.Column(sa.Integer)
+    fecha_estimada_de_envio = sa.Column(sa.DateTime)   

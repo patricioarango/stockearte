@@ -1,8 +1,10 @@
 from . import orden_de_compra_blueprint
-from kafka import KafkaConsumer
+from kafka import KafkaConsumer,KafkaProducer
+from kafka.admin import KafkaAdminClient, NewTopic
+from kafka.errors import TopicAlreadyExistsError
 from flask import Flask, render_template, request, flash, redirect, session, json, url_for, redirect,jsonify
 import os,json
-from app.models import Orden_de_compra,Talle,Color,Articulo,Producto,Orden_de_compra_item
+from app.models import Orden_de_compra,Talle,Color,Articulo,Producto,Orden_de_compra_item,Orden_de_despacho
 from flask import current_app as app
 import datetime
 from app.models import db
@@ -52,7 +54,7 @@ def consumer_orden_de_compra():
             db.session.add(orden_de_compra)
             db.session.commit()
             print(f"Message received: {orden_de_compra_store}")
-    
+            procesar_ordenes_de_compra_solicitadas()
     return render_template('orden_de_compra.html', ordenes_de_compra=orden_de_compra)    
             
     
@@ -93,8 +95,15 @@ def chequearArticulosStockInsuficiente(ordenes_de_compra_items):
             res.append({'codigo_producto': 'Producto codigo: ' + item.codigo_producto, 'error': 'El stock del articulo es insuficiente'}) 
     return res
 
-def procesar_ordenes_de_compra():
+def procesar_ordenes_de_compra_solicitadas():
     ordenes = Orden_de_compra.query.filter_by(procesado = 0).filter_by(estado = 'SOLICITADA').all()
+    return procesar_ordenes_de_compra(ordenes)
+
+def procesar_ordenes_de_compra_aceptadas():
+    ordenes = Orden_de_compra.query.filter_by(procesado = 0).filter_by(estado = 'ACEPTADA').all()
+    return procesar_ordenes_de_compra(ordenes)
+
+def procesar_ordenes_de_compra(ordenes):
     for orden in ordenes:
         if orden.observaciones is None:
             orden.observaciones = ""
@@ -129,6 +138,8 @@ def procesar_ordenes_de_compra():
         # si llego hasta acá es porque todos los articulos pedidos existen  
         stockInsuficiente = chequearArticulosStockInsuficiente(ordenes_items)
         if len(stockInsuficiente) > 0:
+            id_orden_de_despacho = crearOrdenDeDespacho(orden)
+            orden.id_orden_de_despacho = id_orden_de_despacho
             orden.estado = 'ACEPTADA'
             orden.procesado = 0
             for item in stockInsuficiente:
@@ -136,5 +147,119 @@ def procesar_ordenes_de_compra():
 
         orden.fecha_procesamiento = datetime.datetime.now()    
         db.session.commit()
-    result = {'a': 'b'}
-    return result, 200
+    return enviarMensajeKafkaStore(orden.id)
+
+@orden_de_compra_blueprint.route('/enviar_mensaje', methods=['GET'])
+def enviar_mensaje():    
+    id = 1
+    return enviarMensajeKafkaStore(id)
+
+
+def enviarMensajeKafkaStore(id_orden):
+    orden = Orden_de_compra.query.filter_by(id = id_orden).first()
+    store_topic = orden.store_code + "_solicitudes"
+    # chequeamos si el topic del store existe o lo creamos
+    res = checkIFKafkaTopicExists(store_topic)
+    if(res == False):
+        createKafkaTopic(store_topic)
+
+    ssl_cafile = os.path.join(app.static_folder, 'archivos', 'ca.pem')
+    ssl_certfile = os.path.join(app.static_folder, 'archivos', 'service.cert')
+    ssl_keyfile = os.path.join(app.static_folder, 'archivos', 'service.key')
+    producer = KafkaProducer(
+        bootstrap_servers=f"kafka-871a578-pato-ef11.j.aivencloud.com:25630",
+        security_protocol="SSL",
+        ssl_cafile=ssl_cafile,
+        ssl_certfile=ssl_certfile,
+        ssl_keyfile=ssl_keyfile,
+        value_serializer=lambda v: json.dumps(v).encode('utf-8'), 
+    )
+    id_orden_de_despacho = orden.id_orden_de_despacho if True else 0
+    message_dict = {
+        "id": orden.id_odc_externa,
+        "estado": orden.estado,
+        "observaciones": orden.observaciones,
+        "id_store": orden.id_store,
+        "id_orden_de_despacho": id_orden_de_despacho
+        }
+    producer.send(store_topic,message_dict)
+    print(f"Message sent: {message_dict}")
+    producer.close()
+    return "mensaje enviado",200
+
+def checkIFKafkaTopicExists(topic_name):
+    ssl_cafile = os.path.join(app.static_folder, 'archivos', 'ca.pem')
+    ssl_certfile = os.path.join(app.static_folder, 'archivos', 'service.cert')
+    ssl_keyfile = os.path.join(app.static_folder, 'archivos', 'service.key')
+    admin_client = KafkaAdminClient(
+    bootstrap_servers=f"kafka-871a578-pato-ef11.j.aivencloud.com:25630",
+    security_protocol="SSL",
+    ssl_cafile=ssl_cafile,
+    ssl_certfile=ssl_certfile,
+    ssl_keyfile=ssl_keyfile,
+    client_id='admin-client'
+    )
+    topics = admin_client.list_topics()
+    print(topics)
+    return topic_name in topics
+
+def createKafkaTopic(topic_name):
+    ssl_cafile = os.path.join(app.static_folder, 'archivos', 'ca.pem')
+    ssl_certfile = os.path.join(app.static_folder, 'archivos', 'service.cert')
+    ssl_keyfile = os.path.join(app.static_folder, 'archivos', 'service.key')
+    admin_client = KafkaAdminClient(
+    bootstrap_servers=f"kafka-871a578-pato-ef11.j.aivencloud.com:25630",
+    security_protocol="SSL",
+    ssl_cafile=ssl_cafile,
+    ssl_certfile=ssl_certfile,
+    ssl_keyfile=ssl_keyfile,
+    client_id='admin-client'
+    )
+    topic_list = []
+    topic_list.append(NewTopic(name=topic_name, num_partitions=1, replication_factor=1))
+    try:
+        admin_client.create_topics(new_topics=topic_list, validate_only=False)
+    except TopicAlreadyExistsError:
+        print(f"Topic {topic_name} already exists")
+    admin_client.close()
+
+def crearOrdenDeDespacho(orden_de_compra):
+    orden_de_despacho = Orden_de_despacho(
+        id_orden_de_compra = orden_de_compra.id,
+        id_odc_externa = orden_de_compra.id_odc_externa,
+        fecha_estimada_de_envio = datetime.datetime.now() + datetime.timedelta(days=2)
+    )
+    db.session.add(orden_de_despacho)
+    db.session.commit()
+    return orden_de_despacho.id   
+
+def enviarMensajeKafkaOrdenDeDespacho(id_orden_de_compra):  
+    orden_de_despacho = Orden_de_despacho.query.filter_by(id_orden_de_compra = id_orden_de_compra).first()  
+    orden = Orden_de_compra.query.filter_by(id = orden_de_despacho.id_orden_de_compra).first()
+    store_topic = orden.store_code + "_despacho"
+    # chequeamos si el topic del store existe o lo creamos
+    res = checkIFKafkaTopicExists(store_topic)
+    if(res == False):
+        createKafkaTopic(store_topic)
+
+    ssl_cafile = os.path.join(app.static_folder, 'archivos', 'ca.pem')
+    ssl_certfile = os.path.join(app.static_folder, 'archivos', 'service.cert')
+    ssl_keyfile = os.path.join(app.static_folder, 'archivos', 'service.key')
+    producer = KafkaProducer(
+        bootstrap_servers=f"kafka-871a578-pato-ef11.j.aivencloud.com:25630",
+        security_protocol="SSL",
+        ssl_cafile=ssl_cafile,
+        ssl_certfile=ssl_certfile,
+        ssl_keyfile=ssl_keyfile,
+        value_serializer=lambda v: json.dumps(v).encode('utf-8'), 
+    )
+    message_dict = {
+        "id_orden_de_despacho": orden_de_despacho.id,
+        "id_orden_de_compra": orden_de_despacho.id_odc_externa,
+        "fecha_estimada_envio": orden_de_despacho.fecha_estimada_de_envio
+        
+        }
+    producer.send(store_topic,message_dict)
+    print(f"Message sent: {message_dict}")
+    producer.close()
+    return "mensaje enviado",200
