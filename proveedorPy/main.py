@@ -43,12 +43,17 @@ class Color(db.Model):
 
 class Articulo(db.Model):
     __tablename__ = 'articulo'
-    id_producto = sa.Column(sa.Integer, primary_key=True)  
+    id = sa.Column(sa.Integer, primary_key=True)
+    id_producto = sa.Column(sa.Integer, sa.ForeignKey('producto.id'))
     articulo = sa.Column(sa.String(255))
     url_foto = sa.Column(sa.String(255))
-    id_talle = sa.Column(sa.Integer)  
-    id_color = sa.Column(sa.Integer)
-    stock = sa.Column(sa.Integer)   
+    id_talle = sa.Column(sa.Integer, sa.ForeignKey('talle.id'))
+    id_color = sa.Column(sa.Integer, sa.ForeignKey('color.id'))
+    stock = sa.Column(sa.Integer)
+
+    talle = db.relationship('Talle', backref='articulos')
+    color = db.relationship('Color', backref='articulos')
+
 
 class Orden_de_compra(db.Model):
     __tablename__ = 'orden_de_compra'
@@ -187,6 +192,36 @@ def nuevo_producto():
         return redirect(url_for('lista_productos'))
 
     return render_template('add_product.html')
+
+@app.route('/add_article_to_product/<int:producto_id>', methods=['GET', 'POST'])
+def add_article_to_product(producto_id):
+    producto = Producto.query.get(producto_id)
+    talles = Talle.query.all()
+    colores = Color.query.all()
+    articulosdelproducto = Articulo.query.filter_by(id_producto=producto_id).all()
+
+    if request.method == 'POST':
+        nombre_articulo = request.form['articulo']
+        url_foto = request.form['url_foto']
+        id_talle = request.form['id_talle']
+        id_color = request.form['id_color']
+        stock = request.form['stock']
+
+        nuevo_articulo = Articulo(
+            id_producto=producto_id,
+            articulo=nombre_articulo,
+            url_foto=url_foto,
+            id_talle=id_talle,
+            id_color=id_color,
+            stock=stock
+        )
+        db.session.add(nuevo_articulo)
+        db.session.commit()
+
+        flash('Artículo creado exitosamente', 'success')
+        return redirect(url_for('add_article_to_product', producto_id=producto_id))
+
+    return render_template('add_article_to_product.html', producto=producto, talles=talles, colores=colores, articulosdelproducto=articulosdelproducto)
 
 
 

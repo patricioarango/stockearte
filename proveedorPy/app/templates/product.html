@@ -41,6 +41,9 @@
                 <tr>
                     <td>{{ producto.id }}</td>
                     <td>{{ producto.codigo_producto }}</td>
+                    <td>
+                        <a href="/add_article_to_product/{{ producto.id }}" type="button" class="btn btn-success">Agregar Articulos</button>
+                    </td>
                     
                 </tr>
                 {% endfor %}
