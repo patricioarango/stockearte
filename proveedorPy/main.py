@@ -193,12 +193,19 @@ def nuevo_producto():
 
     return render_template('add_product.html')
 
+
+@app.route('/list_articles/<int:producto_id>', methods=['GET'])
+def list_articles(producto_id):
+    producto = Producto.query.get(producto_id)
+    articulosdelproducto = Articulo.query.filter_by(id_producto=producto_id).all()
+
+    return render_template('list_articles.html', producto=producto, articulosdelproducto=articulosdelproducto)
+
 @app.route('/add_article_to_product/<int:producto_id>', methods=['GET', 'POST'])
 def add_article_to_product(producto_id):
     producto = Producto.query.get(producto_id)
     talles = Talle.query.all()
     colores = Color.query.all()
-    articulosdelproducto = Articulo.query.filter_by(id_producto=producto_id).all()
 
     if request.method == 'POST':
         nombre_articulo = request.form['articulo']
@@ -219,9 +226,29 @@ def add_article_to_product(producto_id):
         db.session.commit()
 
         flash('Artículo creado exitosamente', 'success')
-        return redirect(url_for('add_article_to_product', producto_id=producto_id))
+        return redirect(url_for('list_articles', producto_id=producto_id))
 
-    return render_template('add_article_to_product.html', producto=producto, talles=talles, colores=colores, articulosdelproducto=articulosdelproducto)
+    return render_template('add_article_to_product.html', producto=producto, talles=talles, colores=colores)
+
+@app.route('/edit_article/<int:articulo_id>', methods=['GET', 'POST'])
+def edit_article(articulo_id):
+    articulo = Articulo.query.get(articulo_id)
+
+    talles = Talle.query.all()
+    colores = Color.query.all()
+
+    if request.method == 'POST':
+        articulo.articulo = request.form['articulo']
+        articulo.url_foto = request.form['url_foto']
+        articulo.id_talle = request.form['id_talle']
+        articulo.id_color = request.form['id_color']
+        articulo.stock = request.form['stock']
+
+        db.session.commit()
+        flash('Artículo editado exitosamente', 'success')
+        return redirect(url_for('list_articles', producto_id=articulo.id_producto))
+
+    return render_template('edit_article.html', articulo=articulo, talles=talles, colores=colores)
 
 
 
