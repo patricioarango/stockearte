@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package model;
+
+option java_package = "com.stockearte.model";
+option java_outer_classname = "OrderItemProto";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "PurchaseOrder.proto";
+
+service OrderItemService {
+  rpc SaveOrderItem(OrderItem) returns (OrderItem) {}
+}
+
+message OrderItems {
+  repeated OrderItem orderItem = 1;
+}
+
+message OrderItem {
+    int32 idOrderItem = 1;
+    string productCode = 2;
+    string color = 3;
+    string size = 4;
+    int32 requestedAmount = 5;
+    PurchaseOrder purchaseOrder = 6;
+    bool send = 7;
+}
