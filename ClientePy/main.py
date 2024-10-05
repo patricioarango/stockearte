@@ -21,7 +21,8 @@ from role_pb2 import Role
 
 from role_pb2_grpc import RoleServiceStub
 
-from product_pb2 import Product, ProductCodeRequest  
+from product_pb2 import Product
+from product_pb2 import Product, ProductCodeRequest
 
 from product_pb2_grpc import ProductServiceStub  
 
@@ -33,14 +34,16 @@ import logging
 
 from google.protobuf.json_format import MessageToJson
 
+from datetime import datetime
+
 logger = logging.getLogger(__name__)
 
 app = create_app('flask.cfg')
 
 #creo conexion momentanea con base de datos local
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://avnadmin:AVNS_ylqtAU8JPG7TNXz0mDD@mysql-1d36c064-pato-ef11.a.aivencloud.com:25628/stockeartedb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://avnadmin:AVNS_ylqtAU8JPG7TNXz0mDD@mysql-1d36c064-pato-ef11.a.aivencloud.com:25628/stockeartedb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -53,6 +56,50 @@ class Rol(db.Model):
 
     def __repr__(self):
         return f'<Rol id={self.id_rol} rol={self.rol} enabled={self.enabled}>'
+    
+class StoreClass(db.Model):
+      __tablename__ = 'store'
+      id_store = db.Column(db.Integer, primary_key=True, autoincrement=True)
+      store = db.Column(db.String(255), nullable=True)
+      code = db.Column(db.String(255), nullable=True)
+      address = db.Column(db.String(255), nullable=True)
+      city = db.Column(db.String(255), nullable=True)
+      state = db.Column(db.String(255), nullable=True)
+      enabled = db.Column(db.Boolean, default=True)
+    
+      def __repr__(self):
+          return f'<Store id={self.id_store} store={self.store} enabled={self.enabled}>'   
+
+class PurchaseOrder(db.Model):
+    __tablename__ = 'purchase_order'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    observation = db.Column(db.Text, nullable=True)
+    id_store = db.Column(db.Integer, db.ForeignKey('store.id_store'), nullable=True)
+    state = db.Column(db.Enum('RECHAZADA', 'ACEPTADA', 'SOLICITADA', 'RECIBIDA'), default='SOLICITADA')
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    purchase_order_date = db.Column(db.DateTime, nullable=True)
+    reception_date = db.Column(db.DateTime, nullable=True)
+    
+    store = db.relationship('StoreClass', backref='purchase_orders')
+    
+    def __repr__(self):
+        return f'<PurchaseOrder id={self.id} state={self.state}>'
+
+
+class OrderItem(db.Model):
+    __tablename__ = 'order_item'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id_purchase_order = db.Column(db.Integer, db.ForeignKey('purchase_order.id'), nullable=False)
+    product_code = db.Column(db.String(255), nullable=True)
+    color = db.Column(db.String(255), nullable=True)
+    size = db.Column(db.String(255), nullable=True)
+    requested_amount = db.Column(db.Integer, nullable=True)
+
+    purchase_order = db.relationship('PurchaseOrder', backref='order_items')
+
+    def __repr__(self):
+        return f'<OrderItem id={self.id} product_code={self.product_code}>'
+
 
 def checkSessionManager():
     if 'user_id' not in session or session['roleName']!='manager':
@@ -68,7 +115,7 @@ def checkSession():
     
 @app.route("/nuevohome", methods=['GET'])
 def nuevohome():
-    checkSession();
+    checkSession()
     return render_template('home.html')
     
 @app.route("/login", methods=['POST'])
@@ -384,8 +431,9 @@ def add_product_to_store(idStore):
 
 @app.route('/my_products')
 def store_products():
-    checkSessionManager();
+    checkSessionManager()
     user_store_id = session.get('user_id')
+    print("User Store ID de mis productos: ", user_store_id)
     productos_tienda = get_products_by_store(user_store_id)
     return render_template('my_products.html', productos=productos_tienda,idStore=user_store_id)
 
@@ -430,6 +478,131 @@ def edit_stock(id):
                 return f"Error al actualizar el stock: {str(e)}", 500
         
         return render_template('edit_stock.html', producto=stock_response)
+
+@app.route('/purchase_orders')
+def list_purchase_orders():
+    purchase_orders = PurchaseOrder.query.all()
+    return render_template('list_purchase_orders.html', purchase_orders=purchase_orders)
+
+@app.route('/new_purchase_order', methods=['GET', 'POST'])
+def new_purchase_order():
+        # Crear la nueva orden de compra
+        new_order = PurchaseOrder(
+            id_store= session.get('user_store_id'),
+            observation=" ",
+            state="SOLICITADA",
+            purchase_order_date=datetime.now()
+        )
+        db.session.add(new_order)
+        db.session.commit()
+        return redirect(url_for('list_purchase_orders'))
+
+@app.route('/edit_purchase_order/<int:id>', methods=['GET', 'POST'])
+def edit_purchase_order(id):
+    order = PurchaseOrder.query.get_or_404(id)
+    if request.method == 'POST':
+        order.observation = request.form['observation']
+        order.state = request.form['state']
+        db.session.commit()
+        return redirect(url_for('list_purchase_orders'))
+    
+    stores = StoreClass.query.filter_by(enabled=True).all()
+    return render_template('edit_purchase_order.html', order=order, stores=stores)
+
+@app.route('/delete_purchase_order/<int:id>', methods=['POST'])
+def delete_purchase_order(id):
+    order = PurchaseOrder.query.get_or_404(id)
+    db.session.delete(order)
+    db.session.commit()
+    return redirect(url_for('list_purchase_orders'))
+
+@app.route('/add_order_item/<int:id_order>', methods=['GET', 'POST'])
+def add_order_item(id_order):
+    checkSessionManager()
+    user_store_id = session.get('user_id')
+    
+    # Fetch products by store before handling the request
+    productos_tienda = get_products_by_store(user_store_id)
+    order = PurchaseOrder.query.get_or_404(id_order)
+
+    # Handle POST request for adding a new order item
+    if request.method == 'POST':
+        idProduct = int(request.form['idProduct'])
+        requested_amount = request.form['requested_amount']
+        
+        # Open gRPC channel inside the POST request handling block
+        with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+            stub = ProductServiceStub(channel)
+            response = stub.GetProduct(Product(idProduct=idProduct))
+            print("PRODUCTO: ",response.product)
+
+            # Create the new item using the data retrieved from gRPC
+            new_item = OrderItem(
+                id_purchase_order=id_order,
+                product_code=response.code,  # Accessing productCode correctly
+                color=response.color,               # Accessing color correctly
+                size=response.size,                 # Accessing size correctly
+                requested_amount=requested_amount
+                #send=false
+            )
+            
+            # Add the new item to the database
+            db.session.add(new_item)
+            db.session.commit()
+        
+        # Redirect to view the order items after adding a new one
+        return redirect(url_for('view_order_items', id=id_order))
+
+    # Handle GET request by rendering the template
+    print("productos: ", productos_tienda)
+    return render_template('add_order_item.html', order=order, order_id_id=id_order, products=productos_tienda)
+
+
+
+# @app.route('/view_order_items/<int:id>')
+# def view_order_items(id):
+#     order = PurchaseOrder.query.get_or_404(id)
+#     items = OrderItem.query.filter_by(id_purchase_order=id).all()
+#     return render_template('view_order_items.html', order=order, order_items=items)
+
+@app.route('/view_order_items/<int:id>', methods=['GET', 'POST'])
+def view_order_items(id):
+    checkSessionManager()
+    
+    # Obtener la orden de compra
+    order = PurchaseOrder.query.get_or_404(id)
+    
+    # Si el método es POST, significa que estamos agregando un nuevo item
+    if request.method == 'POST':
+        product_code = request.form['product_code']
+        color = request.form['color']
+        size = request.form['size']
+        requested_amount = request.form['requested_amount']
+        
+        # Crear el nuevo item
+        new_item = OrderItem(
+            id_purchase_order=id,
+            product_code=product_code,
+            color=color,
+            size=size,
+            requested_amount=requested_amount
+        )
+        db.session.add(new_item)
+        db.session.commit()
+        
+        # Redirigimos para evitar doble envío de formularios al refrescar
+        return redirect(url_for('view_order_items', id=id))
+    
+    # Obtener los ítems de la orden
+    order_items = OrderItem.query.filter_by(id_purchase_order=id).all()
+    
+    # Obtener productos para el select
+    user_store_id = session.get('user_id')
+    productos_tienda = get_products_by_store(user_store_id)
+
+    return render_template('view_order_items.html', order=order, order_items=order_items)
+
+
 
 
 if __name__ == '__main__':
