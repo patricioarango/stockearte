@@ -1,0 +1,31 @@
+{% include "doctype.html" %}
+<body class="h-100">
+    {% include "nav.html" %}
+    <div class="container h-100">
+        <div class="row h-100">
+            <div class="col-12">
+                
+            </div>
+        </div>
+    </div>
+<div class="container">
+    <table>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>id odc externa</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for odc in orden_de_compra %}
+            <tr>
+                <td>{{ odc.id }}</td>
+                <td>{{ odc.id_odc_externa }}</td>
+                <td>{{ odc.fecha_solicitud }}</td>
+                <td>{{ odc.estado }}</td>
+            </tr>
+            {% endfor %}
+    </table>
+</div>    

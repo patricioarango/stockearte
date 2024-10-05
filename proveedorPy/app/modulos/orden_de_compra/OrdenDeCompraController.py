@@ -1,5 +1,6 @@
 from . import orden_de_compra_blueprint
 from kafka import KafkaConsumer
+from flask import Flask, render_template, request, flash, redirect, session, json, url_for, redirect,jsonify
 import os,json
 from app.models import Orden_de_compra,Talle,Color,Articulo,Producto,Orden_de_compra_item
 from flask import current_app as app
@@ -51,9 +52,8 @@ def consumer_orden_de_compra():
             db.session.add(orden_de_compra)
             db.session.commit()
             print(f"Message received: {orden_de_compra_store}")
-
-    result = {'a': 'beeeeeee'}
-    return result, 200
+            render_template('orden_de_compra.html', orden_de_compra=orden_de_compra_store)
+    
 
 def chequearStockIncorrecto(orden_de_compra_items):
     res = []
