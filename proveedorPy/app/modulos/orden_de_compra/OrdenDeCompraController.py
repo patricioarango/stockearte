@@ -52,7 +52,9 @@ def consumer_orden_de_compra():
             db.session.add(orden_de_compra)
             db.session.commit()
             print(f"Message received: {orden_de_compra_store}")
-            render_template('orden_de_compra.html', orden_de_compra=orden_de_compra_store)
+    
+    return render_template('orden_de_compra.html', ordenes_de_compra=orden_de_compra)    
+            
     
 
 def chequearStockIncorrecto(orden_de_compra_items):

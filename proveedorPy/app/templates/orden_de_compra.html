@@ -9,7 +9,7 @@
         </div>
     </div>
 <div class="container">
-    <table>
+    <table class="table table-striped table-hover">
         <thead>
             <tr>
                 <th>id</th>
@@ -19,7 +19,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for odc in orden_de_compra %}
+            {% for odc in ordenes_de_compra %}
             <tr>
                 <td>{{ odc.id }}</td>
                 <td>{{ odc.id_odc_externa }}</td>
@@ -27,5 +27,6 @@
                 <td>{{ odc.estado }}</td>
             </tr>
             {% endfor %}
+        </tbody>        
     </table>
 </div>    
