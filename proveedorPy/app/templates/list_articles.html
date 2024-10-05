@@ -17,7 +17,7 @@
             <thead>
                 <tr>
                     <th>Nombre del Artículo</th>
-                    <th>Url Foto</th>
+                    <th>Foto</th>
                     <th>Talle</th>
                     <th>Color</th>
                     <th>Stock</th>
@@ -27,7 +27,9 @@
                 {% for articulo in articulosdelproducto %}
                 <tr>
                     <td>{{ articulo.articulo }}</td>
-                    <td>{{ articulo.url_foto }}</td>
+                    <td>
+                        <img src="{{ articulo.url_foto }}" alt="Foto de {{ articulo.articulo }}" style="max-width: 100px; height: auto;">
+                    </td>
                     <td>{{ articulo.talle.talle if articulo.talle else 'N/A' }}</td>
                     <td>{{ articulo.color.color if articulo.color else 'N/A' }}</td>
                     <td>{{ articulo.stock }}</td>
@@ -37,6 +39,7 @@
                 </tr>
                 {% endfor %}
             </tbody>
+            
         </table>
         {% else %}
             <p>No se agregaron artículos para este producto.</p>
