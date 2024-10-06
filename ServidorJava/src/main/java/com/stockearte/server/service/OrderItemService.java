@@ -48,6 +48,7 @@ public class OrderItemService extends OrderItemServiceGrpc.OrderItemServiceImplB
         orderItemreq.setColor(request.getColor());
         orderItemreq.setSize(request.getSize());
         orderItemreq.setRequestedAmount(request.getRequestedAmount());
+        orderItemreq.setSend(request.getSend());
              
         orderItemreq.setPurchaseOrder(purchaseOrderRepository.findById(request.getPurchaseOrder().getIdPurchaseOrder()));
 
@@ -60,6 +61,7 @@ public class OrderItemService extends OrderItemServiceGrpc.OrderItemServiceImplB
                 .setSize(orderItem.getSize())
                 .setRequestedAmount(orderItem.getRequestedAmount())
                 .setPurchaseOrder(PurchaseOrderProto.PurchaseOrder.newBuilder().setIdPurchaseOrder(request.getPurchaseOrder().getIdPurchaseOrder()))
+                .setSend(orderItem.getSend())
                 .build();
         responseObserver.onNext(a);
         responseObserver.onCompleted();
