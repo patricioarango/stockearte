@@ -14,11 +14,9 @@
 <body>
     {% include "nav.html" %}
     <div class="container mt-5">
-        <h1>Items de la Orden de Compra #{{ order.id }}</h1>
-        <a href="{{ url_for('add_order_item', id_order=order.id) }}" class="btn btn-primary mb-3">Agregar Item</a>
-        
+        <h1>Items de la Orden de Compra #{{ order.idPurchaseOrder }}</h1> 
         <!-- Tabla de ítems de la orden de compra -->
-        <table class="table table-striped table-hover">
+        <table id="itemsTable" class="table table-striped table-hover">
             <thead>
                 <tr>
                     <th>Código</th>
@@ -28,12 +26,12 @@
                 </tr>
             </thead>
             <tbody>
-                {% for item in order_items %}
+                {% for item in order.items %}
                 <tr>
-                    <td>{{ item.product_code }}</td>
+                    <td>{{ item.productCode }}</td>  <!-- Asegúrate de que esto sea correcto -->
                     <td>{{ item.color }}</td>
                     <td>{{ item.size }}</td>
-                    <td>{{ item.requested_amount }}</td>
+                    <td>{{ item.requestedAmount }}</td>  <!-- Asegúrate de que esto sea correcto -->
                 </tr>
                 {% endfor %}
             </tbody>
@@ -41,31 +39,37 @@
         
         <!-- Formulario para agregar un nuevo ítem a la orden de compra -->
         <h2>Agregar Nuevo Item</h2>
-        <form method="POST" action="{{ url_for('view_order_items', id=order.id) }}">
+        <form method="POST" action="{{ url_for('view_order_items', id=order.idPurchaseOrder) }}">
             <div class="mb-3">
-                <label for="product_code" class="form-label">Codigo de producto</label>
-                <input type="text" name="product_code" id="product_code" class="form-control" required>
+                <label for="idProduct" class="form-label">Código del Producto</label>
+                <select name="idProduct" id="idProduct" class="form-select" required>
+                    {% for product in productos_tienda %}
+                        <option value="{{ product.idProduct }}">{{ product.code }} ({{ product.productName }})</option>
+                    {% endfor %}
+                </select>
             </div>
-
-            <div class="mb-3">
-                <label for="color" class="form-label">Color</label>
-                <input type="text" name="color" id="color" class="form-control" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="size" class="form-label">Tamaño</label>
-                <input type="text" name="size" id="size" class="form-control" required>
-            </div>
-
             <div class="mb-3">
                 <label for="requested_amount" class="form-label">Cantidad Solicitada</label>
                 <input type="number" name="requested_amount" id="requested_amount" class="form-control" required>
             </div>
-
             <button type="submit" class="btn btn-primary">Agregar Item</button>
+            <button type="submit" class="btn btn-primary">Guardar y Enviar</button><!--NO TIENE FUNCIONALIDAD TODAVIA-->
         </form>
 
-        <a href="{{ url_for('list_purchase_orders') }}" class="btn btn-secondary mt-3">Volver a Órdenes</a>
+        <a href="{{ url_for('list_purchase_orders') }}" class="btn btn-secondary mt-3" id="volverBtn">Volver a Órdenes</a>
     </div>
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const itemsTable = document.getElementById("itemsTable").getElementsByTagName('tbody')[0];
+        const volverBtn = document.getElementById('volverBtn');
+        
+        volverBtn.addEventListener('click', function(event) {
+            if (itemsTable.rows.length === 0) {
+                event.preventDefault();
+                volverBtn.classList.add('disabled');
+            }
+        });
+    });
+</script>
 </html>

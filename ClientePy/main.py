@@ -30,6 +30,14 @@ from productStock_pb2 import ProductStock, ProductsStock, ProductAndStoreRequest
 
 from productStock_pb2_grpc import ProductStockServiceStub
 
+from purchaseOrder_pb2 import PurchaseOrder
+
+from purchaseOrder_pb2_grpc import PurchaseOrderServiceStub
+
+from orderItem_pb2 import OrderItem
+
+from orderItem_pb2_grpc import OrderItemServiceStub
+
 import logging
 
 from google.protobuf.json_format import MessageToJson
@@ -57,50 +65,6 @@ class Rol(db.Model):
     def __repr__(self):
         return f'<Rol id={self.id_rol} rol={self.rol} enabled={self.enabled}>'
     
-class StoreClass(db.Model):
-      __tablename__ = 'store'
-      id_store = db.Column(db.Integer, primary_key=True, autoincrement=True)
-      store = db.Column(db.String(255), nullable=True)
-      code = db.Column(db.String(255), nullable=True)
-      address = db.Column(db.String(255), nullable=True)
-      city = db.Column(db.String(255), nullable=True)
-      state = db.Column(db.String(255), nullable=True)
-      enabled = db.Column(db.Boolean, default=True)
-    
-      def __repr__(self):
-          return f'<Store id={self.id_store} store={self.store} enabled={self.enabled}>'   
-
-class PurchaseOrder(db.Model):
-    __tablename__ = 'purchase_order'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    observation = db.Column(db.Text, nullable=True)
-    id_store = db.Column(db.Integer, db.ForeignKey('store.id_store'), nullable=True)
-    state = db.Column(db.Enum('RECHAZADA', 'ACEPTADA', 'SOLICITADA', 'RECIBIDA'), default='SOLICITADA')
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    purchase_order_date = db.Column(db.DateTime, nullable=True)
-    reception_date = db.Column(db.DateTime, nullable=True)
-    
-    store = db.relationship('StoreClass', backref='purchase_orders')
-    
-    def __repr__(self):
-        return f'<PurchaseOrder id={self.id} state={self.state}>'
-
-
-class OrderItem(db.Model):
-    __tablename__ = 'order_item'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_purchase_order = db.Column(db.Integer, db.ForeignKey('purchase_order.id'), nullable=False)
-    product_code = db.Column(db.String(255), nullable=True)
-    color = db.Column(db.String(255), nullable=True)
-    size = db.Column(db.String(255), nullable=True)
-    requested_amount = db.Column(db.Integer, nullable=True)
-
-    purchase_order = db.relationship('PurchaseOrder', backref='order_items')
-
-    def __repr__(self):
-        return f'<OrderItem id={self.id} product_code={self.product_code}>'
-
-
 def checkSessionManager():
     if 'user_id' not in session or session['roleName']!='manager':
         return redirect('/login')
@@ -139,6 +103,7 @@ def login():
         session['name'] = response.name
         session['lastname'] = response.lastname
         session['user_store_id'] = response.store.idStore  
+        session['user_store_name'] = response.store.storeName
 
         print("Contenido de la sesión:", session)
 
@@ -329,6 +294,7 @@ def product():
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         product_stub = ProductServiceStub(channel)
         response = product_stub.FindAll(Product())  
+        print("productos test: ",response)
     return render_template('product.html', productos=response.product)
 
 def generate_product_code(length=10):
@@ -481,128 +447,136 @@ def edit_stock(id):
 
 @app.route('/purchase_orders')
 def list_purchase_orders():
-    purchase_orders = PurchaseOrder.query.all()
-    return render_template('list_purchase_orders.html', purchase_orders=purchase_orders)
+    try:
+        with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+            purchaseorder_stub = PurchaseOrderServiceStub(channel)
+            response = purchaseorder_stub.FindAll(PurchaseOrder())
+            #print("respuesta", response)
+            return render_template('list_purchase_orders.html', purchase_orders=response.purchaseOrderWithItem)
+    except grpc.RpcError as e:
+        print(f'Error en la llamada gRPC: {e.code()}, {e.details()}')
+        return "Error al obtener órdenes de compra", 500
+
+
+##quitar si se cambia las fechas a String##
+from google.protobuf.timestamp_pb2 import Timestamp
+def get_timestamp(dt=None):
+    if dt is None:
+        dt = datetime.utcnow()  # Usa la hora actual si no se proporciona una fecha
+    timestamp = Timestamp()
+    timestamp.FromDatetime(dt)  # Convierte datetime a Timestamp
+    return timestamp
 
 @app.route('/new_purchase_order', methods=['GET', 'POST'])
 def new_purchase_order():
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        purchaseorder_stub = PurchaseOrderServiceStub(channel)
+        user_store_id = session.get('user_store_id')
+        store_name = session.get('user_store_name')
+        
+        # Crear la tienda asociada
+        store = Store(
+            idStore=user_store_id,
+            storeName=store_name
+        )
+        
         # Crear la nueva orden de compra
         new_order = PurchaseOrder(
-            id_store= session.get('user_store_id'),
-            observation=" ",
-            state="SOLICITADA",
-            purchase_order_date=datetime.now()
-        )
-        db.session.add(new_order)
-        db.session.commit()
-        return redirect(url_for('list_purchase_orders'))
-
-@app.route('/edit_purchase_order/<int:id>', methods=['GET', 'POST'])
-def edit_purchase_order(id):
-    order = PurchaseOrder.query.get_or_404(id)
-    if request.method == 'POST':
-        order.observation = request.form['observation']
-        order.state = request.form['state']
-        db.session.commit()
-        return redirect(url_for('list_purchase_orders'))
-    
-    stores = StoreClass.query.filter_by(enabled=True).all()
-    return render_template('edit_purchase_order.html', order=order, stores=stores)
-
-@app.route('/delete_purchase_order/<int:id>', methods=['POST'])
-def delete_purchase_order(id):
-    order = PurchaseOrder.query.get_or_404(id)
-    db.session.delete(order)
-    db.session.commit()
-    return redirect(url_for('list_purchase_orders'))
-
-@app.route('/add_order_item/<int:id_order>', methods=['GET', 'POST'])
-def add_order_item(id_order):
-    checkSessionManager()
-    user_store_id = session.get('user_id')
-    
-    # Fetch products by store before handling the request
-    productos_tienda = get_products_by_store(user_store_id)
-    order = PurchaseOrder.query.get_or_404(id_order)
-
-    # Handle POST request for adding a new order item
-    if request.method == 'POST':
-        idProduct = int(request.form['idProduct'])
-        requested_amount = request.form['requested_amount']
+            observation=" ",  # Observación vacía
+            state="SOLICITADA",  # Estado inicial
+            createdAt=get_timestamp(),  # Fecha de creación
+            purchaseOrderDate=None,  # Fecha de la orden de compra
+            receptionDate=None,  
+            store=store  # Tienda asociada
+        )     
+        try:
+            # Enviar la orden de compra al servidor gRPC
+            response = purchaseorder_stub.AddPurchaseOrder(new_order)
+            print("respuesta testeito parcero", response)
+            # Redirigir a la pantalla de ítems con el ID de la nueva orden
+            new_order_id = response.idPurchaseOrder  # Asegúrate de que el servidor gRPC devuelva el ID
+            return redirect(url_for('view_order_items', id=new_order_id))
         
-        # Open gRPC channel inside the POST request handling block
-        with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
-            stub = ProductServiceStub(channel)
-            response = stub.GetProduct(Product(idProduct=idProduct))
-            print("PRODUCTO: ",response.product)
+        except grpc.RpcError as e:
+            print(f"Error al agregar la orden de compra: {e}")
+            return render_template('error.html', error_message="Hubo un error al intentar agregar la orden de compra.")
 
-            # Create the new item using the data retrieved from gRPC
-            new_item = OrderItem(
-                id_purchase_order=id_order,
-                product_code=response.code,  # Accessing productCode correctly
-                color=response.color,               # Accessing color correctly
-                size=response.size,                 # Accessing size correctly
-                requested_amount=requested_amount
-                #send=false
-            )
-            
-            # Add the new item to the database
-            db.session.add(new_item)
-            db.session.commit()
-        
-        # Redirect to view the order items after adding a new one
-        return redirect(url_for('view_order_items', id=id_order))
-
-    # Handle GET request by rendering the template
-    print("productos: ", productos_tienda)
-    return render_template('add_order_item.html', order=order, order_id_id=id_order, products=productos_tienda)
-
-
-
-# @app.route('/view_order_items/<int:id>')
-# def view_order_items(id):
-#     order = PurchaseOrder.query.get_or_404(id)
-#     items = OrderItem.query.filter_by(id_purchase_order=id).all()
-#     return render_template('view_order_items.html', order=order, order_items=items)
 
 @app.route('/view_order_items/<int:id>', methods=['GET', 'POST'])
 def view_order_items(id):
     checkSessionManager()
-    
-    # Obtener la orden de compra
-    order = PurchaseOrder.query.get_or_404(id)
-    
-    # Si el método es POST, significa que estamos agregando un nuevo item
-    if request.method == 'POST':
-        product_code = request.form['product_code']
-        color = request.form['color']
-        size = request.form['size']
-        requested_amount = request.form['requested_amount']
-        
-        # Crear el nuevo item
-        new_item = OrderItem(
-            id_purchase_order=id,
-            product_code=product_code,
-            color=color,
-            size=size,
-            requested_amount=requested_amount
-        )
-        db.session.add(new_item)
-        db.session.commit()
-        
-        # Redirigimos para evitar doble envío de formularios al refrescar
-        return redirect(url_for('view_order_items', id=id))
-    
-    # Obtener los ítems de la orden
-    order_items = OrderItem.query.filter_by(id_purchase_order=id).all()
-    
-    # Obtener productos para el select
     user_store_id = session.get('user_id')
     productos_tienda = get_products_by_store(user_store_id)
+    # Conexión al canal gRPC
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        purchase_order_stub = PurchaseOrderServiceStub(channel)
+        order_item_stub = OrderItemServiceStub(channel)
+        
+        # Obtener la orden de compra usando el stub
+        try:
+            order = purchase_order_stub.GetPurchaseOrder(PurchaseOrder(idPurchaseOrder=id))
+        except grpc.RpcError as e:
+            print(f"Error al obtener la orden de compra: {e}")
+            return render_template('error.html', error_message="No se pudo obtener la orden de compra.")
 
-    return render_template('view_order_items.html', order=order, order_items=order_items)
+        # Inicializa una lista para los items
+        order_items = order.items  # Accede directamente a los ítems desde la orden
 
+        # Si el método es POST, significa que estamos agregando un nuevo item
+        if request.method == 'POST':
+            idProduct = int(request.form['idProduct'])
+            requested_amount = int(request.form['requested_amount'])
 
+            # Open gRPC channel inside the POST request handling block
+            with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+                stub = ProductServiceStub(channel)
+                response = stub.GetProduct(Product(idProduct=idProduct))
+                print("PRODUCTO: ", response.product)
+
+                purchaseOrder = PurchaseOrder(
+                    idPurchaseOrder=id,
+                    )
+                
+
+                new_item = OrderItem(
+                    purchaseOrder=purchaseOrder,
+                    productCode=response.code,  
+                    color=response.color,               
+                    size=response.size,                 
+                    requestedAmount=requested_amount
+                )
+
+                try:
+                    order_item_stub.SaveOrderItem(new_item)  # Llamada gRPC para agregar el nuevo item
+                except grpc.RpcError as e:
+                    print(f"Error al agregar el ítem: {e}")
+                    return render_template('error.html', error_message="No se pudo agregar el ítem.")
+
+                # Redirigimos para evitar doble envío de formularios al refrescar
+                return redirect(url_for('view_order_items', id=id))
+    print("productos: ", productos_tienda)
+    return render_template('view_order_items.html', order=order, order_items=order_items, productos_tienda=productos_tienda)
+
+@app.route('/view_order_items_list/<int:id>', methods=['GET'])
+def view_order_items_list(id):
+    checkSessionManager()
+    user_store_id = session.get('user_id')
+    
+    # Conexión al canal gRPC
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        purchase_order_stub = PurchaseOrderServiceStub(channel)
+        
+        # Obtener la orden de compra usando el stub
+        try:
+            order = purchase_order_stub.GetPurchaseOrder(PurchaseOrder(idPurchaseOrder=id))
+        except grpc.RpcError as e:
+            print(f"Error al obtener la orden de compra: {e}")
+            return render_template('error.html', error_message="No se pudo obtener la orden de compra.")
+
+        # Inicializa una lista para los items
+        order_items = order.items  # Accede directamente a los ítems desde la orden
+
+    return render_template('view_order_items_list.html', order=order, order_items=order_items)
 
 
 if __name__ == '__main__':

@@ -12,29 +12,26 @@
       <table class="table table-striped mt-3">
           <thead>
               <tr>
-                  <th>Tienda</th>
-                  <th>Observación</th>
-                  <th>Estado</th>
-                  <th>Fecha de solicitud</th>
-                  <th>Fecha de recepcion</th>
-                  <th>Acciones</th>
+                <th>Tienda</th>
+                <th>Observación</th>
+                <th>Estado</th>
+                <th>Fecha de solicitud</th>
+                <th>Fecha de recepcion</th>
+                <th>Acciones</th>
               </tr>
           </thead>
           <tbody>
-              {% for order in purchase_orders %}
+            {% for order in purchase_orders %}
               <tr>
-                  <td>{{ order.store.store}}</td>
-                  <td>{{ order.observation }}</td>
-                  <td>{{ order.state }}</td>
-                  <td>{{ order.created_at }}</td>
-                  <td>{{ order.purchase_order_date}}</td>
-                  <td>
-                      <a href="{{ url_for('edit_purchase_order', id=order.id) }}" class="btn btn-warning">Editar</a>
-                      <form action="{{ url_for('delete_purchase_order', id=order.id) }}" method="POST" style="display:inline;">
-                          <button class="btn btn-danger" type="submit">Eliminar</button>
-                      </form>
-                      <a href="{{ url_for('view_order_items', id=order.id) }}" class="btn btn-info">Ver Ítems</a>
-                  </td>
+                <td>{{ order.store.storeName}}</td>
+                <td>{{ order.observation }}</td>
+                <td>{{ order.state }}</td>
+                <td>{{ order.createdAt.seconds }}</td>
+                <td>{{ order.purchaseOrderDate.seconds}}</td>
+                <td>
+                    <a href="{{ url_for('view_order_items', id=order.idPurchaseOrder) }}" class="btn btn-success">Agregar Ítems</a>
+                    <a href="{{ url_for('view_order_items_list', id=order.idPurchaseOrder) }}" class="btn btn-info">Ver Ítems</a>
+                </td>
               </tr>
               {% endfor %}
           </tbody>
