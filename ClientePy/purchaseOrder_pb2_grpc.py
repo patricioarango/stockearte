@@ -50,6 +50,11 @@ class PurchaseOrderServiceStub(object):
                 request_serializer=purchaseOrder__pb2.PurchaseOrder.SerializeToString,
                 response_deserializer=purchaseOrder__pb2.PurchaseOrder.FromString,
                 _registered_method=True)
+        self.FindAllByStore = channel.unary_unary(
+                '/model.PurchaseOrderService/FindAllByStore',
+                request_serializer=purchaseOrder__pb2.PurchaseAndStoreRequest.SerializeToString,
+                response_deserializer=purchaseOrder__pb2.PurchaseOrders.FromString,
+                _registered_method=True)
 
 
 class PurchaseOrderServiceServicer(object):
@@ -73,6 +78,12 @@ class PurchaseOrderServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def FindAllByStore(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_PurchaseOrderServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -90,6 +101,11 @@ def add_PurchaseOrderServiceServicer_to_server(servicer, server):
                     servicer.AddPurchaseOrder,
                     request_deserializer=purchaseOrder__pb2.PurchaseOrder.FromString,
                     response_serializer=purchaseOrder__pb2.PurchaseOrder.SerializeToString,
+            ),
+            'FindAllByStore': grpc.unary_unary_rpc_method_handler(
+                    servicer.FindAllByStore,
+                    request_deserializer=purchaseOrder__pb2.PurchaseAndStoreRequest.FromString,
+                    response_serializer=purchaseOrder__pb2.PurchaseOrders.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -173,6 +189,33 @@ class PurchaseOrderService(object):
             '/model.PurchaseOrderService/AddPurchaseOrder',
             purchaseOrder__pb2.PurchaseOrder.SerializeToString,
             purchaseOrder__pb2.PurchaseOrder.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def FindAllByStore(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/model.PurchaseOrderService/FindAllByStore',
+            purchaseOrder__pb2.PurchaseAndStoreRequest.SerializeToString,
+            purchaseOrder__pb2.PurchaseOrders.FromString,
             options,
             channel_credentials,
             insecure,

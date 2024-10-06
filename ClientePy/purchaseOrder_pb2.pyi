@@ -1,6 +1,5 @@
 from google.protobuf import empty_pb2 as _empty_pb2
 from google.protobuf import wrappers_pb2 as _wrappers_pb2
-from google.protobuf import timestamp_pb2 as _timestamp_pb2
 import store_pb2 as _store_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
@@ -15,6 +14,14 @@ class PurchaseOrders(_message.Message):
     purchaseOrderWithItem: _containers.RepeatedCompositeFieldContainer[PurchaseOrderWithItem]
     def __init__(self, purchaseOrderWithItem: _Optional[_Iterable[_Union[PurchaseOrderWithItem, _Mapping]]] = ...) -> None: ...
 
+class PurchaseAndStoreRequest(_message.Message):
+    __slots__ = ("idPurchaseOrder", "idStore")
+    IDPURCHASEORDER_FIELD_NUMBER: _ClassVar[int]
+    IDSTORE_FIELD_NUMBER: _ClassVar[int]
+    idPurchaseOrder: int
+    idStore: int
+    def __init__(self, idPurchaseOrder: _Optional[int] = ..., idStore: _Optional[int] = ...) -> None: ...
+
 class PurchaseOrder(_message.Message):
     __slots__ = ("idPurchaseOrder", "observation", "state", "createdAt", "purchaseOrderDate", "receptionDate", "store")
     IDPURCHASEORDER_FIELD_NUMBER: _ClassVar[int]
@@ -27,11 +34,11 @@ class PurchaseOrder(_message.Message):
     idPurchaseOrder: int
     observation: str
     state: str
-    createdAt: _timestamp_pb2.Timestamp
-    purchaseOrderDate: _timestamp_pb2.Timestamp
-    receptionDate: _timestamp_pb2.Timestamp
+    createdAt: str
+    purchaseOrderDate: str
+    receptionDate: str
     store: _store_pb2.Store
-    def __init__(self, idPurchaseOrder: _Optional[int] = ..., observation: _Optional[str] = ..., state: _Optional[str] = ..., createdAt: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., purchaseOrderDate: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., receptionDate: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., store: _Optional[_Union[_store_pb2.Store, _Mapping]] = ...) -> None: ...
+    def __init__(self, idPurchaseOrder: _Optional[int] = ..., observation: _Optional[str] = ..., state: _Optional[str] = ..., createdAt: _Optional[str] = ..., purchaseOrderDate: _Optional[str] = ..., receptionDate: _Optional[str] = ..., store: _Optional[_Union[_store_pb2.Store, _Mapping]] = ...) -> None: ...
 
 class PurchaseOrderWithItem(_message.Message):
     __slots__ = ("idPurchaseOrder", "observation", "state", "createdAt", "purchaseOrderDate", "receptionDate", "store", "items")
@@ -46,12 +53,12 @@ class PurchaseOrderWithItem(_message.Message):
     idPurchaseOrder: int
     observation: str
     state: str
-    createdAt: _timestamp_pb2.Timestamp
-    purchaseOrderDate: _timestamp_pb2.Timestamp
-    receptionDate: _timestamp_pb2.Timestamp
+    createdAt: str
+    purchaseOrderDate: str
+    receptionDate: str
     store: _store_pb2.Store
     items: _containers.RepeatedCompositeFieldContainer[Item]
-    def __init__(self, idPurchaseOrder: _Optional[int] = ..., observation: _Optional[str] = ..., state: _Optional[str] = ..., createdAt: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., purchaseOrderDate: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., receptionDate: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., store: _Optional[_Union[_store_pb2.Store, _Mapping]] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ...) -> None: ...
+    def __init__(self, idPurchaseOrder: _Optional[int] = ..., observation: _Optional[str] = ..., state: _Optional[str] = ..., createdAt: _Optional[str] = ..., purchaseOrderDate: _Optional[str] = ..., receptionDate: _Optional[str] = ..., store: _Optional[_Union[_store_pb2.Store, _Mapping]] = ..., items: _Optional[_Iterable[_Union[Item, _Mapping]]] = ...) -> None: ...
 
 class Item(_message.Message):
     __slots__ = ("idOrderItem", "productCode", "color", "size", "requestedAmount")

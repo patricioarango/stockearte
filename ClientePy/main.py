@@ -30,7 +30,7 @@ from productStock_pb2 import ProductStock, ProductsStock, ProductAndStoreRequest
 
 from productStock_pb2_grpc import ProductStockServiceStub
 
-from purchaseOrder_pb2 import PurchaseOrder
+from purchaseOrder_pb2 import PurchaseOrder,PurchaseAndStoreRequest
 
 from purchaseOrder_pb2_grpc import PurchaseOrderServiceStub
 
@@ -447,25 +447,57 @@ def edit_stock(id):
 
 @app.route('/purchase_orders')
 def list_purchase_orders():
+    checkSessionManager()
+    user_store_id = session.get('user_store_id')
+    
     try:
+        # Abrir el canal gRPC
         with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+            # Crear el stub para el servicio de órdenes de compra
             purchaseorder_stub = PurchaseOrderServiceStub(channel)
-            response = purchaseorder_stub.FindAll(PurchaseOrder())
-            #print("respuesta", response)
-            return render_template('list_purchase_orders.html', purchase_orders=response.purchaseOrderWithItem)
+            
+            # Crear la solicitud para buscar órdenes por tienda
+            store_request = PurchaseAndStoreRequest(idStore=user_store_id)
+            
+            # Hacer la llamada gRPC al servidor para obtener las órdenes de compra
+            response = purchaseorder_stub.FindAllByStore(store_request)
+            
+            # Procesar la respuesta
+            purchase_orders = []
+            for purchase_order in response.purchaseOrderWithItem:
+                items = []
+                
+                # Procesar cada ítem dentro de la orden de compra
+                for item in purchase_order.items:
+                    items.append({
+                        'idOrderItem': item.idOrderItem,
+                        'productCode': item.productCode,
+                        'color': item.color,
+                        'size': item.size,
+                        'requestedAmount': item.requestedAmount
+                    })
+                
+                # Agregar la orden de compra con sus ítems a la lista
+                purchase_orders.append({
+                    'idPurchaseOrder': purchase_order.idPurchaseOrder,
+                    'observation': purchase_order.observation,
+                    'state': purchase_order.state,
+                    'createdAt': purchase_order.createdAt,
+                    'purchaseOrderDate': purchase_order.purchaseOrderDate,
+                    'receptionDate': purchase_order.receptionDate,
+                    'store': {
+                        'idStore': purchase_order.store.idStore,
+                        'storeName': purchase_order.store.storeName
+                    },
+                    'items': items
+                })
+            
+            # Renderizar la página de órdenes de compra con los datos obtenidos
+            return render_template('list_purchase_orders.html', purchase_orders=purchase_orders, idStore=user_store_id)
+    
     except grpc.RpcError as e:
-        print(f'Error en la llamada gRPC: {e.code()}, {e.details()}')
+        print(f"Error al obtener órdenes de compra: {e.code()}, {e.details()}")
         return "Error al obtener órdenes de compra", 500
-
-
-##quitar si se cambia las fechas a String##
-from google.protobuf.timestamp_pb2 import Timestamp
-def get_timestamp(dt=None):
-    if dt is None:
-        dt = datetime.utcnow()  # Usa la hora actual si no se proporciona una fecha
-    timestamp = Timestamp()
-    timestamp.FromDatetime(dt)  # Convierte datetime a Timestamp
-    return timestamp
 
 @app.route('/new_purchase_order', methods=['GET', 'POST'])
 def new_purchase_order():
@@ -480,19 +512,19 @@ def new_purchase_order():
             storeName=store_name
         )
         
+        current_date = datetime.now().strftime('%Y-%m-%d')
         # Crear la nueva orden de compra
         new_order = PurchaseOrder(
             observation=" ",  # Observación vacía
             state="SOLICITADA",  # Estado inicial
-            createdAt=get_timestamp(),  # Fecha de creación
-            purchaseOrderDate=None,  # Fecha de la orden de compra
-            receptionDate=None,  
+            createdAt=current_date,  # Fecha de creación
+            purchaseOrderDate=" ",  # Fecha de la orden de compra
+            receptionDate=" ",  
             store=store  # Tienda asociada
         )     
         try:
             # Enviar la orden de compra al servidor gRPC
             response = purchaseorder_stub.AddPurchaseOrder(new_order)
-            print("respuesta testeito parcero", response)
             # Redirigir a la pantalla de ítems con el ID de la nueva orden
             new_order_id = response.idPurchaseOrder  # Asegúrate de que el servidor gRPC devuelva el ID
             return redirect(url_for('view_order_items', id=new_order_id))

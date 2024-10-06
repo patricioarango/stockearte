@@ -12,6 +12,7 @@
       <table class="table table-striped mt-3">
           <thead>
               <tr>
+                <th>ID</th>
                 <th>Tienda</th>
                 <th>Observación</th>
                 <th>Estado</th>
@@ -23,11 +24,12 @@
           <tbody>
             {% for order in purchase_orders %}
               <tr>
+                <td>{{order.idPurchaseOrder}}</td>
                 <td>{{ order.store.storeName}}</td>
                 <td>{{ order.observation }}</td>
                 <td>{{ order.state }}</td>
-                <td>{{ order.createdAt.seconds }}</td>
-                <td>{{ order.purchaseOrderDate.seconds}}</td>
+                <td>{{ order.createdAt }}</td>
+                <td>{{ order.purchaseOrderDate}}</td>
                 <td>
                     <a href="{{ url_for('view_order_items', id=order.idPurchaseOrder) }}" class="btn btn-success">Agregar Ítems</a>
                     <a href="{{ url_for('view_order_items_list', id=order.idPurchaseOrder) }}" class="btn btn-info">Ver Ítems</a>
