@@ -31,7 +31,7 @@
                     <td>{{ item.productCode }}</td>  <!-- Asegúrate de que esto sea correcto -->
                     <td>{{ item.color }}</td>
                     <td>{{ item.size }}</td>
-                    <td>{{ item.requestedAmount }}</td>  <!-- Asegúrate de que esto sea correcto -->
+                    <td>{{ item.requestedAmount }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -52,8 +52,12 @@
                 <label for="requested_amount" class="form-label">Cantidad Solicitada</label>
                 <input type="number" name="requested_amount" id="requested_amount" class="form-control" required>
             </div>
-            <button type="submit" class="btn btn-primary">Agregar Item</button>
-            <button type="submit" class="btn btn-primary">Guardar y Enviar</button><!--NO TIENE FUNCIONALIDAD TODAVIA-->
+            <!-- Botón para agregar un ítem -->
+            <button type="submit" class="btn btn-primary" name="add_item" value="add_item">Agregar Item</button>
+    
+            <!-- Botón para guardar y enviar todos los ítems -->
+            <button type="submit" class="btn btn-primary" name="save_and_submit" value="save_and_submit">Guardar y Enviar</button>
+
         </form>
 
         <a href="{{ url_for('list_purchase_orders') }}" class="btn btn-secondary mt-3" id="volverBtn">Volver a Órdenes</a>

@@ -8,7 +8,6 @@ import random
 import string
 import os,grpc
 
-
 from user_pb2 import User
 
 from user_pb2_grpc import UsersServiceStub
@@ -465,18 +464,19 @@ def list_purchase_orders():
             # Procesar la respuesta
             purchase_orders = []
             for purchase_order in response.purchaseOrderWithItem:
-                items = []
+                Orderitems = []
                 
                 # Procesar cada ítem dentro de la orden de compra
-                for item in purchase_order.items:
-                    items.append({
-                        'idOrderItem': item.idOrderItem,
-                        'productCode': item.productCode,
-                        'color': item.color,
-                        'size': item.size,
-                        'requestedAmount': item.requestedAmount
+                for orderitem in purchase_order.items:
+                    Orderitems.append({
+                        'idOrderItem': orderitem.idOrderItem,
+                        'productCode': orderitem.productCode,
+                        'color': orderitem.color,
+                        'size': orderitem.size,
+                        'requestedAmount': orderitem.requestedAmount,
+                        'send': orderitem.send
                     })
-                
+                print("items test: ",Orderitems)
                 # Agregar la orden de compra con sus ítems a la lista
                 purchase_orders.append({
                     'idPurchaseOrder': purchase_order.idPurchaseOrder,
@@ -489,9 +489,9 @@ def list_purchase_orders():
                         'idStore': purchase_order.store.idStore,
                         'storeName': purchase_order.store.storeName
                     },
-                    'items': items
+                    'orderItems': Orderitems
                 })
-            
+            print("respuestaaaa: ",response)
             # Renderizar la página de órdenes de compra con los datos obtenidos
             return render_template('list_purchase_orders.html', purchase_orders=purchase_orders, idStore=user_store_id)
     
@@ -539,11 +539,12 @@ def view_order_items(id):
     checkSessionManager()
     user_store_id = session.get('user_id')
     productos_tienda = get_products_by_store(user_store_id)
+
     # Conexión al canal gRPC
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         purchase_order_stub = PurchaseOrderServiceStub(channel)
         order_item_stub = OrderItemServiceStub(channel)
-        
+
         # Obtener la orden de compra usando el stub
         try:
             order = purchase_order_stub.GetPurchaseOrder(PurchaseOrder(idPurchaseOrder=id))
@@ -551,43 +552,61 @@ def view_order_items(id):
             print(f"Error al obtener la orden de compra: {e}")
             return render_template('error.html', error_message="No se pudo obtener la orden de compra.")
 
-        # Inicializa una lista para los items
         order_items = order.items  # Accede directamente a los ítems desde la orden
 
-        # Si el método es POST, significa que estamos agregando un nuevo item
+        # Si el método es POST
         if request.method == 'POST':
             idProduct = int(request.form['idProduct'])
             requested_amount = int(request.form['requested_amount'])
+            
+            # Detectar qué botón fue presionado
+            if 'add_item' in request.form:  # Si fue el botón de "Agregar Item"
+                with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+                    stub = ProductServiceStub(channel)
+                    response = stub.GetProduct(Product(idProduct=idProduct))
 
-            # Open gRPC channel inside the POST request handling block
-            with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
-                stub = ProductServiceStub(channel)
-                response = stub.GetProduct(Product(idProduct=idProduct))
-                print("PRODUCTO: ", response.product)
-
-                purchaseOrder = PurchaseOrder(
-                    idPurchaseOrder=id,
+                    new_item = OrderItem(
+                        purchaseOrder=PurchaseOrder(idPurchaseOrder=id),
+                        productCode=response.code,
+                        color=response.color,
+                        size=response.size,
+                        requestedAmount=requested_amount,
+                        send=False
                     )
-                
 
-                new_item = OrderItem(
-                    purchaseOrder=purchaseOrder,
-                    productCode=response.code,  
-                    color=response.color,               
-                    size=response.size,                 
-                    requestedAmount=requested_amount
-                )
+                    try:
+                        order_item_stub.SaveOrderItem(new_item)
+                    except grpc.RpcError as e:
+                        print(f"Error al agregar el ítem: {e}")
+                        return render_template('error.html', error_message="No se pudo agregar el ítem.")
 
+                    return redirect(url_for('view_order_items', id=id))
+
+            elif 'save_and_submit' in request.form:  # Si fue el botón "Guardar y Enviar"
+                # Cambiar el atributo de cada item a true y enviar los cambios a gRPC
                 try:
-                    order_item_stub.SaveOrderItem(new_item)  # Llamada gRPC para agregar el nuevo item
-                except grpc.RpcError as e:
-                    print(f"Error al agregar el ítem: {e}")
-                    return render_template('error.html', error_message="No se pudo agregar el ítem.")
+                      with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+                        stub = ProductServiceStub(channel)
+                        response = stub.GetProduct(Product(idProduct=idProduct))
 
-                # Redirigimos para evitar doble envío de formularios al refrescar
-                return redirect(url_for('view_order_items', id=id))
-    print("productos: ", productos_tienda)
+                        new_item = OrderItem(
+                        purchaseOrder=PurchaseOrder(idPurchaseOrder=id),
+                        productCode=response.code,
+                        color=response.color,
+                        size=response.size,
+                        requestedAmount=requested_amount,
+                        send=True
+                        )
+                        order_item_stub.SaveOrderItem(new_item)
+                except grpc.RpcError as e:
+                    print(f"Error al enviar los ítems: {e}")
+                    return render_template('error.html', error_message="No se pudo enviar los ítems.")
+
+                # Redirigir a la lista de órdenes
+                return redirect(url_for('list_purchase_orders'))
+            
     return render_template('view_order_items.html', order=order, order_items=order_items, productos_tienda=productos_tienda)
+
 
 @app.route('/view_order_items_list/<int:id>', methods=['GET'])
 def view_order_items_list(id):
