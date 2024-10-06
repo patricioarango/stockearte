@@ -51,6 +51,7 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
                     .setColor(orderItem.getColor())
                     .setSize(orderItem.getSize())
                     .setRequestedAmount(orderItem.getRequestedAmount())
+                    .setSend(orderItem.getSend())
                     .build();
                 itemList.add(itemProto);
             }
@@ -89,6 +90,7 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
                     .setColor(orderItem.getColor())
                     .setSize(orderItem.getSize())
                     .setRequestedAmount(orderItem.getRequestedAmount())
+                    .setSend(orderItem.getSend())
                     .build();
                 itemList.add(itemProto);
             }
@@ -133,6 +135,7 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
                     .setColor(orderItem.getColor())
                     .setSize(orderItem.getSize())
                     .setRequestedAmount(orderItem.getRequestedAmount())
+                    .setSend(orderItem.getSend())
                     .build();
                 itemList.add(itemProto);
             }

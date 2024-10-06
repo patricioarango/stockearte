@@ -32,6 +32,9 @@ public class OrderItem {
     @JoinColumn(name = "purchase_order_id", nullable = false)
     private PurchaseOrder purchaseOrder;
 
+    @Column(name = "send")
+    private Boolean send;
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -67,6 +70,10 @@ public class OrderItem {
 
     public PurchaseOrder getPurchaseOrder() {
         return purchaseOrder;
+    }
+
+    public Boolean getSend() {
+        return send;
     }
 
 }

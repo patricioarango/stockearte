@@ -52,4 +52,5 @@ message Item {
     string color = 3;
     string size = 4;
     int32 requestedAmount = 5;
+    bool send = 6;
 }
