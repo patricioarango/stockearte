@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package model;
+
+option java_package = "com.stockearte.model";
+option java_outer_classname = "PurchaseOrderProto";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "store.proto";
+
+service PurchaseOrderService {
+  rpc GetPurchaseOrder(PurchaseOrder) returns (PurchaseOrderWithItem) {}
+  rpc FindAll(google.protobuf.Empty) returns (PurchaseOrders) {}
+  rpc AddPurchaseOrder(PurchaseOrder) returns (PurchaseOrder) {}
+  rpc FindAllByStore(PurchaseAndStoreRequest) returns (PurchaseOrders) {}
+}
+
+message PurchaseOrders {
+  repeated PurchaseOrderWithItem purchaseOrderWithItem = 1;
+}
+
+message PurchaseAndStoreRequest {
+  int32 idPurchaseOrder = 1;
+  int32 idStore = 2;
+}
+
+message PurchaseOrder {
+    int32 idPurchaseOrder = 1;
+    string observation = 2;
+    string state = 3;
+    string createdAt = 4;
+    string purchaseOrderDate = 5;
+    string receptionDate = 6;
+    Store store = 8;
+}
+
+message PurchaseOrderWithItem {
+    int32 idPurchaseOrder = 1;
+    string observation = 2;
+    string state = 3;
+    string createdAt = 4;
+    string purchaseOrderDate = 5;
+    string receptionDate = 6;
+    Store store = 8;
+    repeated Item items = 9;
+}
+
+message Item {
+    int32 idOrderItem = 1;
+    string productCode = 2;
+    string color = 3;
+    string size = 4;
+    int32 requestedAmount = 5;
+    bool send = 6;
+}
