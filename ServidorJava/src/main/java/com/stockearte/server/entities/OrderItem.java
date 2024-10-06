@@ -6,7 +6,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "order_item")
-@Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,4 +31,42 @@ public class OrderItem {
     @ManyToOne
     @JoinColumn(name = "purchase_order_id", nullable = false)
     private PurchaseOrder purchaseOrder;
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("OrderItem{");
+        sb.append("id=").append(id);
+        sb.append(", productCode=").append(productCode);
+        sb.append(", color=").append(color);
+        sb.append(", size=").append(size);
+        sb.append(", requestedAmount=").append(requestedAmount);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getProductCode() {
+        return productCode;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public int getRequestedAmount() {
+        return requestedAmount;
+    }
+
+    public PurchaseOrder getPurchaseOrder() {
+        return purchaseOrder;
+    }
+
 }

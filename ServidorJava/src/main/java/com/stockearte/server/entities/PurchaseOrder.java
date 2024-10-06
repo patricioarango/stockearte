@@ -31,18 +31,36 @@ public class PurchaseOrder {
     private State state = State.SOLICITADA;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     @Column(name = "purchase_order_date")
-    private LocalDateTime purchaseOrderDate;
+    private String purchaseOrderDate;
 
     @Column(name = "reception_date")
-    private LocalDateTime receptionDate;
+    private String receptionDate;
 
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderItem> orderItems;
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("PurchaseOrder{");
+        sb.append("id=").append(id);
+        sb.append(", observation=").append(observation);
+        sb.append(", store=").append(store);
+        sb.append(", state=").append(state);
+        sb.append(", createdAt=").append(createdAt);
+        sb.append(", purchaseOrderDate=").append(purchaseOrderDate);
+        sb.append(", receptionDate=").append(receptionDate);
+        sb.append(", orderItems=").append(orderItems);
+        sb.append('}');
+        return sb.toString();
+    }
+
     public enum State {
         RECHAZADA, ACEPTADA, SOLICITADA, RECIBIDA
     }
+
+    
 }
