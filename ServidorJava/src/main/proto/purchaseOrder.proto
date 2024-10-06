@@ -13,10 +13,16 @@ service PurchaseOrderService {
   rpc GetPurchaseOrder(PurchaseOrder) returns (PurchaseOrderWithItem) {}
   rpc FindAll(google.protobuf.Empty) returns (PurchaseOrders) {}
   rpc AddPurchaseOrder(PurchaseOrder) returns (PurchaseOrder) {}
+  rpc FindAllByStore(PurchaseAndStoreRequest) returns (PurchaseOrders) {}
 }
 
 message PurchaseOrders {
   repeated PurchaseOrderWithItem purchaseOrderWithItem = 1;
+}
+
+message PurchaseAndStoreRequest {
+  int32 idPurchaseOrder = 1;
+  int32 idStore = 2;
 }
 
 message PurchaseOrder {

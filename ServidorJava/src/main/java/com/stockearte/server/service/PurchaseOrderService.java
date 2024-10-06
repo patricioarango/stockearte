@@ -119,6 +119,50 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
     }
 
     @Override
+    public void findAllByStore(PurchaseOrderProto.PurchaseAndStoreRequest request, StreamObserver<PurchaseOrderProto.PurchaseOrders> responseObserver) {
+        List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findByStore_IdStore(request.getIdStore());
+        
+        List<PurchaseOrderProto.PurchaseOrderWithItem> purchaseOrderWithItemsList = new ArrayList<>();
+    
+        for (PurchaseOrder purchaseOrder : purchaseOrders) {
+            List<PurchaseOrderProto.Item> itemList = new ArrayList<>();
+            for (OrderItem orderItem : purchaseOrder.getOrderItems()) {
+                PurchaseOrderProto.Item itemProto = PurchaseOrderProto.Item.newBuilder()
+                    .setIdOrderItem(orderItem.getId())
+                    .setProductCode(orderItem.getProductCode())
+                    .setColor(orderItem.getColor())
+                    .setSize(orderItem.getSize())
+                    .setRequestedAmount(orderItem.getRequestedAmount())
+                    .build();
+                itemList.add(itemProto);
+            }
+    
+            PurchaseOrderProto.PurchaseOrderWithItem purchaseOrderWithItem = PurchaseOrderProto.PurchaseOrderWithItem.newBuilder()
+                .setIdPurchaseOrder(purchaseOrder.getId())
+                .setObservation(purchaseOrder.getObservation())
+                .setState(purchaseOrder.getState().name())
+                .setCreatedAt(purchaseOrder.getCreatedAt())
+                .setPurchaseOrderDate(purchaseOrder.getPurchaseOrderDate())
+                .setReceptionDate(purchaseOrder.getReceptionDate())
+                .setStore(StoreProto.Store.newBuilder()
+                    .setIdStore(purchaseOrder.getStore().getIdStore())
+                    .setStoreName(purchaseOrder.getStore().getStoreName())
+                    .build())
+                .addAllItems(itemList)
+                .build();
+    
+            purchaseOrderWithItemsList.add(purchaseOrderWithItem);
+        }
+    
+        PurchaseOrderProto.PurchaseOrders response = PurchaseOrderProto.PurchaseOrders.newBuilder()
+            .addAllPurchaseOrderWithItem(purchaseOrderWithItemsList)
+            .build();
+    
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }    
+
+    @Override
     public void addPurchaseOrder(PurchaseOrderProto.PurchaseOrder request, StreamObserver<PurchaseOrderProto.PurchaseOrder> responseObserver) {
         int purchaseOrderId = request.getIdPurchaseOrder();
         PurchaseOrder purchaseOrderreq = new PurchaseOrder();
