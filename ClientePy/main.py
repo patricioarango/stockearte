@@ -21,7 +21,7 @@ from role_pb2 import Role
 from role_pb2_grpc import RoleServiceStub
 
 from product_pb2 import Product
-from product_pb2 import Product, ProductCodeRequest
+from product_pb2 import Product, ProductCodeRequest, FindProductSearch
 
 from product_pb2_grpc import ProductServiceStub  
 
@@ -48,7 +48,6 @@ logger = logging.getLogger(__name__)
 app = create_app('flask.cfg')
 
 #creo conexion momentanea con base de datos local
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://avnadmin:AVNS_ylqtAU8JPG7TNXz0mDD@mysql-1d36c064-pato-ef11.a.aivencloud.com:25628/stockeartedb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -128,12 +127,28 @@ def index():
 def  home():
     return render_template('index.html')
 
-@app.route('/store_list')
+@app.route('/store_list', methods=['GET'])
 def store_list():
+    # Obtener los parámetros de búsqueda
+    store_code = request.args.get('store_code')  
+    store_state = request.args.get('estado')      
+
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         stub = StoreServiceStub(channel)
-        response = stub.FindAll(Store()) 
-    return render_template('store_list.html', stores=response.store)
+        response = stub.FindAll(Store())
+
+    filtered_stores = []
+    for store in response.store:
+        if store_code and store_code.lower() not in store.code.lower():
+            continue
+        if store_state == "habilitada" and not store.enabled:
+            continue
+        if store_state == "deshabilitada" and store.enabled:
+            continue
+        filtered_stores.append(store)
+
+    return render_template('store_list.html', stores=filtered_stores)
+
 
 @app.route('/stores/add', methods=['GET', 'POST'])
 def add_store():
@@ -200,15 +215,27 @@ def edit_store(idStore):
         return render_template('edit_store.html', store=storegrpc)
 
 
-# Ruta para listar usuarios
-@app.route('/users')
+@app.route('/users', methods=['GET'])
 def list_users():
+    search_username = request.args.get('username')  
+    store_id = request.args.get('id_tienda')      
+
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         stub = UsersServiceStub(channel)
-        response = stub.FindAll(User()) 
+        response = stub.FindAll(User())  
         store_stub = StoreServiceStub(channel)
         stores_response = store_stub.FindAll(Store())
-    return render_template('list_users.html', users=response.user,tiendas=stores_response.store)
+
+    filtered_users = []
+    for user in response.user:
+        if search_username and search_username.lower() not in user.username.lower():
+            continue
+        if store_id and store_id != str(user.store.idStore):
+            continue
+        filtered_users.append(user)
+
+    return render_template('list_users.html', users=filtered_users, tiendas=stores_response.store)
+
 
 # Ruta para agregar un nuevo usuario
 @app.route('/users/add', methods=['GET', 'POST'])
@@ -287,14 +314,31 @@ def edit_user(idUser):
         print("respuesta ", response)
         return render_template('edit_user.html', user=response, stores=stores, roles=roles)
     
-
-@app.route('/product')
+@app.route('/product', methods=['GET', 'POST'])
 def product():
+    search_query = request.args.get('search_query') 
+    search_code = request.args.get('search_code')   
+    search_size = request.args.get('search_size')    
+    search_color = request.args.get('search_color')  
+
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         product_stub = ProductServiceStub(channel)
         response = product_stub.FindAll(Product())  
-        print("productos test: ",response)
-    return render_template('product.html', productos=response.product)
+
+    filtered_products = []
+    for producto in response.product:
+        if search_query and search_query.lower() not in producto.product.lower():
+            continue
+        if search_code and search_code.lower() not in producto.code.lower():
+            continue
+        if search_size and search_size.lower() != producto.size.lower():
+            continue
+        if search_color and search_color.lower() not in producto.color.lower():
+            continue
+
+        filtered_products.append(producto)
+
+    return render_template('product.html', productos=filtered_products)
 
 def generate_product_code(length=10):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
@@ -394,13 +438,36 @@ def add_product_to_store(idStore):
     return render_template('add_product_to_store.html', idStore=idStore, products=product_list,productosdelatienda=product_stocks)
 
 
-@app.route('/my_products')
+@app.route('/my_products', methods=['GET'])
 def store_products():
     checkSessionManager()
     user_store_id = session.get('user_id')
     print("User Store ID de mis productos: ", user_store_id)
     productos_tienda = get_products_by_store(user_store_id)
-    return render_template('my_products.html', productos=productos_tienda,idStore=user_store_id)
+
+    search_query = request.args.get('search_query')
+    search_code = request.args.get('search_code')
+    search_size = request.args.get('search_size')
+    search_color = request.args.get('search_color')
+
+    if search_query or search_code or search_size or search_color:
+        filtered_products = []
+        for producto in productos_tienda:
+            if search_query and search_query.lower() not in producto['productName'].lower():
+                continue
+            if search_code and search_code.lower() not in producto['code'].lower():
+                continue
+            if search_size and search_size.lower() != producto['size'].lower():
+                continue
+            if search_color and search_color.lower() != producto['color'].lower():
+                continue
+            filtered_products.append(producto)
+
+        productos_tienda = filtered_products  
+
+    return render_template('my_products.html', productos=productos_tienda, idStore=user_store_id)
+
+
 
 def get_products_by_store(store_id):
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
@@ -452,21 +519,16 @@ def list_purchase_orders():
     try:
         # Abrir el canal gRPC
         with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
-            # Crear el stub para el servicio de órdenes de compra
             purchaseorder_stub = PurchaseOrderServiceStub(channel)
-            
-            # Crear la solicitud para buscar órdenes por tienda
+
             store_request = PurchaseAndStoreRequest(idStore=user_store_id)
-            
-            # Hacer la llamada gRPC al servidor para obtener las órdenes de compra
+
             response = purchaseorder_stub.FindAllByStore(store_request)
             
-            # Procesar la respuesta
             purchase_orders = []
             for purchase_order in response.purchaseOrderWithItem:
                 Orderitems = []
                 
-                # Procesar cada ítem dentro de la orden de compra
                 for orderitem in purchase_order.items:
                     Orderitems.append({
                         'idOrderItem': orderitem.idOrderItem,
@@ -476,8 +538,7 @@ def list_purchase_orders():
                         'requestedAmount': orderitem.requestedAmount,
                         'send': orderitem.send
                     })
-                print("items test: ",Orderitems)
-                # Agregar la orden de compra con sus ítems a la lista
+
                 purchase_orders.append({
                     'idPurchaseOrder': purchase_order.idPurchaseOrder,
                     'observation': purchase_order.observation,
@@ -492,7 +553,6 @@ def list_purchase_orders():
                     'orderItems': Orderitems
                 })
             print("respuestaaaa: ",response)
-            # Renderizar la página de órdenes de compra con los datos obtenidos
             return render_template('list_purchase_orders.html', purchase_orders=purchase_orders, idStore=user_store_id)
     
     except grpc.RpcError as e:
@@ -506,27 +566,24 @@ def new_purchase_order():
         user_store_id = session.get('user_store_id')
         store_name = session.get('user_store_name')
         
-        # Crear la tienda asociada
         store = Store(
             idStore=user_store_id,
             storeName=store_name
         )
         
         current_date = datetime.now().strftime('%Y-%m-%d')
-        # Crear la nueva orden de compra
+
         new_order = PurchaseOrder(
-            observation=" ",  # Observación vacía
-            state="SOLICITADA",  # Estado inicial
-            createdAt=current_date,  # Fecha de creación
-            purchaseOrderDate=" ",  # Fecha de la orden de compra
+            observation=" ",  
+            state="SOLICITADA", 
+            createdAt=current_date, 
+            purchaseOrderDate=" ", 
             receptionDate=" ",  
-            store=store  # Tienda asociada
+            store=store  
         )     
         try:
-            # Enviar la orden de compra al servidor gRPC
             response = purchaseorder_stub.AddPurchaseOrder(new_order)
-            # Redirigir a la pantalla de ítems con el ID de la nueva orden
-            new_order_id = response.idPurchaseOrder  # Asegúrate de que el servidor gRPC devuelva el ID
+            new_order_id = response.idPurchaseOrder  
             return redirect(url_for('view_order_items', id=new_order_id))
         
         except grpc.RpcError as e:
@@ -540,26 +597,22 @@ def view_order_items(id):
     user_store_id = session.get('user_id')
     productos_tienda = get_products_by_store(user_store_id)
 
-    # Conexión al canal gRPC
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         purchase_order_stub = PurchaseOrderServiceStub(channel)
         order_item_stub = OrderItemServiceStub(channel)
 
-        # Obtener la orden de compra usando el stub
         try:
             order = purchase_order_stub.GetPurchaseOrder(PurchaseOrder(idPurchaseOrder=id))
         except grpc.RpcError as e:
             print(f"Error al obtener la orden de compra: {e}")
             return render_template('error.html', error_message="No se pudo obtener la orden de compra.")
 
-        order_items = order.items  # Accede directamente a los ítems desde la orden
+        order_items = order.items  
 
-        # Si el método es POST
         if request.method == 'POST':
             idProduct = int(request.form['idProduct'])
             requested_amount = int(request.form['requested_amount'])
             
-            # Detectar qué botón fue presionado
             if 'add_item' in request.form:  # Si fue el botón de "Agregar Item"
                 with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
                     stub = ProductServiceStub(channel)
@@ -583,7 +636,6 @@ def view_order_items(id):
                     return redirect(url_for('view_order_items', id=id))
 
             elif 'save_and_submit' in request.form:  # Si fue el botón "Guardar y Enviar"
-                # Cambiar el atributo de cada item a true y enviar los cambios a gRPC
                 try:
                       with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
                         stub = ProductServiceStub(channel)
@@ -602,7 +654,6 @@ def view_order_items(id):
                     print(f"Error al enviar los ítems: {e}")
                     return render_template('error.html', error_message="No se pudo enviar los ítems.")
 
-                # Redirigir a la lista de órdenes
                 return redirect(url_for('list_purchase_orders'))
             
     return render_template('view_order_items.html', order=order, order_items=order_items, productos_tienda=productos_tienda)
@@ -613,19 +664,17 @@ def view_order_items_list(id):
     checkSessionManager()
     user_store_id = session.get('user_id')
     
-    # Conexión al canal gRPC
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         purchase_order_stub = PurchaseOrderServiceStub(channel)
         
-        # Obtener la orden de compra usando el stub
         try:
             order = purchase_order_stub.GetPurchaseOrder(PurchaseOrder(idPurchaseOrder=id))
         except grpc.RpcError as e:
             print(f"Error al obtener la orden de compra: {e}")
             return render_template('error.html', error_message="No se pudo obtener la orden de compra.")
 
-        # Inicializa una lista para los items
-        order_items = order.items  # Accede directamente a los ítems desde la orden
+
+        order_items = order.items 
 
     return render_template('view_order_items_list.html', order=order, order_items=order_items)
 

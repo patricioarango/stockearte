@@ -13,6 +13,18 @@
     <div class="container mt-4">
         <h1 class="mb-4">Lista de Productos: TIENDA #{{ idStore }}</h1>
         
+        <form class="d-flex mb-4" role="search" method="GET" action="{{ url_for('store_products') }}">
+            <input class="form-control me-2" type="search" name="search_query" placeholder="Buscar Producto por Nombre" aria-label="Search">
+
+            <input class="form-control me-2" type="text" name="search_code" placeholder="Buscar por Código" aria-label="Código">
+
+            <input class="form-control me-2" type="text" name="search_size" placeholder="Buscar por Talle" aria-label="Talle">
+
+            <input class="form-control me-2" type="text" name="search_color" placeholder="Buscar por Color" aria-label="Color">
+
+            <button class="btn btn-outline-success" type="submit">Buscar</button>
+        </form>
+
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
@@ -42,7 +54,7 @@
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="5" class="text-center">No hay productos disponibles para esta tienda.</td>
+                        <td colspan="6" class="text-center">No hay productos disponibles para esta tienda.</td>
                     </tr>
                 {% endif %}
             </tbody>
@@ -51,4 +63,3 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-c0WzWzq1xuMzDykjR5O4J8QY4xSmk5TiwW+OrQnbNzI+0KbdzeFSAI16jsuYh2lZ" crossorigin="anonymous"></script>
 </body>
 </html>
-

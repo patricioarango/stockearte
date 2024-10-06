@@ -23,10 +23,11 @@
       <h1 class="mt-3">Lista de Tiendas
       <a href="{{ url_for('add_store') }}" class="btn btn-primary">Nueva Tienda</a></h1>
       <br>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Buscar Tienda por Código" aria-label="Search">
+      <form class="d-flex" role="search" method="GET" action="{{ url_for('store_list') }}">
+        <input class="form-control me-2" type="search" name="store_code" placeholder="Buscar Tienda por Código" aria-label="Search">
         
         <select name="estado">
+          <option value="">Seleccionar Estado</option>
           <option value="habilitada">Habilitada</option>
           <option value="deshabilitada">Deshabilitada</option>
         </select>
