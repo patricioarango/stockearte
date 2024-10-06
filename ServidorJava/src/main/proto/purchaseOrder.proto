@@ -7,7 +7,6 @@ option java_outer_classname = "PurchaseOrderProto";
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
-import "google/protobuf/timestamp.proto";
 import "store.proto";
 
 service PurchaseOrderService {
@@ -24,9 +23,9 @@ message PurchaseOrder {
     int32 idPurchaseOrder = 1;
     string observation = 2;
     string state = 3;
-    google.protobuf.Timestamp createdAt = 4;
-    google.protobuf.Timestamp purchaseOrderDate = 5;
-    google.protobuf.Timestamp receptionDate = 6;
+    string createdAt = 4;
+    string purchaseOrderDate = 5;
+    string receptionDate = 6;
     Store store = 8;
 }
 
@@ -34,9 +33,9 @@ message PurchaseOrderWithItem {
     int32 idPurchaseOrder = 1;
     string observation = 2;
     string state = 3;
-    google.protobuf.Timestamp createdAt = 4;
-    google.protobuf.Timestamp purchaseOrderDate = 5;
-    google.protobuf.Timestamp receptionDate = 6;
+    string createdAt = 4;
+    string purchaseOrderDate = 5;
+    string receptionDate = 6;
     Store store = 8;
     repeated Item items = 9;
 }

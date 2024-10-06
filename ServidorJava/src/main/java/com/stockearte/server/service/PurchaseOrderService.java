@@ -1,7 +1,9 @@
 package com.stockearte.server.service;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset; 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -17,7 +19,6 @@ import com.stockearte.model.PurchaseOrderProto;
 import com.stockearte.model.StoreProto;
 import com.stockearte.model.PurchaseOrderServiceGrpc;
 import com.google.protobuf.Empty;
-import com.google.protobuf.Timestamp;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
@@ -58,9 +59,9 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
                 .setIdPurchaseOrder(purchaseOrder.getId())
                 .setObservation(purchaseOrder.getObservation())
                 .setState(purchaseOrder.getState().name())
-                .setCreatedAt(convertToTimestamp(purchaseOrder.getCreatedAt()))  
-                .setPurchaseOrderDate(convertToTimestamp(purchaseOrder.getPurchaseOrderDate()))  
-                .setReceptionDate(convertToTimestamp(purchaseOrder.getReceptionDate()))  
+                .setCreatedAt(purchaseOrder.getCreatedAt())  
+                .setPurchaseOrderDate(purchaseOrder.getPurchaseOrderDate())  
+                .setReceptionDate(purchaseOrder.getReceptionDate())  
                 .setStore(StoreProto.Store.newBuilder()
                     .setIdStore(purchaseOrder.getStore().getIdStore())
                     .setStoreName(purchaseOrder.getStore().getStoreName())
@@ -96,9 +97,9 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
                 .setIdPurchaseOrder(purchaseOrder.getId())
                 .setObservation(purchaseOrder.getObservation())
                 .setState(purchaseOrder.getState().name())
-                .setCreatedAt(convertToTimestamp(purchaseOrder.getCreatedAt()))
-                .setPurchaseOrderDate(convertToTimestamp(purchaseOrder.getPurchaseOrderDate()))
-                .setReceptionDate(convertToTimestamp(purchaseOrder.getReceptionDate()))
+                .setCreatedAt(purchaseOrder.getCreatedAt())
+                .setPurchaseOrderDate(purchaseOrder.getPurchaseOrderDate())
+                .setReceptionDate(purchaseOrder.getReceptionDate())
                 .setStore(StoreProto.Store.newBuilder()
                     .setIdStore(purchaseOrder.getStore().getIdStore())
                     .setStoreName(purchaseOrder.getStore().getStoreName())
@@ -117,17 +118,6 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
         responseObserver.onCompleted();
     }
 
-    private Timestamp convertToTimestamp(LocalDateTime dateTime) {
-        return Timestamp.newBuilder()
-                .setSeconds(dateTime.toEpochSecond(ZoneOffset.UTC))
-                .setNanos(dateTime.getNano())
-                .build();
-    }
-
-    private LocalDateTime convertToLocalDateTime(Timestamp timestamp) {
-        return LocalDateTime.ofEpochSecond(timestamp.getSeconds(), timestamp.getNanos(), ZoneOffset.UTC);
-    }
-
     @Override
     public void addPurchaseOrder(PurchaseOrderProto.PurchaseOrder request, StreamObserver<PurchaseOrderProto.PurchaseOrder> responseObserver) {
         int purchaseOrderId = request.getIdPurchaseOrder();
@@ -140,9 +130,14 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
         purchaseOrderreq.setObservation(request.getObservation());
         purchaseOrderreq.setState(PurchaseOrder.State.valueOf(request.getState()));
 
-        purchaseOrderreq.setCreatedAt(convertToLocalDateTime(request.getCreatedAt()));
-        purchaseOrderreq.setPurchaseOrderDate(convertToLocalDateTime(request.getPurchaseOrderDate()));
-        purchaseOrderreq.setReceptionDate(convertToLocalDateTime(request.getReceptionDate()));
+        Instant now = Instant.now();
+        ZonedDateTime zonedDateTime = now.atZone(ZoneId.systemDefault());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = zonedDateTime.format(formatter);
+        purchaseOrderreq.setCreatedAt(formattedDate);
+
+        purchaseOrderreq.setPurchaseOrderDate(request.getPurchaseOrderDate());
+        purchaseOrderreq.setReceptionDate(request.getReceptionDate());
         
         purchaseOrderreq.setStore(storeRepository.findByIdStore(request.getStore().getIdStore()));
 
@@ -152,9 +147,9 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
                 .setIdPurchaseOrder(purchaseOrder.getId())
                 .setObservation(purchaseOrder.getObservation())
                 .setState(purchaseOrder.getState().name())
-                .setCreatedAt(convertToTimestamp(purchaseOrder.getCreatedAt()))  // Conversión a Timestamp
-                .setPurchaseOrderDate(convertToTimestamp(purchaseOrder.getPurchaseOrderDate()))  // Conversión a Timestamp
-                .setReceptionDate(convertToTimestamp(purchaseOrder.getReceptionDate()))  // Conversión a Timestamp
+                .setCreatedAt(purchaseOrder.getCreatedAt())  
+                .setPurchaseOrderDate(purchaseOrder.getPurchaseOrderDate())  
+                .setReceptionDate(purchaseOrder.getReceptionDate()) 
                 .setStore(StoreProto.Store.newBuilder()
                         .setIdStore(purchaseOrder.getStore().getIdStore())
                         .setStoreName(purchaseOrder.getStore().getStoreName())

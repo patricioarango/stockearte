@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.stockearte.server.entities.PurchaseOrder;
+import com.stockearte.server.dto.PurchaseOrderDTO;
 
 import net.devh.boot.grpc.server.service.GrpcService;
 
@@ -46,6 +48,7 @@ public class OrderItemService extends OrderItemServiceGrpc.OrderItemServiceImplB
         orderItemreq.setColor(request.getColor());
         orderItemreq.setSize(request.getSize());
         orderItemreq.setRequestedAmount(request.getRequestedAmount());
+             
         orderItemreq.setPurchaseOrder(purchaseOrderRepository.findById(request.getPurchaseOrder().getIdPurchaseOrder()));
 
         OrderItem orderItem = orderItemRepository.save(orderItemreq);
@@ -63,11 +66,12 @@ public class OrderItemService extends OrderItemServiceGrpc.OrderItemServiceImplB
 
         //Kafka orden-de-compra
         System.out.println("SEND: " + request.getSend()); 
-        //if(request.getSend()){
-            String message = new Gson().toJson("purchaseOrderRepository.findById(request.getPurchaseOrder().getIdPurchaseOrder())");
-            System.out.println("Enviando a Kafka: " + message);
+        if(request.getSend()){
+            Gson gson = new GsonBuilder().serializeNulls().create();           
+            String message = gson.toJson(new PurchaseOrderDTO(purchaseOrderRepository.findById(request.getPurchaseOrder().getIdPurchaseOrder())));
+            System.out.println("Enviando a topic orden-de-compra: \n" + message);
             kafkaTemplate.send("orden-de-compra",message);    
-        //}
+        }
 
     }
 
