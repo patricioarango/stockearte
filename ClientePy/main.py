@@ -679,20 +679,13 @@ def consumer_despachos():
             group_id = "CONSUMER_GROUP_2PROV_"+store_code,
             value_deserializer=lambda x: json.loads(x.decode('utf-8'))
         )
-        user_store_id = session.get('user_store_id')
-        store_name = session.get('user_store_name')
         
-        store = Store(
-            idStore=user_store_id,
-            storeName=store_name
-        )
-        
-        purchaseorder_stub = PurchaseOrderServiceStub(channel)
+        dispatchorder_stub = DispatchOrderServiceStub(channel)
         
         while True:
             for message in consumer:
                 orden_de_despacho_store = message.value 
-                updateDispatchOrder(orden_de_despacho_store,store,purchaseorder_stub)
+                updateDispatchOrder(orden_de_despacho_store,dispatchorder_stub)
     return True
 
     
@@ -750,6 +743,21 @@ def updatePurchaseOrder(orden_de_compra_store,store,purchaseorder_stub):
     except grpc.RpcError as e:
         print(f"Error al agregar la orden de compra: {e}")
         return render_template('error.html', error_message="Hubo un error al intentar agregar la orden de compra.")
+
+def updateDispatchOrder(orden_de_despacho_store,dispatchorder_stub):
+    new_order = DispatchOrder(
+        idDispatchOrder=orden_de_despacho_store["id_orden_de_despacho"],
+        idPurchaseOrder=orden_de_despacho_store["id_orden_de_compra"],  
+        estimatedShippingDate=orden_de_despacho_store["fecha_estimada_envio"], 
+    )     
+    try:
+        response = dispatchorder_stub.SaveDispatchOrder(new_order)
+        print("Orden de despacho actualizada: ", response) 
+        return True
+    
+    except grpc.RpcError as e:
+        print(f"Error al agregar la orden de despacho: {e}")
+        return render_template('error.html', error_message="Hubo un error al intentar agregar la orden de despacho.")
 
 def checkIFKafkaTopicExists(topic_name):
     admin_client = KafkaAdminClient(
