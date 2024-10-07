@@ -12,7 +12,8 @@ public class PurchaseOrderDTO {
     private String createdAt; 
     private String purchaseOrderDate; 
     private String receptionDate;    
-    private String state;              
+    private String state; 
+    private int idDispatchOrder;             
     private StoreDTO store;            
     private List<OrderItemDTO> orderItems; 
 
@@ -23,6 +24,7 @@ public class PurchaseOrderDTO {
         this.purchaseOrderDate = purchaseOrder.getPurchaseOrderDate(); 
         this.receptionDate = purchaseOrder.getReceptionDate(); 
         this.state = purchaseOrder.getState().name();
+        this.idDispatchOrder = purchaseOrder.getIdDispatchOrder();
 
         if (purchaseOrder.getStore() != null) {
             this.store = new StoreDTO(purchaseOrder.getStore());
@@ -98,4 +100,12 @@ public class PurchaseOrderDTO {
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
+
+    public int getIdDispatchOrder() {
+        return idDispatchOrder;
+    }
+
+    public void setIdDispatchOrder(String createdAt) {
+        this.idDispatchOrder = idDispatchOrder;
+    }    
 }

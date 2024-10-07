@@ -63,6 +63,7 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
                 .setCreatedAt(purchaseOrder.getCreatedAt())  
                 .setPurchaseOrderDate(purchaseOrder.getPurchaseOrderDate())  
                 .setReceptionDate(purchaseOrder.getReceptionDate())  
+                .setIdDispatchOrder(purchaseOrder.getIdDispatchOrder()) 
                 .setStore(StoreProto.Store.newBuilder()
                     .setIdStore(purchaseOrder.getStore().getIdStore())
                     .setStoreName(purchaseOrder.getStore().getStoreName())
@@ -102,6 +103,7 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
                 .setCreatedAt(purchaseOrder.getCreatedAt())
                 .setPurchaseOrderDate(purchaseOrder.getPurchaseOrderDate())
                 .setReceptionDate(purchaseOrder.getReceptionDate())
+                .setIdDispatchOrder(purchaseOrder.getIdDispatchOrder()) 
                 .setStore(StoreProto.Store.newBuilder()
                     .setIdStore(purchaseOrder.getStore().getIdStore())
                     .setStoreName(purchaseOrder.getStore().getStoreName())
@@ -147,6 +149,7 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
                 .setCreatedAt(purchaseOrder.getCreatedAt())
                 .setPurchaseOrderDate(purchaseOrder.getPurchaseOrderDate())
                 .setReceptionDate(purchaseOrder.getReceptionDate())
+                .setIdDispatchOrder(purchaseOrder.getIdDispatchOrder()) 
                 .setStore(StoreProto.Store.newBuilder()
                     .setIdStore(purchaseOrder.getStore().getIdStore())
                     .setStoreName(purchaseOrder.getStore().getStoreName())
@@ -163,7 +166,53 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
     
         responseObserver.onNext(response);
         responseObserver.onCompleted();
-    }    
+    } 
+    
+    @Override
+    public void findAllByStoreAndState(PurchaseOrderProto.PurchaseAndStoreRequest request, StreamObserver<PurchaseOrderProto.PurchaseOrders> responseObserver) {
+        List<PurchaseOrder> purchaseOrders = purchaseOrderRepository.findByStoreAndState(request.getIdStore(), PurchaseOrder.State.ACEPTADA);
+       
+        List<PurchaseOrderProto.PurchaseOrderWithItem> purchaseOrderWithItemsList = new ArrayList<>();
+    
+        for (PurchaseOrder purchaseOrder : purchaseOrders) {
+            List<PurchaseOrderProto.Item> itemList = new ArrayList<>();
+            for (OrderItem orderItem : purchaseOrder.getOrderItems()) {
+                PurchaseOrderProto.Item itemProto = PurchaseOrderProto.Item.newBuilder()
+                    .setIdOrderItem(orderItem.getId())
+                    .setProductCode(orderItem.getProductCode())
+                    .setColor(orderItem.getColor())
+                    .setSize(orderItem.getSize())
+                    .setRequestedAmount(orderItem.getRequestedAmount())
+                    .setSend(orderItem.getSend())
+                    .build();
+                itemList.add(itemProto);
+            }
+    
+            PurchaseOrderProto.PurchaseOrderWithItem purchaseOrderWithItem = PurchaseOrderProto.PurchaseOrderWithItem.newBuilder()
+                .setIdPurchaseOrder(purchaseOrder.getId())
+                .setObservation(purchaseOrder.getObservation())
+                .setState(purchaseOrder.getState().name())
+                .setCreatedAt(purchaseOrder.getCreatedAt())
+                .setPurchaseOrderDate(purchaseOrder.getPurchaseOrderDate())
+                .setReceptionDate(purchaseOrder.getReceptionDate())
+                .setIdDispatchOrder(purchaseOrder.getIdDispatchOrder()) 
+                .setStore(StoreProto.Store.newBuilder()
+                    .setIdStore(purchaseOrder.getStore().getIdStore())
+                    .setStoreName(purchaseOrder.getStore().getStoreName())
+                    .build())
+                .addAllItems(itemList)
+                .build();
+    
+            purchaseOrderWithItemsList.add(purchaseOrderWithItem);
+        }
+    
+        PurchaseOrderProto.PurchaseOrders response = PurchaseOrderProto.PurchaseOrders.newBuilder()
+            .addAllPurchaseOrderWithItem(purchaseOrderWithItemsList)
+            .build();
+    
+        responseObserver.onNext(response);
+        responseObserver.onCompleted();
+    }   
 
     @Override
     public void addPurchaseOrder(PurchaseOrderProto.PurchaseOrder request, StreamObserver<PurchaseOrderProto.PurchaseOrder> responseObserver) {
@@ -185,6 +234,7 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
 
         purchaseOrderreq.setPurchaseOrderDate(request.getPurchaseOrderDate());
         purchaseOrderreq.setReceptionDate(request.getReceptionDate());
+        purchaseOrderreq.setIdDispatchOrder(request.getIdDispatchOrder());
         
         purchaseOrderreq.setStore(storeRepository.findByIdStore(request.getStore().getIdStore()));
 
@@ -196,7 +246,8 @@ public class PurchaseOrderService extends PurchaseOrderServiceGrpc.PurchaseOrder
                 .setState(purchaseOrder.getState().name())
                 .setCreatedAt(purchaseOrder.getCreatedAt())  
                 .setPurchaseOrderDate(purchaseOrder.getPurchaseOrderDate())  
-                .setReceptionDate(purchaseOrder.getReceptionDate()) 
+                .setReceptionDate(purchaseOrder.getReceptionDate())
+                .setIdDispatchOrder(purchaseOrder.getIdDispatchOrder()) 
                 .setStore(StoreProto.Store.newBuilder()
                         .setIdStore(purchaseOrder.getStore().getIdStore())
                         .setStoreName(purchaseOrder.getStore().getStoreName())

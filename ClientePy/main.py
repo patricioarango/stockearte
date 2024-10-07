@@ -515,11 +515,12 @@ def new_purchase_order():
         current_date = datetime.now().strftime('%Y-%m-%d')
         # Crear la nueva orden de compra
         new_order = PurchaseOrder(
-            observation=" ",  # Observación vacía
+            observation=None,  # Observación vacía
             state="SOLICITADA",  # Estado inicial
             createdAt=current_date,  # Fecha de creación
-            purchaseOrderDate=" ",  # Fecha de la orden de compra
-            receptionDate=" ",  
+            purchaseOrderDate=None,  # Fecha de la orden de compra
+            receptionDate=None,
+            idDispatchOrder=None,  
             store=store  # Tienda asociada
         )     
         try:

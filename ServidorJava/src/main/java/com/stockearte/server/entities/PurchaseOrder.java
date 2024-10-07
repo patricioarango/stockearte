@@ -39,6 +39,9 @@ public class PurchaseOrder {
     @Column(name = "reception_date")
     private String receptionDate;
 
+    @Column(name = "id_dispatch_order")
+    private int idDispatchOrder;
+
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<OrderItem> orderItems;
 

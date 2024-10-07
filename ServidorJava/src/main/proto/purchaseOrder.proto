@@ -14,6 +14,7 @@ service PurchaseOrderService {
   rpc FindAll(google.protobuf.Empty) returns (PurchaseOrders) {}
   rpc AddPurchaseOrder(PurchaseOrder) returns (PurchaseOrder) {}
   rpc FindAllByStore(PurchaseAndStoreRequest) returns (PurchaseOrders) {}
+  rpc FindAllByStoreAndState(PurchaseAndStoreRequest) returns (PurchaseOrders) {}
 }
 
 message PurchaseOrders {
@@ -23,6 +24,7 @@ message PurchaseOrders {
 message PurchaseAndStoreRequest {
   int32 idPurchaseOrder = 1;
   int32 idStore = 2;
+  string state = 3;
 }
 
 message PurchaseOrder {
@@ -33,6 +35,7 @@ message PurchaseOrder {
     string purchaseOrderDate = 5;
     string receptionDate = 6;
     Store store = 8;
+    int32 idDispatchOrder = 9;
 }
 
 message PurchaseOrderWithItem {
@@ -44,6 +47,7 @@ message PurchaseOrderWithItem {
     string receptionDate = 6;
     Store store = 8;
     repeated Item items = 9;
+    int32 idDispatchOrder = 10;
 }
 
 message Item {
