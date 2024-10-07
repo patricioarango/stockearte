@@ -21,6 +21,9 @@ from purchaseOrder_pb2 import PurchaseOrder,PurchaseAndStoreRequest
 from purchaseOrder_pb2_grpc import PurchaseOrderServiceStub
 from orderItem_pb2 import OrderItem
 from orderItem_pb2_grpc import OrderItemServiceStub
+from dispatchOrder_pb2 import DispatchOrder
+from dispatchOrder_pb2_grpc import DispatchOrderServiceStub
+
 import logging
 from google.protobuf.json_format import MessageToJson
 from datetime import datetime
