@@ -1,83 +1,96 @@
 {% include "doctype.html" %}
 <body class="h-100">
     {% include "nav.html" %}
+    
     <div class="container h-100">
         <div class="row h-100">
-            <div class="col-12">
-                
-            </div>
+            <div class="col-12"></div>
         </div>
     </div>
     
-<div class="container">
-    <div class="col-12">
-        <h1 class="text-center"><a class="navbar-brand d-flex gap-lg-1 mx-lg-3" href="/nuevohome">
-            <img src="{{ url_for('static', filename='stockearte.png') }}" alt="Stockearte" style="vertical-align: Stickman; margin: 0px 35px" />
-          </a></h1>
-    </div>
-</div>
-<div class="container">
-  <div class="row">
-    {% if session['roleName'] == 'admin' %}
-    <div class="col">
-        <div class="card" style="width: 18rem;">
-            <img src="https://img.freepik.com/vector-premium/icono-comunicacion-personas-estilo-comic-ilustracion-vector-dibujos-animados-personas-sobre-fondo-blanco-concepto-negocio-efecto-salpicadura-asociacion_157943-13666.jpg" class="card-img-top" alt="..." width="100%" height="200">
-            <div class="card-body">
-                <h5 class="card-title">Usuarios</h5>
-                <p class="card-text">Como usuario de Casa Central, crea nuevos usuarios con nombre, contraseña, tienda asignada y estado habilitado/deshabilitado. Asigna usuarios a una tienda específica o a la casa central. Filtra usuarios por nombre y tienda para facilitar su búsqueda y administración.</p>
-                <a href="/users" class="btn btn-primary">VER USUARIOS</a>
-            </div>
+    <div class="container">
+        <div class="col-12">
+            <h1 class="text-center">
+                <a class="navbar-brand d-flex gap-lg-1 mx-lg-3" href="/nuevohome">
+                    <img src="{{ url_for('static', filename='stockearte.png') }}" alt="Stockearte" style="vertical-align: Stickman; margin: 0px 35px" />
+                </a>
+            </h1>
         </div>
     </div>
-    {% endif %}
-    {% if session['roleName'] == 'admin' %}
-    <div class="col">
-        <div class="card" style="width: 18rem;">
-            <img src="https://i.pinimg.com/736x/33/66/3a/33663afe1341595fef614dad3305d328.jpg" class="card-img-top" alt="..." width="100%" height="200">
-            <div class="card-body">
-                <h5 class="card-title">Tiendas</h5>
-                <p class="card-text">Como usuario de Casa Central, crea nuevas tiendas, modifica o elimina las existentes. Cada tienda puede ser habilitada o deshabilitada según sea necesario. Cada tienda cuenta con un código único, dirección, ciudad y provincia. Asigna productos y usuarios a cada tienda para gestionar su stock y equipo.</p>
-                <a href="/store_list" class="btn btn-success">VER TIENDAS</a>
-            </div>
-        </div>
-    </div>
-    {% endif %}
+    
+    <div class="container">
+        <div class="row">
+            {% if session['roleName'] == 'admin' %}
+                <div class="col">
+                    <div class="card" style="width: 18rem;">
+                        <img src="https://img.freepik.com/vector-premium/icono-comunicacion-personas-estilo-comic-ilustracion-vector-dibujos-animados-personas-sobre-fondo-blanco-concepto-negocio-efecto-salpicadura-asociacion_157943-13666.jpg" class="card-img-top" alt="..." width="100%" height="200">
+                        <div class="card-body">
+                            <h5 class="card-title">Usuarios</h5>
+                            <p class="card-text">Como usuario de Casa Central, crea nuevos usuarios con nombre, contraseña, tienda asignada y estado habilitado/deshabilitado. Asigna usuarios a una tienda específica o a la casa central. Filtra usuarios por nombre y tienda para facilitar su búsqueda y administración.</p>
+                            <a href="/users" class="btn btn-primary">VER USUARIOS</a>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="col">
-        <div class="card" style="width: 18rem;">
-            <img src="https://manada.com.ar/blog/wp-content/uploads/2016/04/fashion-winter.png" class="card-img-top" alt="..." width="100%" height="200">
-            <div class="card-body">
-                <h5 class="card-title">Mis Productos</h5>
-                <p class="card-text">Como usuario de tienda, gestiona el stock de los productos asignados a tu tienda. Consulta la lista de productos disponibles, filtrando por nombre, código, talle o color. Actualiza el stock en tiempo real para garantizar la disponibilidad de los productos en tu tienda.</p>
-                <a href="/my_products" class="btn btn-success">MIS PRODUCTOS</a>
-            </div>
-        </div>
-    </div>
-    <div class="col">
-        <div class="card" style="width: 18rem;">
-            <img src="https://manada.com.ar/blog/wp-content/uploads/2016/04/fashion-winter.png" class="card-img-top" alt="..." width="100%" height="200">
-            <div class="card-body">
-                <h5 class="card-title">Órdenes de Compra</h5>
-                <p class="card-text">Generar órdenes de compra.</p>
-                <a href="/purchase_orders" class="btn btn-success">ORDENES DE COMPRA</a>
-            </div>
-        </div>
-    </div>
-    {% if session['roleName'] == 'admin' %}
-    <div class="col">
-        <div class="card" style="width: 18rem;">
-            <img src="https://manada.com.ar/blog/wp-content/uploads/2016/04/fashion-winter.png" class="card-img-top" alt="..." width="100%" height="200">
-            <div class="card-body">
-                <h5 class="card-title">Productos</h5>
-                <p class="card-text">Como usuario de Casa Central, administra todos los productos del sistema. Crea nuevos productos con nombre, código único generado automáticamente, foto, talle, color y stock. Consulta el stock en cada tienda y gestiona los detalles del producto. Filtra los productos por nombre, código, talle o color para facilitar la búsqueda y edición.</p>
-                <a href="/product" class="btn btn-warning">VER PRODUCTOS</a>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-</div>
+                <div class="col">
+                    <div class="card" style="width: 18rem;">
+                        <img src="https://img.freepik.com/vector-premium/megafon-colorido-pancarta-que-dice-nuevo_150234-148049.jpg?w=740" class="card-img-top" alt="Novedades" width="100%" height="275">
+                        <div class="card-body">
+                            <h5 class="card-title">Novedades</h5>
+                            <p class="card-text">Mantente al tanto de las últimas novedades y actualizaciones de la Casa Central. Aquí podrás encontrar noticias importantes sobre productos, cambios en el sistema y mucho más.</p>
+                            <a href="/novedades" class="btn btn-info">VER NOVEDADES</a>
+                        </div>
+                    </div>
+                </div>
 
-</div>
+                <div class="col">
+                    <div class="card" style="width: 18rem;">
+                        <img src="https://i.pinimg.com/736x/33/66/3a/33663afe1341595fef614dad3305d328.jpg" class="card-img-top" alt="..." width="100%" height="200">
+                        <div class="card-body">
+                            <h5 class="card-title">Tiendas</h5>
+                            <p class="card-text">Como usuario de Casa Central, crea nuevas tiendas, modifica o elimina las existentes. Cada tienda puede ser habilitada o deshabilitada según sea necesario. Cada tienda cuenta con un código único, dirección, ciudad y provincia. Asigna productos y usuarios a cada tienda para gestionar su stock y equipo.</p>
+                            <a href="/store_list" class="btn btn-success">VER TIENDAS</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            {% if session['roleName'] == 'manager' %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card" style="width: 18rem;">
+                    <img src="https://manada.com.ar/blog/wp-content/uploads/2016/04/fashion-winter.png" class="card-img-top" alt="Mis Productos" width="100%" height="200">
+                    <div class="card-body">
+                        <h5 class="card-title">Mis Productos</h5>
+                        <p class="card-text">Como usuario de tienda, gestiona el stock de los productos asignados a tu tienda. Consulta la lista de productos disponibles, filtrando por nombre, código, talle o color. Actualiza el stock en tiempo real para garantizar la disponibilidad de los productos en tu tienda.</p>
+                        <a href="/my_products" class="btn btn-success">MIS PRODUCTOS</a>
+                    </div>
+                </div>
+            </div>
 
+            <div class="col-md-6 col-lg-4">
+                <div class="card" style="width: 18rem;">
+                    <img src="https://cdn-icons-png.flaticon.com/512/12341/12341347.png" class="card-img-top" alt="Órdenes de Compra" width="100%" height="295">
+                    <div class="card-body">
+                        <h5 class="card-title">Órdenes de Compra</h5>
+                        <p class="card-text">Como usuario manager, puedes gestionar las órdenes de compra, visualizar y actualizar el estado de las órdenes realizadas.</p>
+                        <a href="/purchase_orders" class="btn btn-success">ORDENES DE COMPRA</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+            {% if session['roleName'] == 'admin' %}
+                <div class="col">
+                    <div class="card" style="width: 18rem;">
+                        <img src="https://manada.com.ar/blog/wp-content/uploads/2016/04/fashion-winter.png" class="card-img-top" alt="..." width="100%" height="200">
+                        <div class="card-body">
+                            <h5 class="card-title">Productos</h5>
+                            <p class="card-text">Como usuario de Casa Central, administra todos los productos del sistema. Crea nuevos productos con nombre, código único generado automáticamente, foto, talle, color y stock. Consulta el stock en cada tienda y gestiona los detalles del producto. Filtra los productos por nombre, código, talle o color para facilitar la búsqueda y edición.</p>
+                            <a href="/product" class="btn btn-warning">VER PRODUCTOS</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+           
+        </div>
+    </div>
 </body>
 </html>

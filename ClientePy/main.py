@@ -8,7 +8,6 @@ import random
 import string
 import os,grpc
 
-
 from user_pb2 import User
 
 from user_pb2_grpc import UsersServiceStub
@@ -21,7 +20,8 @@ from role_pb2 import Role
 
 from role_pb2_grpc import RoleServiceStub
 
-from product_pb2 import Product, ProductCodeRequest  
+from product_pb2 import Product
+from product_pb2 import Product, ProductCodeRequest, FindProductSearch
 
 from product_pb2_grpc import ProductServiceStub  
 
@@ -29,18 +29,27 @@ from productStock_pb2 import ProductStock, ProductsStock, ProductAndStoreRequest
 
 from productStock_pb2_grpc import ProductStockServiceStub
 
+from purchaseOrder_pb2 import PurchaseOrder,PurchaseAndStoreRequest
+
+from purchaseOrder_pb2_grpc import PurchaseOrderServiceStub
+
+from orderItem_pb2 import OrderItem
+
+from orderItem_pb2_grpc import OrderItemServiceStub
+
 import logging
 
 from google.protobuf.json_format import MessageToJson
+
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 app = create_app('flask.cfg')
 
 #creo conexion momentanea con base de datos local
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://avnadmin:AVNS_ylqtAU8JPG7TNXz0mDD@mysql-1d36c064-pato-ef11.a.aivencloud.com:25628/stockeartedb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost:3306/stockearte'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://avnadmin:AVNS_ylqtAU8JPG7TNXz0mDD@mysql-1d36c064-pato-ef11.a.aivencloud.com:25628/stockeartedb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -53,7 +62,7 @@ class Rol(db.Model):
 
     def __repr__(self):
         return f'<Rol id={self.id_rol} rol={self.rol} enabled={self.enabled}>'
-
+    
 def checkSessionManager():
     if 'user_id' not in session or session['roleName']!='manager':
         return redirect('/login')
@@ -68,7 +77,7 @@ def checkSession():
     
 @app.route("/nuevohome", methods=['GET'])
 def nuevohome():
-    checkSession();
+    checkSession()
     return render_template('home.html')
     
 @app.route("/login", methods=['POST'])
@@ -92,6 +101,7 @@ def login():
         session['name'] = response.name
         session['lastname'] = response.lastname
         session['user_store_id'] = response.store.idStore  
+        session['user_store_name'] = response.store.storeName
 
         print("Contenido de la sesión:", session)
 
@@ -117,12 +127,28 @@ def index():
 def  home():
     return render_template('index.html')
 
-@app.route('/store_list')
+@app.route('/store_list', methods=['GET'])
 def store_list():
+    # Obtener los parámetros de búsqueda
+    store_code = request.args.get('store_code')  
+    store_state = request.args.get('estado')      
+
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         stub = StoreServiceStub(channel)
-        response = stub.FindAll(Store()) 
-    return render_template('store_list.html', stores=response.store)
+        response = stub.FindAll(Store())
+
+    filtered_stores = []
+    for store in response.store:
+        if store_code and store_code.lower() not in store.code.lower():
+            continue
+        if store_state == "habilitada" and not store.enabled:
+            continue
+        if store_state == "deshabilitada" and store.enabled:
+            continue
+        filtered_stores.append(store)
+
+    return render_template('store_list.html', stores=filtered_stores)
+
 
 @app.route('/stores/add', methods=['GET', 'POST'])
 def add_store():
@@ -189,15 +215,27 @@ def edit_store(idStore):
         return render_template('edit_store.html', store=storegrpc)
 
 
-# Ruta para listar usuarios
-@app.route('/users')
+@app.route('/users', methods=['GET'])
 def list_users():
+    search_username = request.args.get('username')  
+    store_id = request.args.get('id_tienda')      
+
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         stub = UsersServiceStub(channel)
-        response = stub.FindAll(User()) 
+        response = stub.FindAll(User())  
         store_stub = StoreServiceStub(channel)
         stores_response = store_stub.FindAll(Store())
-    return render_template('list_users.html', users=response.user,tiendas=stores_response.store)
+
+    filtered_users = []
+    for user in response.user:
+        if search_username and search_username.lower() not in user.username.lower():
+            continue
+        if store_id and store_id != str(user.store.idStore):
+            continue
+        filtered_users.append(user)
+
+    return render_template('list_users.html', users=filtered_users, tiendas=stores_response.store)
+
 
 # Ruta para agregar un nuevo usuario
 @app.route('/users/add', methods=['GET', 'POST'])
@@ -276,13 +314,31 @@ def edit_user(idUser):
         print("respuesta ", response)
         return render_template('edit_user.html', user=response, stores=stores, roles=roles)
     
-
-@app.route('/product')
+@app.route('/product', methods=['GET', 'POST'])
 def product():
+    search_query = request.args.get('search_query') 
+    search_code = request.args.get('search_code')   
+    search_size = request.args.get('search_size')    
+    search_color = request.args.get('search_color')  
+
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         product_stub = ProductServiceStub(channel)
         response = product_stub.FindAll(Product())  
-    return render_template('product.html', productos=response.product)
+
+    filtered_products = []
+    for producto in response.product:
+        if search_query and search_query.lower() not in producto.product.lower():
+            continue
+        if search_code and search_code.lower() not in producto.code.lower():
+            continue
+        if search_size and search_size.lower() != producto.size.lower():
+            continue
+        if search_color and search_color.lower() not in producto.color.lower():
+            continue
+
+        filtered_products.append(producto)
+
+    return render_template('product.html', productos=filtered_products)
 
 def generate_product_code(length=10):
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
@@ -382,12 +438,36 @@ def add_product_to_store(idStore):
     return render_template('add_product_to_store.html', idStore=idStore, products=product_list,productosdelatienda=product_stocks)
 
 
-@app.route('/my_products')
+@app.route('/my_products', methods=['GET'])
 def store_products():
-    checkSessionManager();
+    checkSessionManager()
     user_store_id = session.get('user_id')
+    print("User Store ID de mis productos: ", user_store_id)
     productos_tienda = get_products_by_store(user_store_id)
-    return render_template('my_products.html', productos=productos_tienda,idStore=user_store_id)
+
+    search_query = request.args.get('search_query')
+    search_code = request.args.get('search_code')
+    search_size = request.args.get('search_size')
+    search_color = request.args.get('search_color')
+
+    if search_query or search_code or search_size or search_color:
+        filtered_products = []
+        for producto in productos_tienda:
+            if search_query and search_query.lower() not in producto['productName'].lower():
+                continue
+            if search_code and search_code.lower() not in producto['code'].lower():
+                continue
+            if search_size and search_size.lower() != producto['size'].lower():
+                continue
+            if search_color and search_color.lower() != producto['color'].lower():
+                continue
+            filtered_products.append(producto)
+
+        productos_tienda = filtered_products  
+
+    return render_template('my_products.html', productos=productos_tienda, idStore=user_store_id)
+
+
 
 def get_products_by_store(store_id):
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
@@ -430,6 +510,174 @@ def edit_stock(id):
                 return f"Error al actualizar el stock: {str(e)}", 500
         
         return render_template('edit_stock.html', producto=stock_response)
+
+@app.route('/purchase_orders')
+def list_purchase_orders():
+    checkSessionManager()
+    user_store_id = session.get('user_store_id')
+    
+    try:
+        # Abrir el canal gRPC
+        with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+            purchaseorder_stub = PurchaseOrderServiceStub(channel)
+
+            store_request = PurchaseAndStoreRequest(idStore=user_store_id)
+
+            response = purchaseorder_stub.FindAllByStore(store_request)
+            
+            purchase_orders = []
+            for purchase_order in response.purchaseOrderWithItem:
+                Orderitems = []
+                
+                for orderitem in purchase_order.items:
+                    Orderitems.append({
+                        'idOrderItem': orderitem.idOrderItem,
+                        'productCode': orderitem.productCode,
+                        'color': orderitem.color,
+                        'size': orderitem.size,
+                        'requestedAmount': orderitem.requestedAmount,
+                        'send': orderitem.send
+                    })
+
+                purchase_orders.append({
+                    'idPurchaseOrder': purchase_order.idPurchaseOrder,
+                    'observation': purchase_order.observation,
+                    'state': purchase_order.state,
+                    'createdAt': purchase_order.createdAt,
+                    'purchaseOrderDate': purchase_order.purchaseOrderDate,
+                    'receptionDate': purchase_order.receptionDate,
+                    'store': {
+                        'idStore': purchase_order.store.idStore,
+                        'storeName': purchase_order.store.storeName
+                    },
+                    'orderItems': Orderitems
+                })
+            print("respuestaaaa: ",response)
+            return render_template('list_purchase_orders.html', purchase_orders=purchase_orders, idStore=user_store_id)
+    
+    except grpc.RpcError as e:
+        print(f"Error al obtener órdenes de compra: {e.code()}, {e.details()}")
+        return "Error al obtener órdenes de compra", 500
+
+@app.route('/new_purchase_order', methods=['GET', 'POST'])
+def new_purchase_order():
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        purchaseorder_stub = PurchaseOrderServiceStub(channel)
+        user_store_id = session.get('user_store_id')
+        store_name = session.get('user_store_name')
+        
+        store = Store(
+            idStore=user_store_id,
+            storeName=store_name
+        )
+        
+        current_date = datetime.now().strftime('%Y-%m-%d')
+
+        new_order = PurchaseOrder(
+            observation=None,  
+            state="SOLICITADA", 
+            createdAt=current_date,  
+            purchaseOrderDate=None,  
+            receptionDate=None,
+            idDispatchOrder=None,  
+            store=store 
+        )     
+        try:
+            response = purchaseorder_stub.AddPurchaseOrder(new_order)
+            new_order_id = response.idPurchaseOrder  
+            return redirect(url_for('view_order_items', id=new_order_id))
+        
+        except grpc.RpcError as e:
+            print(f"Error al agregar la orden de compra: {e}")
+            return render_template('error.html', error_message="Hubo un error al intentar agregar la orden de compra.")
+
+
+@app.route('/view_order_items/<int:id>', methods=['GET', 'POST'])
+def view_order_items(id):
+    checkSessionManager()
+    user_store_id = session.get('user_id')
+    productos_tienda = get_products_by_store(user_store_id)
+
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        purchase_order_stub = PurchaseOrderServiceStub(channel)
+        order_item_stub = OrderItemServiceStub(channel)
+
+        try:
+            order = purchase_order_stub.GetPurchaseOrder(PurchaseOrder(idPurchaseOrder=id))
+        except grpc.RpcError as e:
+            print(f"Error al obtener la orden de compra: {e}")
+            return render_template('error.html', error_message="No se pudo obtener la orden de compra.")
+
+        order_items = order.items  
+
+        if request.method == 'POST':
+            idProduct = int(request.form['idProduct'])
+            requested_amount = int(request.form['requested_amount'])
+            
+            if 'add_item' in request.form:  # Si fue el botón de "Agregar Item"
+                with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+                    stub = ProductServiceStub(channel)
+                    response = stub.GetProduct(Product(idProduct=idProduct))
+
+                    new_item = OrderItem(
+                        purchaseOrder=PurchaseOrder(idPurchaseOrder=id),
+                        productCode=response.code,
+                        color=response.color,
+                        size=response.size,
+                        requestedAmount=requested_amount,
+                        send=False
+                    )
+
+                    try:
+                        order_item_stub.SaveOrderItem(new_item)
+                    except grpc.RpcError as e:
+                        print(f"Error al agregar el ítem: {e}")
+                        return render_template('error.html', error_message="No se pudo agregar el ítem.")
+
+                    return redirect(url_for('view_order_items', id=id))
+
+            elif 'save_and_submit' in request.form:  # Si fue el botón "Guardar y Enviar"
+                try:
+                      with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+                        stub = ProductServiceStub(channel)
+                        response = stub.GetProduct(Product(idProduct=idProduct))
+
+                        new_item = OrderItem(
+                        purchaseOrder=PurchaseOrder(idPurchaseOrder=id),
+                        productCode=response.code,
+                        color=response.color,
+                        size=response.size,
+                        requestedAmount=requested_amount,
+                        send=True
+                        )
+                        order_item_stub.SaveOrderItem(new_item)
+                except grpc.RpcError as e:
+                    print(f"Error al enviar los ítems: {e}")
+                    return render_template('error.html', error_message="No se pudo enviar los ítems.")
+
+                return redirect(url_for('list_purchase_orders'))
+            
+    return render_template('view_order_items.html', order=order, order_items=order_items, productos_tienda=productos_tienda)
+
+
+@app.route('/view_order_items_list/<int:id>', methods=['GET'])
+def view_order_items_list(id):
+    checkSessionManager()
+    user_store_id = session.get('user_id')
+    
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        purchase_order_stub = PurchaseOrderServiceStub(channel)
+        
+        try:
+            order = purchase_order_stub.GetPurchaseOrder(PurchaseOrder(idPurchaseOrder=id))
+        except grpc.RpcError as e:
+            print(f"Error al obtener la orden de compra: {e}")
+            return render_template('error.html', error_message="No se pudo obtener la orden de compra.")
+
+
+        order_items = order.items 
+
+    return render_template('view_order_items_list.html', order=order, order_items=order_items)
 
 
 if __name__ == '__main__':

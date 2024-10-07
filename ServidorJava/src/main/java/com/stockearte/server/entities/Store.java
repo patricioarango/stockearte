@@ -3,12 +3,12 @@ package com.stockearte.server.entities;
 import lombok.*;
 
 import javax.persistence.*;
+
 import java.util.Set;
 import java.util.HashSet;
 
 @Entity
 @Table(name = "store")
-@Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,4 +37,53 @@ public class Store {
 
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Store{");
+        sb.append("idStore=").append(idStore);
+        sb.append(", storeName=").append(storeName);
+        sb.append(", storeCode=").append(storeCode);
+        sb.append(", address=").append(address);
+        sb.append(", city=").append(city);
+        sb.append(", state=").append(state);
+        sb.append(", enabled=").append(enabled);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    public int getIdStore() {
+        return idStore;
+    }
+
+    public String getStoreName() {
+        return storeName;
+    }
+
+    public String getStoreCode() {
+        return storeCode;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public Set<ProductStock> getProductStock() {
+        return productStock;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+
 }
