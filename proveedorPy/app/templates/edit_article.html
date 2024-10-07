@@ -14,17 +14,17 @@
         <form method="POST" class="mt-3">
             <div class="mb-3">
                 <label for="articulo" class="form-label">Nombre del artículo:</label>
-                <input type="text" id="articulo" name="articulo" class="form-control" value="{{ articulo.articulo }}" required>
+                <input type="text" id="articulo" name="articulo" class="form-control" value="{{ articulo.articulo }}" readonly>
             </div>
 
             <div class="mb-3">
                 <label for="url_foto" class="form-label">URL de la foto:</label>
-                <input type="url" id="url_foto" name="url_foto" class="form-control" value="{{ articulo.url_foto }}" required>
+                <input type="url" id="url_foto" name="url_foto" class="form-control" value="{{ articulo.url_foto }}" readonly>
             </div>
         
             <div class="mb-3">
                 <label for="id_talle" class="form-label">Talle:</label>
-                <select id="id_talle" name="id_talle" class="form-select">
+                <select id="id_talle" name="id_talle" class="form-select" disabled>
                     {% for talle in talles %}
                         <option value="{{ talle.id }}" {% if talle.id == articulo.id_talle %}selected{% endif %}>{{ talle.talle }}</option>
                     {% endfor %}
@@ -33,7 +33,7 @@
         
             <div class="mb-3">
                 <label for="id_color" class="form-label">Color:</label>
-                <select id="id_color" name="id_color" class="form-select">
+                <select id="id_color" name="id_color" class="form-select" disabled>
                     {% for color in colores %}
                         <option value="{{ color.id }}" {% if color.id == articulo.id_color %}selected{% endif %}>{{ color.color }}</option>
                     {% endfor %}

@@ -39,17 +39,11 @@ def nuevo_producto():
         nuevo_producto = Producto(codigo_producto=codigo_producto)
         db.session.add(nuevo_producto)
         db.session.commit()
-        enviarNovedadKafka(nuevo_producto)
         flash('Producto creado exitosamente', 'success')
 
         return redirect(url_for('lista_productos'))
 
     return render_template('add_product.html')
-
-def enviarNovedadKafka(producto):
-    producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    producer.send('novedades', json.dumps(MessageToJson(producto)).encode())
-    producer.flush()
 
 @app.route('/list_articles/<int:producto_id>', methods=['GET'])
 def list_articles(producto_id):
@@ -89,11 +83,23 @@ def add_article_to_product(producto_id):
         )
         db.session.add(nuevo_articulo)
         db.session.commit()
-
+        enviarNovedadKafka(nuevo_articulo)
         flash('Artículo creado exitosamente', 'success')
         return redirect(url_for('list_articles', producto_id=producto_id))
 
     return render_template('add_article_to_product.html', producto=producto, talles=talles, colores=colores)
+
+def enviarNovedadKafka(articulo):
+    color = Color.query.get(articulo.id_color)
+    talle = Talle.query.get(articulo.id_talle)
+    producto = Producto.query.get(articulo.id_producto)
+    articulo.color = color.color
+    articulo.talle = talle.talle
+    articulo.producto = producto.codigo_producto
+
+    producer = KafkaProducer(bootstrap_servers='localhost:9092')
+    producer.send('novedades', json.dumps(MessageToJson(articulo)).encode())
+    producer.flush()
 
 @app.route('/edit_article/<int:articulo_id>', methods=['GET', 'POST'])
 def edit_article(articulo_id):
@@ -103,10 +109,6 @@ def edit_article(articulo_id):
     colores = Color.query.all()
 
     if request.method == 'POST':
-        articulo.articulo = request.form['articulo']
-        articulo.url_foto = request.form['url_foto']
-        articulo.id_talle = request.form['id_talle']
-        articulo.id_color = request.form['id_color']
         articulo.stock = request.form['stock']
 
         db.session.commit()
