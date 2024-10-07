@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-TOPIC_NAME = "novedades"
+TOPIC_NAME = "orden_de_compra"
 
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_USER = os.getenv("DB_USER")
@@ -32,7 +32,7 @@ def connect_to_mysql():
 
 def queryODC():
     with connection.cursor() as cursor:
-        query = "SELECT * FROM orden_de_compra odc INNER JOIN item i ON odc.id=i.id_orden_de_compra WHERE estado='SOLICITADA' LIMIT 5;"
+        query = "SELECT * FROM orden_de_compra odc WHERE estado='SOLICITADA' LIMIT 5;"
         cursor.execute(query)
         result = cursor.fetchall()
         return result
