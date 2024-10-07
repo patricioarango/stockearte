@@ -50,6 +50,21 @@ class ProductServiceStub(object):
                 request_serializer=product__pb2.Product.SerializeToString,
                 response_deserializer=product__pb2.Product.FromString,
                 _registered_method=True)
+        self.FindProductsByStore = channel.unary_unary(
+                '/model.ProductService/FindProductsByStore',
+                request_serializer=product__pb2.StoreRequest.SerializeToString,
+                response_deserializer=product__pb2.Products.FromString,
+                _registered_method=True)
+        self.FindProductByCode = channel.unary_unary(
+                '/model.ProductService/FindProductByCode',
+                request_serializer=product__pb2.ProductCodeRequest.SerializeToString,
+                response_deserializer=product__pb2.Product.FromString,
+                _registered_method=True)
+        self.findByAttributes = channel.unary_unary(
+                '/model.ProductService/findByAttributes',
+                request_serializer=product__pb2.FindProductSearch.SerializeToString,
+                response_deserializer=product__pb2.Products.FromString,
+                _registered_method=True)
 
 
 class ProductServiceServicer(object):
@@ -73,6 +88,24 @@ class ProductServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def FindProductsByStore(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def FindProductByCode(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def findByAttributes(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ProductServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -90,6 +123,21 @@ def add_ProductServiceServicer_to_server(servicer, server):
                     servicer.SaveProduct,
                     request_deserializer=product__pb2.Product.FromString,
                     response_serializer=product__pb2.Product.SerializeToString,
+            ),
+            'FindProductsByStore': grpc.unary_unary_rpc_method_handler(
+                    servicer.FindProductsByStore,
+                    request_deserializer=product__pb2.StoreRequest.FromString,
+                    response_serializer=product__pb2.Products.SerializeToString,
+            ),
+            'FindProductByCode': grpc.unary_unary_rpc_method_handler(
+                    servicer.FindProductByCode,
+                    request_deserializer=product__pb2.ProductCodeRequest.FromString,
+                    response_serializer=product__pb2.Product.SerializeToString,
+            ),
+            'findByAttributes': grpc.unary_unary_rpc_method_handler(
+                    servicer.findByAttributes,
+                    request_deserializer=product__pb2.FindProductSearch.FromString,
+                    response_serializer=product__pb2.Products.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -173,6 +221,87 @@ class ProductService(object):
             '/model.ProductService/SaveProduct',
             product__pb2.Product.SerializeToString,
             product__pb2.Product.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def FindProductsByStore(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/model.ProductService/FindProductsByStore',
+            product__pb2.StoreRequest.SerializeToString,
+            product__pb2.Products.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def FindProductByCode(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/model.ProductService/FindProductByCode',
+            product__pb2.ProductCodeRequest.SerializeToString,
+            product__pb2.Product.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def findByAttributes(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/model.ProductService/findByAttributes',
+            product__pb2.FindProductSearch.SerializeToString,
+            product__pb2.Products.FromString,
             options,
             channel_credentials,
             insecure,

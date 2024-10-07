@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package model;
+
+option java_package = "com.stockearte.model";
+option java_outer_classname = "DispatchOrderProto";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+service DispatchOrderService {
+  rpc SaveDispatchOrder(DispatchOrder) returns (DispatchOrder) {}
+}
+
+message DispatchOrder {
+    int32 idDispatchOrder = 1;
+    int32 idPurchaseOrder = 2;
+    string estimatedShippingDate = 3;
+}

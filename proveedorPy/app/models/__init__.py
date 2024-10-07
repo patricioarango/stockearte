@@ -20,7 +20,8 @@ class Color(db.Model):
 
 class Articulo(db.Model):
     __tablename__ = 'articulo'
-    id_producto = sa.Column(sa.Integer, primary_key=True)  
+    id = sa.Column(sa.Integer, primary_key=True) 
+    id_producto = sa.Column(sa.Integer)  
     articulo = sa.Column(sa.String(255))
     url_foto = sa.Column(sa.String(255))
     id_talle = sa.Column(sa.Integer)  

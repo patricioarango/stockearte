@@ -44,7 +44,7 @@
                 <label for="idProduct" class="form-label">Código del Producto</label>
                 <select name="idProduct" id="idProduct" class="form-select" required>
                     {% for product in productos_tienda %}
-                        <option value="{{ product.idProduct }}">{{ product.code }} ({{ product.productName }})</option>
+                        <option value="{{ product.idProduct }}">Código Producto: {{ product.code }} Producto: {{ product.productName }} Talle: {{ product.size }} Color: {{ product.color }} Stock: {{ product.stock }}</option>
                     {% endfor %}
                 </select>
             </div>

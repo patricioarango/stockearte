@@ -1,5 +1,6 @@
 .idea/
 ServidorJava\bin\src\main\generated\
+ServidorJava\bin\src\main\generated\*
 ServidorJava\src\main\generated\
 ServidorJava\target\
 pythonClientForTesting\__pycache__\
@@ -13,4 +14,3 @@ __pycache__/
 proveedorPy\app\__pycache__\*.pyc
 proveedorPy\.env
 proveedorPy/.env
-kafka-test-script/*

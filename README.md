@@ -50,11 +50,11 @@ Ingresar los siguientes comandos en la terminal:
 python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --pyi_out=. --grpc_python_out=. ../ServidorJava/src/main/proto/orderItem.proto
 python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --pyi_out=. --grpc_python_out=. ../ServidorJava/src/main/proto/purchaseOrder.proto
 
-
+## Inicio Apache Kafka
 cd C:\Kafka
 .\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
 en otra terminal:
 cd C:\Kafka
 .\bin\windows\kafka-server-start.bat .\config\server.properties
-
+### Listar todos los topics que existen dentro del broker:
 .\bin\windows\kafka-console-consumer.bat --topic orden-de-compra --bootstrap-server localhost:9092

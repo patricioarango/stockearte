@@ -21,17 +21,18 @@
                     <th>Talle</th>
                     <th>Color</th>
                     <th>Stock</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
-                {% for articulo in articulosdelproducto %}
+                {% for articulo, color_value, talle_value in articulosdelproducto %}
                 <tr>
                     <td>{{ articulo.articulo }}</td>
                     <td>
                         <img src="{{ articulo.url_foto }}" alt="Foto de {{ articulo.articulo }}" style="max-width: 100px; height: auto;">
                     </td>
-                    <td>{{ articulo.talle.talle if articulo.talle else 'N/A' }}</td>
-                    <td>{{ articulo.color.color if articulo.color else 'N/A' }}</td>
+                    <td>{{ talle_value if talle_value else 'N/A' }}</td>
+                    <td>{{ color_value if color_value else 'N/A' }}</td>
                     <td>{{ articulo.stock }}</td>
                     <td>
                         <a href="{{ url_for('edit_article', articulo_id=articulo.id) }}" class="btn btn-warning">Editar</a>

@@ -1,46 +1,28 @@
 from app import create_app
-#from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-
 from flask import Flask, render_template, request, flash, redirect, session, json, url_for, redirect
-
 import random
 import string
 import os,grpc
-
+from kafka import KafkaConsumer,KafkaProducer
+from kafka.admin import KafkaAdminClient, NewTopic
+from kafka.errors import TopicAlreadyExistsError
 from user_pb2 import User
-
 from user_pb2_grpc import UsersServiceStub
-
 from store_pb2 import Store
-
 from store_pb2_grpc import StoreServiceStub
-
 from role_pb2 import Role
-
 from role_pb2_grpc import RoleServiceStub
-
-from product_pb2 import Product
 from product_pb2 import Product, ProductCodeRequest, FindProductSearch
-
 from product_pb2_grpc import ProductServiceStub  
-
-from productStock_pb2 import ProductStock, ProductsStock, ProductAndStoreRequest
-
+from productStock_pb2 import ProductStock, ProductAndStoreRequest
 from productStock_pb2_grpc import ProductStockServiceStub
-
 from purchaseOrder_pb2 import PurchaseOrder,PurchaseAndStoreRequest
-
 from purchaseOrder_pb2_grpc import PurchaseOrderServiceStub
-
 from orderItem_pb2 import OrderItem
-
 from orderItem_pb2_grpc import OrderItemServiceStub
-
 import logging
-
 from google.protobuf.json_format import MessageToJson
-
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -678,6 +660,118 @@ def view_order_items_list(id):
         order_items = order.items 
 
     return render_template('view_order_items_list.html', order=order, order_items=order_items)
+
+@app.route('/consumer_despachos', methods=['GET'])
+def consumer_despachos():
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        store_stub = StoreServiceStub(channel)
+        storegrpc = store_stub.GetStore(Store(idStore=session['user_store_id']))
+        store_code = storegrpc.code
+        store_topic = store_code + "_despacho"
+        # chequeamos si el topic del store existe o lo creamos
+        res = checkIFKafkaTopicExists(store_topic)
+        if(res == False):
+            createKafkaTopic(store_topic)
+        consumer = KafkaConsumer(
+            store_topic,
+            bootstrap_servers=os.getenv("SERVER-KAFKA-BROKER"),
+            client_id = "CONSUMER_STORE_ID_"+store_code,
+            group_id = "CONSUMER_GROUP_2PROV_"+store_code,
+            value_deserializer=lambda x: json.loads(x.decode('utf-8'))
+        )
+        user_store_id = session.get('user_store_id')
+        store_name = session.get('user_store_name')
+        
+        store = Store(
+            idStore=user_store_id,
+            storeName=store_name
+        )
+        
+        purchaseorder_stub = PurchaseOrderServiceStub(channel)
+        
+        while True:
+            for message in consumer:
+                orden_de_despacho_store = message.value 
+                updateDispatchOrder(orden_de_despacho_store,store,purchaseorder_stub)
+    return True
+
+    
+@app.route('/consumer_solicitudes', methods=['GET'])
+def consumer_solicitudes_orden_de_compra():
+
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        store_stub = StoreServiceStub(channel)
+        storegrpc = store_stub.GetStore(Store(idStore=session['user_store_id']))
+        store_code = storegrpc.code
+        store_topic = store_code + "_solicitudes"
+        # chequeamos si el topic del store existe o lo creamos
+        res = checkIFKafkaTopicExists(store_topic)
+        if(res == False):
+            createKafkaTopic(store_topic)
+        consumer = KafkaConsumer(
+            store_topic,
+            bootstrap_servers=os.getenv("SERVER-KAFKA-BROKER"),
+            client_id = "CONSUMER_STORE_ID_"+store_code,
+            group_id = "CONSUMER_GROUP_2PROV_"+store_code,
+            value_deserializer=lambda x: json.loads(x.decode('utf-8'))
+        )
+        user_store_id = session.get('user_store_id')
+        store_name = session.get('user_store_name')
+        
+        store = Store(
+            idStore=user_store_id,
+            storeName=store_name
+        )
+        
+        purchaseorder_stub = PurchaseOrderServiceStub(channel)
+        
+        while True:
+            for message in consumer:
+                orden_de_compra_store = message.value 
+                updatePurchaseOrder(orden_de_compra_store,store,purchaseorder_stub)
+                
+
+def updatePurchaseOrder(orden_de_compra_store,store,purchaseorder_stub):
+    print("orden_de_compra_store")
+    print(orden_de_compra_store)
+    
+    new_order = PurchaseOrder(
+        idPurchaseOrder=orden_de_compra_store["id"],
+        observation=orden_de_compra_store["observaciones"],  
+        state=orden_de_compra_store["estado"], 
+        idDispatchOrder=orden_de_compra_store["id_orden_de_despacho"],  
+        store=store
+    )     
+    try:
+        response = purchaseorder_stub.AddPurchaseOrder(new_order)
+        print("Orden de compra actualizada: ", response) 
+        return True
+    
+    except grpc.RpcError as e:
+        print(f"Error al agregar la orden de compra: {e}")
+        return render_template('error.html', error_message="Hubo un error al intentar agregar la orden de compra.")
+
+def checkIFKafkaTopicExists(topic_name):
+    admin_client = KafkaAdminClient(
+    bootstrap_servers=os.getenv("SERVER-KAFKA-BROKER"),
+    client_id='admin-client'
+    )
+    topics = admin_client.list_topics()
+    print(topics)
+    return topic_name in topics
+
+def createKafkaTopic(topic_name):
+    admin_client = KafkaAdminClient(
+    bootstrap_servers=os.getenv("SERVER-KAFKA-BROKER"),
+    client_id='admin-client'
+    )
+    topic_list = []
+    topic_list.append(NewTopic(name=topic_name, num_partitions=1, replication_factor=1))
+    try:
+        admin_client.create_topics(new_topics=topic_list, validate_only=False)
+    except TopicAlreadyExistsError:
+        print(f"Topic {topic_name} already exists")
+    admin_client.close()
 
 
 if __name__ == '__main__':
