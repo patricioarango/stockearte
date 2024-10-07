@@ -1,4 +1,4 @@
-package src.main.java.com.stockearte.server.entities;
+package com.stockearte.server.entities;
 
 import lombok.*;
 

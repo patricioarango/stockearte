@@ -1,4 +1,4 @@
-package src.main.java.com.stockearte.server.service;
+package com.stockearte.server.service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,11 +12,11 @@ import com.stockearte.server.repository.PurchaseOrderRepository;
 
 import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
-import src.main.generated.com.stockearte.model.DispatchOrderServiceGrpc;
-import src.main.generated.com.stockearte.model.StoreProto;
-import src.main.generated.com.stockearte.model.DispatchOrderProto;
-import src.main.java.com.stockearte.server.entities.DispatchOrder;
-import src.main.java.com.stockearte.server.repository.DispatchOrderRepository;
+import com.stockearte.model.DispatchOrderServiceGrpc;
+import com.stockearte.model.StoreProto;
+import com.stockearte.model.DispatchOrderProto;
+import com.stockearte.server.entities.DispatchOrder;
+import com.stockearte.server.repository.DispatchOrderRepository;
 
 @GrpcService
 public class DispatchOrderService extends DispatchOrderServiceGrpc.DispatchOrderServiceImplBase{
@@ -31,7 +31,7 @@ public class DispatchOrderService extends DispatchOrderServiceGrpc.DispatchOrder
     private PurchaseOrderRepository purchaseOrderRepository;
 
     @Override
-    public void savePurchaseOrder(DispatchOrderProto.DispatchOrder request, StreamObserver<DispatchOrderProto.DispatchOrder> responseObserver) {
+    public void saveDispatchOrder(DispatchOrderProto.DispatchOrder request, StreamObserver<DispatchOrderProto.DispatchOrder> responseObserver) {
         int dipatchOrderId = request.getIdDispatchOrder();
         DispatchOrder dispatchOrderreq = new DispatchOrder();
         
