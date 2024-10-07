@@ -782,6 +782,27 @@ def createKafkaTopic(topic_name):
     admin_client.close()
 
 
+@app.route('/recibir_orden_de_compra/<int:id_orden_de_compra>', methods=['GET'])
+def recibir_orden_de_compra(id_orden_de_compra):
+
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        purchaseorder_stub = PurchaseOrderServiceStub(channel)
+        order = purchaseorder_stub.GetPurchaseOrder(PurchaseOrder(idPurchaseOrder=int(id_orden_de_compra)))
+        order.state = "RECIBIDA"
+        order.receptionDate = datetime.now().strftime('%Y-%m-%d')
+        purchaseorder_stub.AddPurchaseOrder(order)
+        aumentarStock(order)
+    return redirect(url_for('list_purchase_orders'))
+
+def aumentarStock(order):
+    for item in order.items:
+        with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+            product = ProductServiceStub(channel).GetProduct(ProductCodeRequest(code=item.productCode))
+            product_stock = ProductStockServiceStub(channel).GetProductStock(ProductAndStoreRequest(idProduct=product.idProduct, idStore=order.store.idStore))
+            product_stock.stock += item.requestedAmount
+            ProductStockServiceStub(channel).SaveProductStock(product_stock)
+            return True
+
 if __name__ == '__main__':
     from argparse import ArgumentParser
 
