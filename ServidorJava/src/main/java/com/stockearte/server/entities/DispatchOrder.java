@@ -5,7 +5,10 @@ import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
+
 import javax.persistence.*;
+
+import com.stockearte.server.entities.PurchaseOrder;
 
 @Entity
 @Table(name = "dispatch_order")
