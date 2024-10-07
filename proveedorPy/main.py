@@ -6,6 +6,7 @@ from app.models import Talle,Color,Articulo,Producto
 from app.models import db
 from sqlalchemy.orm import aliased
 from app.modulos.orden_de_compra import OrdenDeCompraController  
+from kafka import KafkaProducer
 
 logger = logging.getLogger(__name__)
 
@@ -38,13 +39,17 @@ def nuevo_producto():
         nuevo_producto = Producto(codigo_producto=codigo_producto)
         db.session.add(nuevo_producto)
         db.session.commit()
-
+        enviarNovedadKafka(nuevo_producto)
         flash('Producto creado exitosamente', 'success')
 
         return redirect(url_for('lista_productos'))
 
     return render_template('add_product.html')
 
+def enviarNovedadKafka(producto):
+    producer = KafkaProducer(bootstrap_servers='localhost:9092')
+    producer.send('novedades', json.dumps(MessageToJson(producto)).encode())
+    producer.flush()
 
 @app.route('/list_articles/<int:producto_id>', methods=['GET'])
 def list_articles(producto_id):
