@@ -658,7 +658,6 @@ def view_order_items_list(id):
 
 
         order_items = order.items 
-
     return render_template('view_order_items_list.html', order=order, order_items=order_items)
 
 @app.route('/consumer_despachos', methods=['GET'])
