@@ -19,8 +19,8 @@
     </div>
     
     <div class="container">
-        <div class="row">
             {% if session['roleName'] == 'admin' %}
+            <div class="row">
                 <div class="col">
                     <div class="card" style="width: 18rem;">
                         <img src="https://img.freepik.com/vector-premium/icono-comunicacion-personas-estilo-comic-ilustracion-vector-dibujos-animados-personas-sobre-fondo-blanco-concepto-negocio-efecto-salpicadura-asociacion_157943-13666.jpg" class="card-img-top" alt="..." width="100%" height="200">
@@ -31,7 +31,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="col">
                     <div class="card" style="width: 18rem;">
                         <img src="https://i.pinimg.com/736x/33/66/3a/33663afe1341595fef614dad3305d328.jpg" class="card-img-top" alt="..." width="100%" height="200">
@@ -42,64 +41,77 @@
                         </div>
                     </div>
                 </div>
-            {% endif %}
-            {% if session['roleName'] == 'manager' %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card" style="width: 18rem;">
-                    <img src="https://manada.com.ar/blog/wp-content/uploads/2016/04/fashion-winter.png" class="card-img-top" alt="Mis Productos" width="100%" height="200">
-                    <div class="card-body">
-                        <h5 class="card-title">Mis Productos</h5>
-                        <p class="card-text">Como usuario de tienda, gestiona el stock de los productos asignados a tu tienda. Consulta la lista de productos disponibles, filtrando por nombre, código, talle o color. Actualiza el stock en tiempo real para garantizar la disponibilidad de los productos en tu tienda.</p>
-                        <a href="/my_products" class="btn btn-success">MIS PRODUCTOS</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6 col-lg-4">
-                <div class="card" style="width: 18rem;">
-                    <img src="https://cdn-icons-png.flaticon.com/512/12341/12341347.png" class="card-img-top" alt="Órdenes de Compra" width="100%" height="295">
-                    <div class="card-body">
-                        <h5 class="card-title">Órdenes de Compra</h5>
-                        <p class="card-text">Como usuario manager, puedes gestionar las órdenes de compra, visualizar y actualizar el estado de las órdenes realizadas.</p>
-                        <a href="/purchase_orders" class="btn btn-success">ORDENES DE COMPRA</a>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-            {% if session['roleName'] == 'admin' %}
                 <div class="col">
                     <div class="card" style="width: 18rem;">
                         <img src="https://manada.com.ar/blog/wp-content/uploads/2016/04/fashion-winter.png" class="card-img-top" alt="..." width="100%" height="200">
                         <div class="card-body">
                             <h5 class="card-title">Productos</h5>
-                            <p class="card-text">Como usuario de Casa Central, administra todos los productos del sistema. Crea nuevos productos con nombre, código único generado automáticamente, foto, talle, color y stock. Consulta el stock en cada tienda y gestiona los detalles del producto. Filtra los productos por nombre, código, talle o color para facilitar la búsqueda y edición.</p>
+                            <p class="card-text">Como usuario de Casa Central, administra todos los productos del sistema. Crea nuevos productos con nombre, código único generado automáticamente, foto, talle, color y stock. Filtra los productos por nombre, código, talle o color.</p>
                             <a href="/product" class="btn btn-warning">VER PRODUCTOS</a>
                         </div>
                     </div>
                 </div>
-            {% endif %}
                 <div class="col">
                     <div class="card" style="width: 18rem;">
-                        <img src="https://img.freepik.com/vector-premium/megafon-colorido-pancarta-que-dice-nuevo_150234-148049.jpg?w=740" class="card-img-top" alt="Novedades" width="100%" height="275">
+                        <img src="{{ url_for('static', filename='nuevo_producto.jpg') }}" class="card-img-top" alt="Novedades" width="100%" height="275">
                         <div class="card-body">
                             <h5 class="card-title">Novedades</h5>
-                            <p class="card-text">Mantente al tanto de las últimas novedades y actualizaciones de la Casa Central. Aquí podrás encontrar noticias importantes sobre productos, cambios en el sistema y mucho más.</p>
+                            <p class="card-text">Listado de Novedades para ingresar nuevos productos a Stockearte.</p>
                             <a href="/novedades" class="btn btn-info">VER NOVEDADES</a>
                         </div>
                     </div>
                 </div>
-
-                <div class="col">
+                
+            </div>    
+            
+            {% endif %}
+            {% if session['roleName'] == 'manager' %}
+            <div class="row">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card" style="width: 18rem;">
+                        <img src="https://manada.com.ar/blog/wp-content/uploads/2016/04/fashion-winter.png" class="card-img-top" alt="Mis Productos" width="100%" height="200">
+                        <div class="card-body">
+                            <h5 class="card-title">Mis Productos</h5>
+                            <p class="card-text">Como usuario de tienda, gestiona el stock de los productos asignados a tu tienda. Consulta la lista de productos disponibles, filtrando por nombre, código, talle o color. Actualiza el stock en tiempo real para garantizar la disponibilidad de los productos en tu tienda.</p>
+                            <a href="/my_products" class="btn btn-danger">MIS PRODUCTOS</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4">
+                    <div class="card" style="width: 18rem;">
+                        <img src="https://cdn-icons-png.flaticon.com/512/12341/12341347.png" class="card-img-top" alt="Órdenes de Compra" width="100%" height="295">
+                        <div class="card-body">
+                            <h5 class="card-title">Órdenes de Compra</h5>
+                            <p class="card-text">Como usuario manager, puedes gestionar las órdenes de compra, visualizar y actualizar el estado de las órdenes realizadas.</p>
+                            <a href="/purchase_orders" class="btn btn-info">ORDENES DE COMPRA</a>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+        {% endif %}
+            <div class="row">
+                <h1>Consumers</h1>
+                <div class="col-4">
                     <div class="card" style="width: 18rem;">
                         <img src="https://img.freepik.com/vector-premium/megafon-colorido-pancarta-que-dice-nuevo_150234-148049.jpg?w=740" class="card-img-top" alt="Novedades" width="100%" height="275">
                         <div class="card-body">
                             <h5 class="card-title">Consumer Solicitudes</h5>
-                            <p class="card-text">Mantente al tanto de las últimas novedades y actualizaciones de la Casa Central. Aquí podrás encontrar noticias importantes sobre productos, cambios en el sistema y mucho más.</p>
-                            <a href="/consumer_solicitudes" target="_blank" class="btn btn-warning">START LISTENER</a>
+                            <p class="card-text">Enciende el Consumer para Ingresar Solicitudes de Órdenes de Compra a Stockearte</p>
+                            <a href="/consumer_solicitudes" target="_blank" class="btn btn-warning">Start Consumer Órdenes</a>
                         </div>
                     </div>
                 </div>
-        </div>
+                <div class="col-4">
+                    <div class="card" style="width: 18rem;">
+                        <img src="https://img.freepik.com/vector-premium/megafon-colorido-pancarta-que-dice-nuevo_150234-148049.jpg?w=740" class="card-img-top" alt="..." width="100%" height="275">
+                        <div class="card-body">
+                            <h5 class="card-title">Consumer Novedades</h5>
+                            <p class="card-text">Enciende el Consumer para Ingresar Novedades a Stockearte</p>
+                            <a href="/consumer_novedades" target="_blank" class="btn btn-success">Consumer Novedades</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
     </div>
 </body>
 </html>

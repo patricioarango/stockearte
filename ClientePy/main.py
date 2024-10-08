@@ -23,6 +23,8 @@ from orderItem_pb2 import OrderItem
 from orderItem_pb2_grpc import OrderItemServiceStub
 from dispatchOrder_pb2 import DispatchOrder
 from dispatchOrder_pb2_grpc import DispatchOrderServiceStub
+from novelty_pb2 import Novelty
+from novelty_pb2_grpc import NoveltyServiceStub
 
 import logging
 from google.protobuf.json_format import MessageToJson
@@ -844,6 +846,89 @@ def aumentarStock(order):
     except grpc.RpcError as e:
         print(f"Error al interactuar con gRPC: {e.code()} - {e.details()}")
         return False
+
+@app.route('/consumer_novedades', methods=['GET'])
+def consumer_novedades():
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        novedades_topic = "novedades"
+        # chequeamos si el topic del store existe o lo creamos
+        res = checkIFKafkaTopicExists(novedades_topic)
+        if(res == False):
+            createKafkaTopic(novedades_topic)
+        consumer = KafkaConsumer(
+            novedades_topic,
+            bootstrap_servers=os.getenv("SERVER-KAFKA-BROKER"),
+            client_id = "CONSUMER_CASA_CENTRAL_NOVEDADES",
+            group_id = "CONSUMER_GROUP_ID",
+            value_deserializer=lambda x: json.loads(x.decode('utf-8'))
+        )
+        novelty_stub = NoveltyServiceStub(channel)
+        while True:
+            for message in consumer:
+                new_novelty = message.value 
+                insertNovelty(new_novelty,novelty_stub)
+    return True
+
+def insertNovelty(new_novelty,novelty_stub):
+    print("new_novelty")
+    print(new_novelty)
+    
+    novelty = Novelty(
+        date=datetime.now().strftime('%Y-%m-%d'),
+        novelty="test",
+        code=new_novelty["producto"],  
+        color=new_novelty["color"], 
+        size=new_novelty["talle"], 
+        img=new_novelty["url_foto"], 
+        saved=False
+    )     
+    try:
+        response = novelty_stub.SaveNovelty(novelty)
+        print("Novedad agregada: ", response) 
+        return True
+    
+    except grpc.RpcError as e:
+        print(f"Error al agregar la novedad: {e}")
+        return render_template('error.html', error_message="Hubo un error al intentar agregar la novedad.")
+
+@app.route('/agregar_novedad/<int:id>', methods=['GET'])
+def agregar_novedad(id):
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        novelty_stub = NoveltyServiceStub(channel)
+        product_stub = ProductServiceStub(channel)
+        novelty = Novelty(
+            idNovelty=id,
+        )
+        
+        try:
+            novelty_response = novelty_stub.GetNovelty(novelty)
+            codeExists = product_stub.FindProductByCode(ProductCodeRequest(code=novelty_response.code))
+            if codeExists.idProduct > 0:
+                flash('El código del producto es obligatorio', 'danger')
+                return redirect(url_for('novedades'))
+            
+            nuevo_producto = Product(
+                product="producto del proveedor",
+                code=novelty_response.code,
+                img=novelty_response.img,
+                color=novelty_response.color,
+                size=novelty_response.size,
+                enabled=True 
+            )
+            try:
+                producto_response = product_stub.SaveProduct(nuevo_producto)
+                novelty_response.saved = True
+                novelty_stub.SaveNovelty(novelty_response)
+                flash('El producto se agregó con éxito. Id del Producto: #' + producto_response.idProduct, 'success')
+                return redirect(url_for('novedades'))
+            except grpc.RpcError as e:
+                print(f"Error al guardar el producto: {e}")
+                return render_template('error.html', error_message="Hubo un error al intentar guardar la novedad.")
+        
+        except grpc.RpcError as e:
+            print(f"Error al guardar el producto: {e}")
+            return render_template('error.html', error_message="Hubo un error al intentar guardar la novedad.")
+
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
