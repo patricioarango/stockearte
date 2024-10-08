@@ -90,16 +90,31 @@ def add_article_to_product(producto_id):
     return render_template('add_article_to_product.html', producto=producto, talles=talles, colores=colores)
 
 def enviarNovedadKafka(articulo):
+    print("enviarNovedadKafka")
+    print(articulo.id_color)
     color = Color.query.get(articulo.id_color)
     talle = Talle.query.get(articulo.id_talle)
     producto = Producto.query.get(articulo.id_producto)
     articulo.color = color.color
     articulo.talle = talle.talle
     articulo.producto = producto.codigo_producto
-
-    producer = KafkaProducer(bootstrap_servers='localhost:9092')
-    producer.send('novedades', json.dumps(MessageToJson(articulo)).encode())
-    producer.flush()
+    print("producto.codigo_producto")
+    print(producto.codigo_producto)
+    producer = KafkaProducer(
+        bootstrap_servers='localhost:9092',
+        value_serializer=lambda v: json.dumps(v).encode('utf-8')
+    )
+    articulo_dict = {
+        "producto": articulo.producto,
+        "color": articulo.color,
+        "talle": articulo.talle,
+        "url_foto": articulo.url_foto
+        }
+    print("articulo_dict")
+    print(articulo_dict)
+    producer.send('novedades', articulo_dict)
+    producer.close()
+    return redirect(url_for('list_articles', producto_id=articulo.id_producto))
 
 @app.route('/edit_article/<int:articulo_id>', methods=['GET', 'POST'])
 def edit_article(articulo_id):
