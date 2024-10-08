@@ -543,6 +543,32 @@ def list_purchase_orders():
     except grpc.RpcError as e:
         print(f"Error al obtener órdenes de compra: {e.code()}, {e.details()}")
         return "Error al obtener órdenes de compra", 500
+    
+@app.route('/purchase_orders_accepted')
+def list_purchase_orders_accepted():
+    try:
+        # Abrir el canal gRPC
+        with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+            purchaseorder_stub = PurchaseOrderServiceStub(channel)
+
+            # Crear la solicitud gRPC para encontrar órdenes de compra por tienda y estado
+            request = PurchaseAndStoreRequest(
+                idStore=session.get('user_store_id'),  # Obtener ID de la tienda desde la sesión
+                state="ACEPTADA"  # Definir el estado como ACEPTADA
+            )
+
+            # Llamada gRPC al método FindAllByStoreAndState
+            response = purchaseorder_stub.FindAllByStoreAndState(request)
+            print("La respuesta es: ", response)
+
+            # Renderizar la respuesta en la plantilla HTML
+            return render_template('list_purchase_orders_accepted.html', purchase_orders=response.purchaseOrderWithItem)
+
+    except grpc.RpcError as e:
+        # Manejo de errores en la llamada gRPC
+        print(f"Error en la llamada gRPC: {e.code()}, {e.details()}")
+        return "Error al obtener órdenes de compra", 500
+
 
 @app.route('/new_purchase_order', methods=['GET', 'POST'])
 def new_purchase_order():
@@ -797,13 +823,27 @@ def recibir_orden_de_compra(id_orden_de_compra):
     return redirect(url_for('list_purchase_orders'))
 
 def aumentarStock(order):
-    for item in order.items:
-        with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
-            product = ProductServiceStub(channel).GetProduct(ProductCodeRequest(code=item.productCode))
-            product_stock = ProductStockServiceStub(channel).GetProductStock(ProductAndStoreRequest(idProduct=product.idProduct, idStore=order.store.idStore))
-            product_stock.stock += item.requestedAmount
-            ProductStockServiceStub(channel).SaveProductStock(product_stock)
-            return True
+    try:
+        for item in order.items:
+            print(f"Procesando el producto con código {item.productCode} y cantidad {item.requestedAmount}")
+
+            with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+                product_stub = ProductServiceStub(channel)
+                product = product_stub.FindProductByCode(ProductCodeRequest(code=item.productCode))
+
+                stock_stub = ProductStockServiceStub(channel)
+                product_stock = stock_stub.GetProductStock(ProductAndStoreRequest(
+                    idProduct=product.idProduct, 
+                    idStore=order.store.idStore
+                ))
+
+                product_stock.stock += item.requestedAmount
+                stock_stub.SaveProductStock(product_stock)
+
+        return True
+    except grpc.RpcError as e:
+        print(f"Error al interactuar con gRPC: {e.code()} - {e.details()}")
+        return False
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
