@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package model;
+
+option java_package = "com.stockearte.model";
+option java_outer_classname = "NoveltyProto";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+service NoveltyService {
+  rpc GetNovelty(Novelty) returns (Novelty) {}
+  rpc FindAll(google.protobuf.Empty) returns (Novelties) {}
+  rpc SaveNovelty(Novelty) returns (Novelty) {}
+}
+
+message Novelties {
+  repeated Novelty novelty = 1;
+}
+
+message Novelty {
+  int32 idNovelty = 1;
+  string date = 2;
+  string novelty = 3;
+  string code = 4;
+  string color = 5;
+  string size = 6;
+  string img = 7;
+  bool saved = 8;
+}
