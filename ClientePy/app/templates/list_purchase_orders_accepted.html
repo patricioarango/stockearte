@@ -31,6 +31,7 @@
                 <td>{{ order.receptionDate}}</td>
                 <td>
                     <a href="{{ url_for('recibir_orden_de_compra', id_orden_de_compra=order.idPurchaseOrder) }}" class="btn btn-success">Recibir</a>
+                    <a href="{{ url_for('view_order_items_list', id=order.idPurchaseOrder) }}" class="btn btn-info">Ver Ítems</a>
                 </td>
               </tr>
               {% endfor %}
