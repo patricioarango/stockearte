@@ -101,6 +101,7 @@
                         </div>
                     </div>
                 </div>
+                {% if session['roleName'] == 'admin' %}
                 <div class="col-4">
                     <div class="card" style="width: 18rem;">
                         <img src="https://img.freepik.com/vector-premium/megafon-colorido-pancarta-que-dice-nuevo_150234-148049.jpg?w=740" class="card-img-top" alt="..." width="100%" height="275">
@@ -108,6 +109,17 @@
                             <h5 class="card-title">Consumer Novedades</h5>
                             <p class="card-text">Enciende el Consumer para Ingresar Novedades a Stockearte</p>
                             <a href="/consumer_novedades" target="_blank" class="btn btn-success">Consumer Novedades</a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="col-4">
+                    <div class="card" style="width: 18rem;">
+                        <img src="https://img.freepik.com/vector-premium/megafon-colorido-pancarta-que-dice-nuevo_150234-148049.jpg?w=740" class="card-img-top" alt="..." width="100%" height="275">
+                        <div class="card-body">
+                            <h5 class="card-title">Consumer Despachos</h5>
+                            <p class="card-text">Enciende el Consumer para Ingresar Despachos a Stockearte</p>
+                            <a href="/consumer_despachos" target="_blank" class="btn btn-danger">Consumer Despachos</a>
                         </div>
                     </div>
                 </div>

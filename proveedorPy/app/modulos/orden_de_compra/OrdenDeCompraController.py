@@ -26,10 +26,8 @@ def consumer_orden_de_compra():
     consumer = KafkaConsumer(
         TOPIC_NAME,
         bootstrap_servers=os.getenv("SERVER-KAFKA-BROKER"),
-        client_id = "CONSUMER_CLIENT_ID_24",
-        group_id = "CONSUMER_GROUP_PROV24",
-        auto_offset_reset = 'earliest',
-        enable_auto_commit = True,
+        client_id = "CONSUMER_CLIENT_ID_99",
+        group_id = "CONSUMER_GROUP_PROV99",
         value_deserializer=lambda x: json.loads(x.decode('utf-8'))
     )
     while True:

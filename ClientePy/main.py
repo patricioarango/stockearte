@@ -919,7 +919,7 @@ def agregar_novedad(id):
                 producto_response = product_stub.SaveProduct(nuevo_producto)
                 novelty_response.saved = True
                 novelty_stub.SaveNovelty(novelty_response)
-                flash('El producto se agregó con éxito. Id del Producto: #' + producto_response.idProduct, 'success')
+                flash('El producto se agregó con éxito. Id del Producto: #' + str(producto_response.idProduct), 'success')
                 return redirect(url_for('novedades'))
             except grpc.RpcError as e:
                 print(f"Error al guardar el producto: {e}")
