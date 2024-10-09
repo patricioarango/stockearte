@@ -24,7 +24,8 @@ def novedades():
 @app.route('/product', methods=['GET'])
 def lista_productos():
     productos = Producto.query.all()
-    
+    for producto in productos:
+        producto.articulos = Articulo.query.filter_by(id_producto=producto.id).all()
     return render_template('product.html', productos=productos)
 
 @app.route('/add_product', methods=['GET', 'POST'])

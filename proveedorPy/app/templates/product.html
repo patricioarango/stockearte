@@ -43,10 +43,17 @@
                     <td>{{ producto.id }}</td>
                     <td>{{ producto.codigo_producto }}</td>
                     <td>
-                        <a href="/list_articles/{{ producto.id }}" type="button" class="btn btn-success">Articulos</button>
+                        <a href="/list_articles/{{ producto.id }}" type="button" class="btn btn-success">Agregar Articulos</button>
                     </td>
-                    
                 </tr>
+                    {% if producto.articulos %}
+                    <tr><td>Artículos:</td><td colspan="2">
+                                    {% for articulo in producto.articulos %}
+                                        <p><img src="{{ articulo.url_foto }}" class="rounded-circle" height="75"> {{ articulo.articulo }} <b>Stock: </b>{{ articulo.stock }}</p>
+                                    {% endfor %}
+                                </td>    
+                    </tr>
+                    {% endif %}
                 {% endfor %}
             </tbody>
         </table>

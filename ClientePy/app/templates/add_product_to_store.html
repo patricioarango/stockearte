@@ -14,6 +14,7 @@
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
+                    <th></th>
                     <th>Nombre</th>
                     <th>Código</th>
                     <th>Talle</th>
@@ -25,6 +26,7 @@
                 {% if productosdelatienda %}
                     {% for producto in productosdelatienda %}
                     <tr>
+                        <td><img src="{{ producto.img }}" class="rounded-circle" height="75"></td>
                         <td>{{ producto.productName }}</td>
                         <td>{{ producto.code }}</td>
                         <td>{{ producto.size }}</td>

@@ -120,7 +120,7 @@ public class ProductStockService extends ProductStockServiceGrpc.ProductStockSer
                     .setProduct(ProductProto.Product.newBuilder()
                         .setIdProduct(productStock.getProduct().getIdProduct())
                         .setProduct(productStock.getProduct().getProductName())
-                        .setCode(productStock.getProduct().getProductCode()).setColor(productStock.getProduct().getColor()).     setSize(productStock.getProduct().getSize())
+                        .setCode(productStock.getProduct().getProductCode()).setColor(productStock.getProduct().getColor()).setSize(productStock.getProduct().getSize()).setImg(productStock.getProduct().getImg())
                         .build())
                     .setStore(StoreProto.Store.newBuilder()
                         .setIdStore(productStock.getStore().getIdStore())

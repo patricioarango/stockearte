@@ -429,7 +429,6 @@ def add_product_to_store(idStore):
 def store_products():
     checkSessionManager()
     user_store_id = session.get('user_id')
-    print("User Store ID de mis productos: ", user_store_id)
     productos_tienda = get_products_by_store(user_store_id)
 
     search_query = request.args.get('search_query')
@@ -469,6 +468,7 @@ def get_products_by_store(store_id):
                 products.append({
                     'idProduct': product.idProduct,
                     'productName': product.product,
+                    'img': product.img,
                     'code': product.code,
                     'size': product.size,
                     'color': product.color,
