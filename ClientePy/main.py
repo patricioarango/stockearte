@@ -533,6 +533,7 @@ def list_purchase_orders():
                     'createdAt': purchase_order.createdAt,
                     'purchaseOrderDate': purchase_order.purchaseOrderDate,
                     'receptionDate': purchase_order.receptionDate,
+                    'idDispatchOrder': purchase_order.idDispatchOrder,
                     'store': {
                         'idStore': purchase_order.store.idStore,
                         'storeName': purchase_order.store.storeName

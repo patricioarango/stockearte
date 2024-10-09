@@ -18,6 +18,7 @@
                 <th>Estado</th>
                 <th>Fecha de solicitud</th>
                 <th>Fecha de recepción</th>
+                <th>Orden de Despacho</th>
                 <th>Acciones</th>
               </tr>
           </thead>
@@ -30,11 +31,16 @@
                 <td>{{ order.state }}</td>
                 <td>{{ order.createdAt }}</td>
                 <td>{{ order.receptionDate }}</td>
+                <td>{{ order.idPurchaseOrder }}</td>
                 <td>
                     {% if order.state == 'SOLICITADA' %}
                       <a href="{{ url_for('view_order_items', id=order.idPurchaseOrder) }}" class="btn btn-success">Agregar Ítems</a>
                     {% endif %}
                     <a href="{{ url_for('view_order_items_list', id=order.idPurchaseOrder) }}" class="btn btn-info">Ver Ítems</a>
+                    {% if order.idDispatchOrder %}
+                      <a href="/recibir_orden_de_compra/{{ order.idPurchaseOrder }}" class="btn btn-danger">Recibir Orden</a>
+                    {% endif %}
+
                 </td>
               </tr>
             {% endfor %}

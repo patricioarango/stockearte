@@ -11,6 +11,10 @@ from app.models import db
 
 TOPIC_NAME = "orden-de-compra"
 
+@orden_de_compra_blueprint.route('/enviar_mensaje_a_store/<int:id>', methods=['GET'])
+def enviar_mensaje_a_store(id):
+    return enviarMensajeKafkaStore(id)
+
 @orden_de_compra_blueprint.route('/ver_ordenes_de_compra', methods=['GET'])
 def ver_ordenes_de_compra():
     ordenes_de_compra = Orden_de_compra.query.order_by(Orden_de_compra.id.desc()).all()
@@ -26,8 +30,8 @@ def consumer_orden_de_compra():
     consumer = KafkaConsumer(
         TOPIC_NAME,
         bootstrap_servers=os.getenv("SERVER-KAFKA-BROKER"),
-        client_id = "CONSUMER_CLIENT_ID_99",
-        group_id = "CONSUMER_GROUP_PROV99",
+        client_id = "CONSUMER_CLIENT_ID_24",
+        group_id = "CONSUMER_GROUP_PROV24",
         value_deserializer=lambda x: json.loads(x.decode('utf-8'))
     )
     while True:
