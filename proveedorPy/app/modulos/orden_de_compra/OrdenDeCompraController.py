@@ -11,6 +11,16 @@ from app.models import db
 
 TOPIC_NAME = "orden-de-compra"
 
+@orden_de_compra_blueprint.route('/ver_ordenes_de_compra', methods=['GET'])
+def ver_ordenes_de_compra():
+    ordenes_de_compra = Orden_de_compra.query.order_by(Orden_de_compra.id.desc()).all()
+    return render_template('listado_odc.html', ordenes_de_compra=ordenes_de_compra)
+
+@orden_de_compra_blueprint.route('/ver_orden_de_despacho/<int:id>', methods=['GET'])
+def ver_orden_de_despacho(id):
+    orden_de_despacho = Orden_de_despacho.query.filter_by(id = id).first()
+    return render_template('orden_de_despacho.html', orden_de_despacho=orden_de_despacho)
+    
 @orden_de_compra_blueprint.route('/orden_de_compra', methods=['GET'])
 def consumer_orden_de_compra():
     consumer = KafkaConsumer(
