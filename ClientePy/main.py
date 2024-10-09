@@ -846,32 +846,34 @@ def aumentarStock(order):
     except grpc.RpcError as e:
         print(f"Error al interactuar con gRPC: {e.code()} - {e.details()}")
         return False
-
+    
 @app.route('/consumer_novedades', methods=['GET'])
 def consumer_novedades():
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
         novedades_topic = "novedades"
-        # chequeamos si el topic del store existe o lo creamos
+        
+        
         res = checkIFKafkaTopicExists(novedades_topic)
-        if(res == False):
+        if not res:
             createKafkaTopic(novedades_topic)
+        
         consumer = KafkaConsumer(
             novedades_topic,
             bootstrap_servers=os.getenv("SERVER-KAFKA-BROKER"),
-            client_id = "CONSUMER_CASA_CENTRAL_NOVEDADES",
-            group_id = "CONSUMER_GROUP_ID",
+            client_id="CONSUMER_CASA_CENTRAL_NOVEDADES",
+            group_id="CONSUMER_GROUP_ID",
             value_deserializer=lambda x: json.loads(x.decode('utf-8'))
         )
+        
         novelty_stub = NoveltyServiceStub(channel)
         while True:
             for message in consumer:
                 new_novelty = message.value 
                 insertNovelty(new_novelty,novelty_stub)
-    return True
+        return True
 
-def insertNovelty(new_novelty,novelty_stub):
-    print("new_novelty")
-    print(new_novelty)
+def insertNovelty(new_novelty, novelty_stub):
+    print("new_novelty:", new_novelty)
     
     novelty = Novelty(
         date=datetime.now().strftime('%Y-%m-%d'),
@@ -881,16 +883,30 @@ def insertNovelty(new_novelty,novelty_stub):
         size=new_novelty["talle"], 
         img=new_novelty["url_foto"], 
         saved=False
-    )     
+    )
+    
     try:
         response = novelty_stub.SaveNovelty(novelty)
-        print("Novedad agregada: ", response) 
+        print("Novedad agregada: ", response)
         return True
-    
     except grpc.RpcError as e:
         print(f"Error al agregar la novedad: {e}")
-        return render_template('error.html', error_message="Hubo un error al intentar agregar la novedad.")
+        return False
 
+@app.route('/novedades', methods=['GET'])
+def listado_novedades():
+    with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
+        novelty_stub = NoveltyServiceStub(channel)
+        
+        try:
+            novelties_response = novelty_stub.FindAll(Empty())
+            novedades_no_guardadas = [novedad for novedad in novelties_response.novelty if not novedad.saved]
+            return render_template('novedades.html', novedades=novedades_no_guardadas)
+        except grpc.RpcError as e:
+            print(f"Error al obtener las novedades: {e}")
+            return render_template('error.html', error_message="Hubo un error al intentar obtener las novedades.")
+
+        
 @app.route('/agregar_novedad/<int:id>', methods=['GET'])
 def agregar_novedad(id):
     with grpc.insecure_channel(os.getenv("SERVIDOR-GRPC")) as channel:
@@ -905,7 +921,7 @@ def agregar_novedad(id):
             codeExists = product_stub.FindProductByCode(ProductCodeRequest(code=novelty_response.code))
             if codeExists.idProduct > 0:
                 flash('El código del producto es obligatorio', 'danger')
-                return redirect(url_for('novedades'))
+                return redirect(url_for('listado_novedades'))
             
             nuevo_producto = Product(
                 product="producto del proveedor",
@@ -920,7 +936,7 @@ def agregar_novedad(id):
                 novelty_response.saved = True
                 novelty_stub.SaveNovelty(novelty_response)
                 flash('El producto se agregó con éxito. Id del Producto: #' + str(producto_response.idProduct), 'success')
-                return redirect(url_for('novedades'))
+                return redirect(url_for('listado_novedades'))
             except grpc.RpcError as e:
                 print(f"Error al guardar el producto: {e}")
                 return render_template('error.html', error_message="Hubo un error al intentar guardar la novedad.")
@@ -928,6 +944,8 @@ def agregar_novedad(id):
         except grpc.RpcError as e:
             print(f"Error al guardar el producto: {e}")
             return render_template('error.html', error_message="Hubo un error al intentar guardar la novedad.")
+
+
 
 
 if __name__ == '__main__':
