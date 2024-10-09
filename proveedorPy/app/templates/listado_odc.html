@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Órdenes de Compra</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  {% include "nav.html" %}
+  <div class="container">
+      <h1 class="mt-3">Lista de Órdenes de Compra</h1>
+      <table class="table table-striped mt-3">
+          <thead>
+              <tr>
+                <th>ID</th>
+                <th>Código de Tienda</th>
+                <th>Observaciones</th>
+                <th>Estado</th>
+                <th>Fecha de solicitud</th>
+                <th>Fecha de recepción</th>
+                <th>Fecha de procesamiento</th>
+                <th>Despacho</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for order in ordenes_de_compra %}
+              <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.store_code }}</td>
+                <td>{{ order.observaciones }}</td>
+                <td>{{ order.estado }}</td>
+                <td>{{ order.fecha_solicitud }}</td>
+                <td>{{ order.fecha_recepción }}</td>
+                <td>{{ order.fecha_procesamiento }}</td>
+                <td>{% if order.id_orden_de_despacho %}
+                        <a class="btn btn-success" href="/ver_orden_de_despacho/{{ order.id_orden_de_despacho }}">Ver Despacho</a>
+                    {% endif %}
+                </td>
+                
+              </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+  </div>
+</body>
+</html>
