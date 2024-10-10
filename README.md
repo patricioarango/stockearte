@@ -31,6 +31,7 @@ Ingresar los siguientes comandos en la terminal:
 ## Inicio Apache Kafka
 3. cd C:\Kafka
 4. .\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+
 En otra terminal:
 5. cd C:\Kafka
 6. .\bin\windows\kafka-server-start.bat .\config\server.properties
