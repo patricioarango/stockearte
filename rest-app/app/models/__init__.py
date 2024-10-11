@@ -69,3 +69,25 @@ class UserFilters(db.Model):
     state = sa.Column(sa.String(255))
     id_store = sa.Column(sa.Integer)
     enabled = sa.Column(sa.Boolean)
+
+class PurchaseOrder(db.Model):
+    __tablename__ = 'purchase_order'
+    id = sa.Column(sa.Integer, primary_key=True)
+    created_at = sa.Column(sa.String(255))
+    id_dispatch_order = sa.Column(sa.Integer)
+    purchase_order_date = sa.Column(sa.String(255))
+    observation = sa.Column(sa.Text)
+    reception_date = sa.Column(sa.String(255))
+    state = sa.Column(sa.String(255))
+    id_store = sa.Column(sa.Integer)
+
+class OrderItem(db.Model):
+    __tablename__ = 'order_item'
+    id = sa.Column(sa.Integer, primary_key=True)
+    purchase_order_id = sa.Column(sa.Integer)
+    color = sa.Column(sa.String(255))
+    size = sa.Column(sa.String(255))
+    product_code = sa.Column(sa.String(255))
+    send = sa.Column(sa.Boolean)
+    requested_amount = sa.Column(sa.Integer)
+        
