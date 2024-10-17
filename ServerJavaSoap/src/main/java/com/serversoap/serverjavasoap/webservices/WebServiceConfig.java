@@ -20,7 +20,18 @@ public class WebServiceConfig extends WsConfigurerAdapter {
         MessageDispatcherServlet servlet = new MessageDispatcherServlet();
         servlet.setApplicationContext(applicationContext);
         servlet.setTransformWsdlLocations(true);
-        return new ServletRegistrationBean<>(servlet, "/ws/*");
+        //return new ServletRegistrationBean<>(servlet, "/ws/*");
+        return new ServletRegistrationBean<>(servlet, "/ws/*", "/wsu/*");
+    }
+
+    @Bean(name = "users")
+    public DefaultWsdl11Definition userstWsdl11Definition(XsdSchema usersSchema) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("UsersPort");
+        wsdl11Definition.setLocationUri("/wsu");
+        wsdl11Definition.setTargetNamespace("http://spring.io/guides/users-web-service");
+        wsdl11Definition.setSchema(usersSchema);
+        return wsdl11Definition;
     }
 
     @Bean(name = "countries")
@@ -36,5 +47,10 @@ public class WebServiceConfig extends WsConfigurerAdapter {
     @Bean
     public XsdSchema countriesSchema() {
         return new SimpleXsdSchema(new ClassPathResource("countries.xsd"));
+    }
+
+    @Bean
+    public XsdSchema usersSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("users.xsd"));
     }
 }
