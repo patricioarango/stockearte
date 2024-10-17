@@ -1,0 +1,31 @@
+{% include "doctype.html" %}
+<body class="h-100">
+    {% include "nav.html" %}
+    <div class="container h-100">
+        <div class="row h-100">
+            <div class="col-12">
+                <div class="container">
+                    <h1>Carga Usuarios de Tienda</h1>
+
+                    <form action="{{ url_for('usuarios.upload_file') }}" method="POST" enctype="multipart/form-data">
+                        <label for="file">Seleccionar archivo CSV:</label>
+                        <input type="file" id="file" name="file" accept=".csv" required>
+                        <br><br>
+                        <button type="submit" class="btn btn-primary">Subir archivo</button>
+                    </form>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        <ul>
+                          {% for category, message in messages %}
+                            <li class="{{ category }}">{{ message }}</li>
+                          {% endfor %}
+                        </ul>
+                      {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
