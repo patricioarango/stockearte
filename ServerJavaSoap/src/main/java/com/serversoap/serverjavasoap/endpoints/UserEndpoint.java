@@ -52,6 +52,7 @@ public class UserEndpoint {
     public AddUserResponse addUser(@RequestPayload AddUserRequest request) {
         AddUserResponse response = new AddUserResponse();
         boolean puede_insertar = true;
+
         //el username ya existe
         User existe = userRepository.findByUsername(request.getUser().getUsername());
         if (existe != null) {
@@ -74,8 +75,7 @@ public class UserEndpoint {
             userEntity.setStore(store);
             userEntity.setEnabled(true);
             User nuevoUser = userRepository.save(userEntity);
-            System.out.println(nuevoUser);
-            
+
             io.spring.guides.user_web_service.User userReponse = new io.spring.guides.user_web_service.User();
             userReponse.setIdUser(nuevoUser.getIdUser());
             userReponse.setName(nuevoUser.getName());

@@ -21,7 +21,17 @@ public class WebServiceConfig extends WsConfigurerAdapter {
         servlet.setApplicationContext(applicationContext);
         servlet.setTransformWsdlLocations(true);
         //return new ServletRegistrationBean<>(servlet, "/ws/*");
-        return new ServletRegistrationBean<>(servlet, "/ws/*", "/wsu/*");
+        return new ServletRegistrationBean<>(servlet, "/ws/*", "/wsu/*", "/wsi/*");
+    }
+
+    @Bean(name = "informes")
+    public DefaultWsdl11Definition informesWsdl11Definition(XsdSchema informesSchema) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("InformesPort");
+        wsdl11Definition.setLocationUri("/wsi");
+        wsdl11Definition.setTargetNamespace("http://spring.io/guides/informes-web-service");
+        wsdl11Definition.setSchema(informesSchema);
+        return wsdl11Definition;
     }
 
     @Bean(name = "users")
@@ -52,5 +62,10 @@ public class WebServiceConfig extends WsConfigurerAdapter {
     @Bean
     public XsdSchema usersSchema() {
         return new SimpleXsdSchema(new ClassPathResource("users.xsd"));
+    }
+
+    @Bean
+    public XsdSchema informesSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("informes.xsd"));
     }
 }
