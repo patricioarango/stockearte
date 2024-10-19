@@ -34,7 +34,7 @@ public class UserFilter {
     private String state;
 
     @Column(name = "id_store", nullable = true)
-    private int id_store;
+    private int idStore;
 
     @Column(name = "enabled", nullable = false)
     private Boolean enabled;

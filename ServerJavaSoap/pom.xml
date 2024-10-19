@@ -99,6 +99,8 @@
 					<sources>
 						<source>${project.basedir}/src/main/resources/countries.xsd</source>
 						<source>${project.basedir}/src/main/resources/users.xsd</source>
+						<source>${project.basedir}/src/main/resources/informes.xsd</source>
+						<source>${project.basedir}/src/main/resources/catalogos.xsd</source>
 					</sources>
 				</configuration>
 			</plugin>

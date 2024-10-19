@@ -9,15 +9,31 @@
         </xs:complexType>
     </xs:element>
 
-    <xs:element name="getUserFiltersResponse">
+    <xs:element name="saveUserFiltersRequest">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="userfilters" type="tns:userfilter" maxOccurs="unbounded"/>
+                <xs:element name="id_user" type="xs:int"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
 
-    <xs:complexType name="userfilter">
+    <xs:element name="saveUserFiltersResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id_user" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getUserFiltersResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="user_filters" type="tns:user_filter" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="user_filter">
         <xs:sequence>
             <xs:element name="id_user_filter" type="xs:int"/>
             <xs:element name="filter" type="xs:string"/>

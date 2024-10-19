@@ -21,7 +21,17 @@ public class WebServiceConfig extends WsConfigurerAdapter {
         servlet.setApplicationContext(applicationContext);
         servlet.setTransformWsdlLocations(true);
         //return new ServletRegistrationBean<>(servlet, "/ws/*");
-        return new ServletRegistrationBean<>(servlet, "/ws/*", "/wsu/*", "/wsi/*");
+        return new ServletRegistrationBean<>(servlet, "/ws/*", "/wsu/*", "/wsi/*", "/wsc/*");
+    }
+
+    @Bean(name = "catalogos")
+    public DefaultWsdl11Definition catalogosWsdl11Definition(XsdSchema catalogosSchema) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("CatalogosPort");
+        wsdl11Definition.setLocationUri("/wsc");
+        wsdl11Definition.setTargetNamespace("http://spring.io/guides/catalogos-web-service");
+        wsdl11Definition.setSchema(catalogosSchema);
+        return wsdl11Definition;
     }
 
     @Bean(name = "informes")
@@ -44,21 +54,6 @@ public class WebServiceConfig extends WsConfigurerAdapter {
         return wsdl11Definition;
     }
 
-    @Bean(name = "countries")
-    public DefaultWsdl11Definition defaultWsdl11Definition(XsdSchema countriesSchema) {
-        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
-        wsdl11Definition.setPortTypeName("CountriesPort");
-        wsdl11Definition.setLocationUri("/ws");
-        wsdl11Definition.setTargetNamespace("http://spring.io/guides/gs-producing-web-service");
-        wsdl11Definition.setSchema(countriesSchema);
-        return wsdl11Definition;
-    }
-
-    @Bean
-    public XsdSchema countriesSchema() {
-        return new SimpleXsdSchema(new ClassPathResource("countries.xsd"));
-    }
-
     @Bean
     public XsdSchema usersSchema() {
         return new SimpleXsdSchema(new ClassPathResource("users.xsd"));
@@ -67,5 +62,10 @@ public class WebServiceConfig extends WsConfigurerAdapter {
     @Bean
     public XsdSchema informesSchema() {
         return new SimpleXsdSchema(new ClassPathResource("informes.xsd"));
+    }
+
+    @Bean
+    public XsdSchema catalogosSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("catalogos.xsd"));
     }
 }
