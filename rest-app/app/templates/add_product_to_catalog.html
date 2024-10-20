@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Producto al Catálogo</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Agregar Producto al Catálogo</h1>
+        <form action="{{ url_for('catalogos.add_product_to_catalog', id_catalog=id_catalog) }}" method="POST">
+            <div class="mb-3">
+                <label for="id_product" class="form-label">Seleccionar Producto:</label>
+                <select id="id_product" name="id_product" class="form-select" required>
+                    <option value="">Seleccione un producto</option>
+                    {% for product in products %}
+                        <option value="{{ product.id_product }}">{{ product.product }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Agregar Producto</button>
+        </form>
+
+        <br>
+
+        <!-- Listado de productos en el catálogo -->
+        <h2>Productos en el Catálogo</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID Producto</th>
+                    <th>Nombre del Producto</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in catalog_product_details %}
+                    <tr>
+                        <td>{{ item.catalog_product.id_product }}</td>
+                        <td>{{ item.product_name }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('catalogos.get_catalogs') }}" class="btn btn-secondary">Volver a la lista de catálogos</a>
+    </div>
+</body>
+</html>
