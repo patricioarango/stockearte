@@ -120,5 +120,21 @@ def add_product_to_catalog(id_catalog):
 
     return render_template('add_product_to_catalog.html', id_catalog=id_catalog, products=products, catalog_product_details=catalog_product_details)
 
+@catalogos_blueprint.route('/catalogs/<int:id_catalog>/remove_product', methods=['POST'])
+def remove_product_from_catalog(id_catalog):
+    data = request.form  # Usa request.form si estás usando un formulario
+    id_product = data.get('id_product')
+
+    # Buscar la entrada del producto en el catálogo
+    catalog_product = CatalogProducts.query.filter_by(id_catalog=id_catalog, id_product=id_product).first()
+    if not catalog_product:
+        return jsonify({'message': 'El producto no está en el catálogo.'}), 404
+
+    # Eliminar la entrada del producto en el catálogo
+    db.session.delete(catalog_product)
+    db.session.commit()
+
+    return redirect(url_for('catalogos.add_product_to_catalog', id_catalog=id_catalog))
+
 
 

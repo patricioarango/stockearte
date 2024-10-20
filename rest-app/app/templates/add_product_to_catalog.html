@@ -31,6 +31,7 @@
                 <tr>
                     <th>ID Producto</th>
                     <th>Nombre del Producto</th>
+                    <th>Acciones</th> <!-- Nueva columna para las acciones -->
                 </tr>
             </thead>
             <tbody>
@@ -38,6 +39,12 @@
                     <tr>
                         <td>{{ item.catalog_product.id_product }}</td>
                         <td>{{ item.product_name }}</td>
+                        <td>
+                            <form action="{{ url_for('catalogos.remove_product_from_catalog', id_catalog=id_catalog) }}" method="POST" style="display:inline;">
+                                <input type="hidden" name="id_product" value="{{ item.catalog_product.id_product }}">
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>

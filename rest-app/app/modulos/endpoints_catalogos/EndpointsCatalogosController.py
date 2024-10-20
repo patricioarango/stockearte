@@ -79,3 +79,20 @@ def get_products():
     products = Product.query.all()
     return jsonify([{'id_product': product.id_product, 'product_name': product.product_name} for product in products])
 
+@endpoints_catalogos_blueprint.route('/catalogs/<int:id_catalog>/remove_product', methods=['POST'])
+def remove_product_from_catalog(id_catalog):
+    data = request.json
+    id_product = data.get('id_product')
+
+    # Buscar la entrada del producto en el catálogo
+    catalog_product = CatalogProducts.query.filter_by(id_catalog=id_catalog, id_product=id_product).first()
+    if not catalog_product:
+        return jsonify({'message': 'El producto no está en el catálogo.'}), 404
+
+    # Eliminar la entrada del producto en el catálogo
+    db.session.delete(catalog_product)
+    db.session.commit()
+
+    return jsonify({'message': 'Producto eliminado del catálogo exitosamente'}), 200
+
+
