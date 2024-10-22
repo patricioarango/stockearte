@@ -68,8 +68,17 @@
 </body>
 </html>
 <script>
+  function actualizarTextoBoton() {
+    var selectedOption = document.getElementById("idFilter").options[document.getElementById("idFilter").selectedIndex];
+    var guardarFiltroBtn = document.getElementById("guardarFiltroBtn");
+
+    if (selectedOption.value) {
+        guardarFiltroBtn.textContent = "Editar Filtro";
+    } else {
+        guardarFiltroBtn.textContent = "Guardar Filtro";
+    }
+  }
   document.getElementById("guardarFiltroBtn").addEventListener("click", function() {
-      console.log('Botón de guardar filtro presionado.');
       
       var productCode = document.getElementsByName("product_code")[0].value;
       var desde = document.getElementsByName("desde")[0].value;
@@ -89,6 +98,7 @@
   document.getElementById("idFilter").addEventListener("change", function() {
 
       var selectedOption = this.options[this.selectedIndex];
+      var guardarFiltroBtn = document.getElementById("guardarFiltroBtn");
 
       if (selectedOption.value) {
           var productCode = selectedOption.getAttribute("data-product-code");
@@ -102,12 +112,19 @@
           document.getElementsByName("hasta")[0].value = dateTo;
           document.getElementsByName("estado")[0].value = state;
           document.getElementsByName("tienda")[0].value = storeName;
+
+          guardarFiltroBtn.textContent = "Editar Filtro";
       } else {
           document.getElementsByName("product_code")[0].value = '';
           document.getElementsByName("desde")[0].value = '';
           document.getElementsByName("hasta")[0].value = '';
           document.getElementsByName("estado")[0].value = '';
           document.getElementsByName("tienda")[0].value = '';
+
+          guardarFiltroBtn.textContent = "Guardar Filtro";
       }
   });
+  document.addEventListener("DOMContentLoaded", function() {
+      actualizarTextoBoton();  
+  })
 </script>
