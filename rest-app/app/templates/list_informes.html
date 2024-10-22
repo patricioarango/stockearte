@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lista de Informes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  {% include "nav.html" %}
+  <div class="container">
+      <h1 class="mt-3">Lista de Informes</h1>
+      <br>
+      <form class="d-flex" role="search" method="GET" id="searchForm" action="{{ url_for('informes.informes') }}">
+        <select id="idFilter" name="idFilter" class="form-select">
+          <option value="">Nuevo Filtro</option>
+          {% for filtro in filtros %}
+              <option value="{{ filtro.idUserFilter }}" 
+                      data-product-code="{{ filtro.productCode }}" 
+                      data-date-from="{{ filtro.dateFrom }}" 
+                      data-date-to="{{ filtro.dateTo }}" 
+                      data-state="{{ filtro.state }}" 
+                      data-store="{{ filtro.store.storeName }}" 
+                      {% if filtro.idUserFilter|string == filtroUsado.idUserFilter|string %}selected{% endif %}>
+                  {{ filtro.filter }}
+              </option>
+          {% endfor %}
+         </select>
+         
+          <input class="form-control me-2" type="text" name="product_code" placeholder="Buscar por Código de Producto" aria-label="Código" value="{{filtroUsado.productCode}}">
+          
+          <input class="form-control me-2" type="search" name="desde" placeholder="Desde" aria-label="Search" value="{{filtroUsado.startDate}}">
+            
+          <input class="form-control me-2" type="text" name="hasta" placeholder="Hasta" aria-label="Talle" value="{{filtroUsado.endDate}}">
+      
+          <input class="form-control me-2" type="text" name="estado" placeholder="Buscar por Estado" aria-label="Color" value="{{filtroUsado.state}}">
+
+          <input class="form-control me-2" type="text" name="tienda" placeholder="Buscar por Tienda" aria-label="Color" value="{{filtroUsado.store}}">
+          
+
+          <button class="btn btn-outline-success" type="submit">Buscar</button>
+          <button class="btn btn-outline-success" type="button" id="guardarFiltroBtn">Guardar Filtro</button>
+        </form>
+      <br>
+      <table class="table table-striped mt-3">
+          <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Cantidad Pedida</th>
+                <th>Tienda</th>
+                <th>Estado</th>
+                <th>Fecha de solicitud</th>
+                <th>Orden de compra</th>
+              </tr>
+          </thead>
+          <tbody>
+            {% for order in purchase_orders %}
+              <tr>
+                <td>{{ order.productCode }}</td>
+                <td>{{ order.cantidadPedida }}</td>
+                <td>{{ order.store.storeName }}</td>
+                <td>{{ order.state }}</td>
+                <td>{{ order.createdAt }}</td>
+                <td>{{ order.idPurchaseOrder }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+      </table>
+  </div>
+</body>
+</html>
+<script>
+  document.getElementById("guardarFiltroBtn").addEventListener("click", function() {
+      console.log('Botón de guardar filtro presionado.');
+      
+      var productCode = document.getElementsByName("product_code")[0].value;
+      var desde = document.getElementsByName("desde")[0].value;
+      var hasta = document.getElementsByName("hasta")[0].value;
+      var estado = document.getElementsByName("estado")[0].value;
+      var tienda = document.getElementsByName("tienda")[0].value;
+
+      var form = document.getElementById("searchForm");
+      form.action = "{{ url_for('informes.add_filtro') }}?product_code=" + encodeURIComponent(productCode) + 
+                    "&desde=" + encodeURIComponent(desde) + 
+                    "&hasta=" + encodeURIComponent(hasta) + 
+                    "&estado=" + encodeURIComponent(estado) + 
+                    "&tienda=" + encodeURIComponent(tienda);
+
+      form.submit(); 
+  });
+  document.getElementById("idFilter").addEventListener("change", function() {
+
+      var selectedOption = this.options[this.selectedIndex];
+
+      if (selectedOption.value) {
+          var productCode = selectedOption.getAttribute("data-product-code");
+          var dateFrom = selectedOption.getAttribute("data-date-from");
+          var dateTo = selectedOption.getAttribute("data-date-to");
+          var state = selectedOption.getAttribute("data-state");
+          var storeName = selectedOption.getAttribute("data-store");
+
+          document.getElementsByName("product_code")[0].value = productCode;
+          document.getElementsByName("desde")[0].value = dateFrom;
+          document.getElementsByName("hasta")[0].value = dateTo;
+          document.getElementsByName("estado")[0].value = state;
+          document.getElementsByName("tienda")[0].value = storeName;
+      } else {
+          document.getElementsByName("product_code")[0].value = '';
+          document.getElementsByName("desde")[0].value = '';
+          document.getElementsByName("hasta")[0].value = '';
+          document.getElementsByName("estado")[0].value = '';
+          document.getElementsByName("tienda")[0].value = '';
+      }
+  });
+</script>
