@@ -1,5 +1,16 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://spring.io/guides/user-web-service"
            targetNamespace="http://spring.io/guides/user-web-service" elementFormDefault="qualified">
+    <xs:element name="getAllUsersRequest">
+        <xs:complexType/>
+    </xs:element>
+
+    <xs:element name="getAllUsersResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="users" type="tns:user" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
 
     <xs:element name="getUserRequest">
         <xs:complexType>
