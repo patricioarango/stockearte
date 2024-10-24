@@ -16,5 +16,20 @@
           <a class="nav-link" href="/catalogs">Catalogos</a>
         </li>
       </ul>  
+
+      <ul class="navbar-nav ms-auto">
+        {% if session.get('name') and session.get('lastname') and session.get('roleName') %}
+          <li class="nav-item">
+            <a class="nav-link" href="#">{{ session['name'] }} {{ session['lastname'] }} - Rol: {{ session['roleName'] }}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="#">No autenticado</a>
+          </li>
+        {% endif %}
+      </ul>
   </div>
   </nav>
