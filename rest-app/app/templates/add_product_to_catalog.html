@@ -14,9 +14,13 @@
                 <label for="id_product" class="form-label">Seleccionar Producto:</label>
                 <select id="id_product" name="id_product" class="form-select" required>
                     <option value="">Seleccione un producto</option>
-                    {% for product in products %}
-                        <option value="{{ product.id_product }}">{{ product.product }}</option>
-                    {% endfor %}
+                    {% if products %}
+                        {% for product in products %}
+                            <option value="{{ product.idProduct }}">{{ product.productName }}</option>
+                        {% endfor %}
+                    {% else %}
+                        <option value="" disabled>No hay productos disponibles</option>
+                    {% endif %}
                 </select>
             </div>
             <button type="submit" class="btn btn-primary">Agregar Producto</button>
@@ -36,17 +40,17 @@
             </thead>
             <tbody>
                 {% for item in catalog_product_details %}
-                    <tr>
-                        <td>{{ item.catalog_product.id_product }}</td>
-                        <td>{{ item.product_name }}</td>
-                        <td>
-                            <form action="{{ url_for('catalogos.remove_product_from_catalog_view', id_catalog=id_catalog) }}" method="POST" style="display:inline;">
-                                <input type="hidden" name="id_product" value="{{ item.catalog_product.id_product }}">
-                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endfor %}
+                <tr>
+                    <td>{{ item.catalog_product.id_product }}</td>
+                    <td>{{ item.product_name }}</td>
+                    <td>
+                        <form action="{{ url_for('catalogos.remove_product_from_catalog_view', id_catalog=id_catalog) }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="id_product" value="{{ item.catalog_product.id_product }}">
+                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
 
