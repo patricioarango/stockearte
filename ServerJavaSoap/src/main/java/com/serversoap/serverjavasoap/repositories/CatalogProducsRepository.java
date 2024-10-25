@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface CatalogProducsRepository extends JpaRepository<CatalogProducts, Serializable> {
     public abstract List<CatalogProducts> findByCatalog_IdCatalog(int idCatalog);
+    public abstract CatalogProducts findByCatalog_IdCatalogAndProduct_IdProduct(int idCatalog, int idProduct);
 }

@@ -10,6 +10,15 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:element name="removeProductFromCatalogRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id_catalog" type="xs:int"/>
+                <xs:element name="id_product" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
     <xs:element name="saveCatalogoRequest">
         <xs:complexType>
             <xs:sequence>
@@ -38,6 +47,15 @@
     </xs:element>
 
     <xs:element name="addProductToCatalogResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="catalogo" type="tns:catalogo" />
+                <xs:element name="productos" type="tns:producto" maxOccurs="unbounded" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="removeProductFromCatalogResponse">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="catalogo" type="tns:catalogo" />
