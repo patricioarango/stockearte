@@ -42,11 +42,13 @@ def add_user():
     response = client.service.addUser(user=new_user_data)
     return response
 
+
 @endpoints_usuarios_blueprint.route("/login", methods=["POST"])
 def login():
     wsdl = os.getenv("SOAP_WSDL_USUARIOS")
     client = Client(wsdl=wsdl)
     data = request.get_json()
+    user = None
     if data:
         username = data.get('username')
         password = data.get('password')
@@ -57,17 +59,19 @@ def login():
         username = data.get('username')
         password = data.get('password')
         response = client.service.userLogin(username=username, password=password)
-        user = {
-            'id_user': response.user.id_user,
-            'name': response.user.name,
-            'lastname': response.user.lastname,
-            'username': response.user.username,
-            'storeName': response.user.store.store,
-            'storeCode': response.user.store.code,
-            'id_role': response.user.role.id_role,
-            'role': response.user.role.role,
-        }
-        message = {"status": "success"}
+        message = {"status": "username or password incorrect"}
+        if(response.user):
+            user = {
+                'id_user': response.user.id_user,
+                'name': response.user.name,
+                'lastname': response.user.lastname,
+                'username': response.user.username,
+                'storeName': response.user.store.store,
+                'storeCode': response.user.store.code,
+                'id_role': response.user.role.id_role,
+                'role': response.user.role.role,
+            }
+            message = {"status": "success"}
         respuesta = {
             "message": message,
             "user": user
@@ -79,7 +83,7 @@ def login():
 def test_login():
     url = "http://localhost:5005/login"
     data = {
-        "username": "johndoe1234",
+        "username": "johndoe1234567891011",
         "password": "securepassword"
     }
     response = requests.post(url, json=data)
