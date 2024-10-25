@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Filtro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    {% include "nav.html" %}
+    <div class="container mt-4">
+        {% if filtro.idFilter %}
+            <h1>Editar Filtro</h1>
+            <input type="hidden" name="idFilter" value="{{ filtro.idFilter }}">
+        {% else %}
+            <h1>Agregar Nuevo Filtro</h1>
+        {% endif %}
+        <form method="post">
+            <div class="mb-3">
+                <label for="name" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{filtro.name}}" required>
+            </div>
+            <div class="mb-3">
+                <label for="productCode" class="form-label">Código Producto</label>
+                <input type="text" class="form-control" id="productCode" name="productCode" value="{{filtro.productCode}}">
+            </div>
+            <div class="mb-3">
+                <label for="startDate" class="form-label">Desde</label>
+                <input type="text" class="form-control" id="startDate" name="startDate" value="{{filtro.startDate}}">
+            </div>
+            <div class="mb-3">
+                <label for="endDate" class="form-label">Hasta</label>
+                <input type="text" class="form-control" id="endDate" name="endDate" value="{{filtro.endDate}}">
+            </div>
+            
+            <div class="mb-3">
+                <label for="state" class="form-label">Estado</label>
+                <input type="text" class="form-control" id="state" name="state" value="{{filtro.state}}">
+            </div>
+
+            <div class="mb-3">
+                <label for="store" class="form-label">Tienda</label>
+                <input type="store" class="form-control" id="store" name="store" value="{{filtro.store}}">
+            </div>
+
+            {% if filtro.idFilter %}
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="enabled" name="enabled" {% if filtro.enabled %}checked{% endif %}>
+                <label class="form-check-label" for="enabled">Habilitado</label>
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">Guardar Filtro</button>
+        </form>
+    </div>
+</body>
+</html>
