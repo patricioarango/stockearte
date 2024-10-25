@@ -152,3 +152,24 @@ def remove_producto_from_catalog(id_store,id_catalog,id_product):
         'productos': catalogo_productos
     }
     return jsonify(catalogoProductos=respuesta)
+
+@endpoints_tiendas_blueprint.route("/stores/<int:id_store>/products", methods=["GET"])
+def productosPorStore(id_store):
+    wsdl = os.getenv("SOAP_WSDL_PRODUCTOS")
+    client = Client(wsdl=wsdl)
+    data = request.get_json()
+    productos = []
+    response = client.service.getProductsByStore(id_store=int(id_store))
+    for producto in response:
+        productos.append({
+            'id_product': producto.id_product,
+            'productName': producto.product,
+            'productCode': producto.code,
+            'color': producto.color,
+            'size': producto.size,
+            'img': producto.img,
+            'stock': producto.stock,
+            'id_store': producto.id_store,
+        })
+
+    return jsonify(productos=productos)
