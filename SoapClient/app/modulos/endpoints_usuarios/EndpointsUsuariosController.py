@@ -16,8 +16,10 @@ def endpoint_usuarios():
             'name': usuario.name,
             'lastname': usuario.lastname,
             'username': usuario.username,
-            'storeName': "falta StoreName", #TO-DO
-            'storeCode': "falta storeCode", #TO-DO
+            'storeName': usuario.store.store,
+            'storeCode': usuario.store.code,
+            'id_role': usuario.role.id_role,
+            'role': usuario.role.role,
         })
    
     resp = jsonify(usuarios=usuarios)
@@ -49,16 +51,28 @@ def login():
         username = data.get('username')
         password = data.get('password')
         
-        # Check if username and password are provided
         if not username or not password:
             return {"error": "Username and password are required"}, 400
         
         username = data.get('username')
         password = data.get('password')
         response = client.service.userLogin(username=username, password=password)
-        print("response")
-        print(response)
-        return {response},200
+        user = {
+            'id_user': response.user.id_user,
+            'name': response.user.name,
+            'lastname': response.user.lastname,
+            'username': response.user.username,
+            'storeName': response.user.store.store,
+            'storeCode': response.user.store.code,
+            'id_role': response.user.role.id_role,
+            'role': response.user.role.role,
+        }
+        message = {"status": "success"}
+        respuesta = {
+            "message": message,
+            "user": user
+        }
+        return jsonify(respuesta)
     return {"error": "No data provided"}, 400
     
 @endpoints_usuarios_blueprint.route("/test_login", methods=["GET"])
@@ -68,15 +82,6 @@ def test_login():
         "username": "johndoe1234",
         "password": "securepassword"
     }
-    try:
-        response = requests.post(url, json=data)
-        print(response)
-        
-        # Check if the response is successful
-        if response.status_code == 200:
-            return response.json(), response.status_code
-        else:
-            return {"error": "Login failed"}, response.status_code
-    except requests.exceptions.RequestException as e:
-        print(f"Error while sending POST request: {e}")
-        return {"error": "Request failed"}, 500
+    response = requests.post(url, json=data)
+    print(response.json())
+    return response.json()
