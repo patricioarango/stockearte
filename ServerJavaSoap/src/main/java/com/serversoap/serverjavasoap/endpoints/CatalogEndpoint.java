@@ -2,9 +2,11 @@ package com.serversoap.serverjavasoap.endpoints;
 
 import com.serversoap.serverjavasoap.entities.Catalog;
 import com.serversoap.serverjavasoap.entities.CatalogProducts;
+import com.serversoap.serverjavasoap.entities.Product;
 import com.serversoap.serverjavasoap.entities.Store;
 import com.serversoap.serverjavasoap.repositories.CatalogProducsRepository;
 import com.serversoap.serverjavasoap.repositories.CatalogRepository;
+import com.serversoap.serverjavasoap.repositories.ProductRepository;
 import com.serversoap.serverjavasoap.repositories.StoreRepository;
 import io.spring.guides.catalogos_web_service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +25,14 @@ public class CatalogEndpoint {
     private CatalogRepository catalogRepository;
     private CatalogProducsRepository catalogProducsRepository;
     private StoreRepository storeRepository;
+    private ProductRepository productRepository;
 
     @Autowired
-    public CatalogEndpoint(CatalogRepository catalogRepository,CatalogProducsRepository catalogProducsRepository,StoreRepository storeRepository) {
+    public CatalogEndpoint(CatalogRepository catalogRepository,CatalogProducsRepository catalogProducsRepository,StoreRepository storeRepository, ProductRepository productRepository) {
         this.catalogRepository = catalogRepository;
         this.catalogProducsRepository = catalogProducsRepository;
         this.storeRepository = storeRepository;
+        this.productRepository = productRepository;
     }
 
     @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getCatalogosRequest")
@@ -102,6 +106,45 @@ public class CatalogEndpoint {
         catalogoSimple.setEnabled(nuevoCatalogo.getEnabled());
         SaveCatalogoResponse response = new SaveCatalogoResponse();
         response.setCatalogo(catalogoSimple);
+        return response;
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "addProductToCatalogRequest")
+    @ResponsePayload
+    public AddProductToCatalogResponse addProductoACatalogo(@RequestPayload AddProductToCatalogRequest request) {
+        Catalog catalogo = catalogRepository.findByIdCatalog(request.getIdCatalog());
+        Product producto = productRepository.findByIdProduct(request.getIdProduct());
+        CatalogProducts catalogProducts = new CatalogProducts();
+        catalogProducts.setCatalog(catalogo);
+        catalogProducts.setProduct(producto);
+        catalogProducsRepository.save(catalogProducts);
+
+        io.spring.guides.catalogos_web_service.Catalogo catalogoSimple = new io.spring.guides.catalogos_web_service.Catalogo();
+        catalogoSimple.setCatalog(null);
+        catalogoSimple.setIdCatalog(0);
+        catalogoSimple.setIdStore(0);
+        if(catalogo != null){
+            catalogoSimple.setCatalog(catalogo.getCatalog());
+            catalogoSimple.setIdCatalog(catalogo.getIdCatalog());
+            catalogoSimple.setIdStore(catalogo.getStore().getIdStore());
+        }
+        List<CatalogProducts> productosCatalogo = catalogProducsRepository.findByCatalog_IdCatalog(request.getIdCatalog());
+
+        List<io.spring.guides.catalogos_web_service.Producto> catalogoResponse = productosCatalogo.stream().map(product ->
+        {
+            io.spring.guides.catalogos_web_service.Producto productoResponse = new io.spring.guides.catalogos_web_service.Producto();
+            productoResponse.setIdProduct(product.getProduct().getIdProduct());
+            productoResponse.setProduct(product.getProduct().getProductName());
+            productoResponse.setCode(product.getProduct().getProductCode());
+            productoResponse.setColor(product.getProduct().getColor());
+            productoResponse.setSize(product.getProduct().getSize());
+            productoResponse.setImg(product.getProduct().getImg());
+            return productoResponse;
+        }).collect(Collectors.toList());
+
+        AddProductToCatalogResponse response = new AddProductToCatalogResponse();
+        response.setCatalogo(catalogoSimple);
+        response.getProductos().addAll(catalogoResponse);
         return response;
     }
 }

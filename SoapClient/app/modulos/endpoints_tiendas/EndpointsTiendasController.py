@@ -82,3 +82,6 @@ def add_catalog(id_store):
         'enabled': response.enabled,
     }
     return jsonify(catalogo=respuesta)
+
+@endpoints_tiendas_blueprint.route("/stores/<int:id_store>/catalogs/<int:id_catalog>", methods=["PUT"])
+def add_producto_to_catalog():

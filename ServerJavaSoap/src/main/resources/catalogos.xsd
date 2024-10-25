@@ -1,6 +1,15 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://spring.io/guides/catalogos-web-service"
            targetNamespace="http://spring.io/guides/catalogos-web-service" elementFormDefault="qualified">
 
+    <xs:element name="addProductToCatalogRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id_catalog" type="xs:int"/>
+                <xs:element name="id_product" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
     <xs:element name="saveCatalogoRequest">
         <xs:complexType>
             <xs:sequence>
@@ -24,6 +33,15 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="id_catalog" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="addProductToCatalogResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="catalogo" type="tns:catalogo" />
+                <xs:element name="productos" type="tns:producto" maxOccurs="unbounded" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>
