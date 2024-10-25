@@ -18,4 +18,7 @@ public class Catalog {
     @ManyToOne
     @JoinColumn(name="id_store", nullable=true)
     private Store store;
+
+    @Column(name = "enabled", nullable = false)
+    private Boolean enabled;
 }

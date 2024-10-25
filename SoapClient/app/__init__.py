@@ -37,11 +37,13 @@ def register_blueprints(app):
     from app.modulos.endpoints_informes import endpoints_informes_blueprint
     from app.modulos.endpoints_usuarios import endpoints_usuarios_blueprint
     from app.modulos.endpoints_catalogos import endpoints_catalogos_blueprint
+    from app.modulos.endpoints_tiendas import endpoints_tiendas_blueprint
     
     from app.models import db
     app.register_blueprint(endpoints_informes_blueprint)
     app.register_blueprint(endpoints_usuarios_blueprint)
     app.register_blueprint(endpoints_catalogos_blueprint)
+    app.register_blueprint(endpoints_tiendas_blueprint)
     
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://'+DB_USER+':'+DB_PASSWORD+'@'+DB_HOST+':'+DB_PORT+'/'+DB_NAME+'?charset=utf8mb4'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
