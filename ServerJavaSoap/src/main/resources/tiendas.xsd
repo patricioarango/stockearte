@@ -1,0 +1,27 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://spring.io/guides/store-web-service"
+           targetNamespace="http://spring.io/guides/store-web-service" elementFormDefault="qualified">
+
+    <xs:element name="getAllStoresRequest">
+        <xs:complexType/>
+    </xs:element>
+
+    <xs:element name="getAllStoresResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="stores" type="tns:store" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="store">
+        <xs:sequence>
+            <xs:element name="id_store" type="xs:int"/>
+            <xs:element name="store" type="xs:string"/>
+            <xs:element name="code" type="xs:string"/>
+            <xs:element name="address" type="xs:string"/>
+            <xs:element name="city" type="xs:string"/>
+            <xs:element name="state" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

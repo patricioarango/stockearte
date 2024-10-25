@@ -1,7 +1,28 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://spring.io/guides/user-web-service"
-           targetNamespace="http://spring.io/guides/user-web-service" elementFormDefault="qualified">
+            targetNamespace="http://spring.io/guides/user-web-service" elementFormDefault="qualified">
+
+
+
     <xs:element name="getAllUsersRequest">
         <xs:complexType/>
+    </xs:element>
+
+    <xs:element name="userLoginRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="username" type="xs:string"/>
+                <xs:element name="password" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="userLoginResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="status" type="xs:string"/>
+                <xs:element name="user" type="tns:user" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
     </xs:element>
 
     <xs:element name="getAllUsersResponse">
@@ -64,6 +85,13 @@
             <xs:element name="username" type="xs:string"/>
             <xs:element name="password" type="xs:string"/>
             <xs:element name="storeCode" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="role">
+        <xs:sequence>
+            <xs:element name="id_role" type="xs:int"/>
+            <xs:element name="role" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
