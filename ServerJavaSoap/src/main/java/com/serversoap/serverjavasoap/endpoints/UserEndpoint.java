@@ -16,6 +16,9 @@ import io.spring.guides.user_web_service.GetAllUsersResponse;
 import io.spring.guides.user_web_service.GetUserResponse;
 import io.spring.guides.user_web_service.AddUserRequest;
 import io.spring.guides.user_web_service.AddUserResponse;
+import io.spring.guides.user_web_service.UserLoginRequest;
+import io.spring.guides.user_web_service.UserLoginResponse;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -111,6 +114,28 @@ public class UserEndpoint {
         }).collect(Collectors.toList());
         GetAllUsersResponse response = new GetAllUsersResponse();
         response.getUsers().addAll(usersResponse);
+        return response;
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "userLoginRequest")
+    @ResponsePayload
+    public UserLoginResponse loginUser(@RequestPayload UserLoginRequest request) {
+        System.out.println("logueando usuario");
+        UserLoginResponse response = new UserLoginResponse();
+        User userEntity = userRepository.validateUser(request.getUsername(), request.getPassword());
+        response.setStatus("login error");
+        if(userEntity != null) {
+            response.setStatus("ok");
+            io.spring.guides.user_web_service.User userReponse = new io.spring.guides.user_web_service.User();
+            userReponse.setIdUser(userEntity.getIdUser());
+            userReponse.setName(userEntity.getName());
+            userReponse.setLastname(userEntity.getLastname());
+            userReponse.setUsername(userEntity.getUsername());
+            userReponse.setPassword(userEntity.getPassword());
+            userReponse.setIdRole(userEntity.getRole().getIdRole());
+            userReponse.setIdStore(userEntity.getStore().getIdStore());
+            response.setUser(userReponse);
+        }
         return response;
     }
 }
