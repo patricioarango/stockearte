@@ -1,13 +1,34 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://spring.io/guides/user-web-service"
-           targetNamespace="http://spring.io/guides/user-web-service" elementFormDefault="qualified">
+            targetNamespace="http://spring.io/guides/user-web-service" elementFormDefault="qualified">
+
+
+
     <xs:element name="getAllUsersRequest">
         <xs:complexType/>
+    </xs:element>
+
+    <xs:element name="userLoginRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="username" type="xs:string"/>
+                <xs:element name="password" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="userLoginResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="status" type="xs:string"/>
+                <xs:element name="user" type="tns:userFull" minOccurs="0"/>
+            </xs:sequence>
+        </xs:complexType>
     </xs:element>
 
     <xs:element name="getAllUsersResponse">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="users" type="tns:user" maxOccurs="unbounded"/>
+                <xs:element name="users" type="tns:userFull" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -64,6 +85,36 @@
             <xs:element name="username" type="xs:string"/>
             <xs:element name="password" type="xs:string"/>
             <xs:element name="storeCode" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="userFull">
+        <xs:sequence>
+            <xs:element name="id_user" type="xs:int"/>
+            <xs:element name="name" type="xs:string"/>
+            <xs:element name="lastname" type="xs:string"/>
+            <xs:element name="username" type="xs:string"/>
+            <xs:element name="password" type="xs:string"/>
+            <xs:element name="role" type="tns:role" />
+            <xs:element name="store" type="tns:store" />
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="role">
+        <xs:sequence>
+            <xs:element name="id_role" type="xs:int"/>
+            <xs:element name="role" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="store">
+        <xs:sequence>
+            <xs:element name="id_store" type="xs:int"/>
+            <xs:element name="store" type="xs:string"/>
+            <xs:element name="code" type="xs:string"/>
+            <xs:element name="address" type="xs:string"/>
+            <xs:element name="city" type="xs:string"/>
+            <xs:element name="state" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 

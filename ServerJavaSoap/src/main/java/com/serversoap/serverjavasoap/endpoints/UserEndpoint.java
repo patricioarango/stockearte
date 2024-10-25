@@ -16,6 +16,9 @@ import io.spring.guides.user_web_service.GetAllUsersResponse;
 import io.spring.guides.user_web_service.GetUserResponse;
 import io.spring.guides.user_web_service.AddUserRequest;
 import io.spring.guides.user_web_service.AddUserResponse;
+import io.spring.guides.user_web_service.UserLoginRequest;
+import io.spring.guides.user_web_service.UserLoginResponse;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -98,19 +101,68 @@ public class UserEndpoint {
     @ResponsePayload
     public GetAllUsersResponse getAllUsers(@RequestPayload GetAllUsersRequest request) {
         List<User> usuarios = userRepository.findAllByEnabledTrue();
-        List<io.spring.guides.user_web_service.User> usersResponse = usuarios.stream().map(userEntity -> {
-            io.spring.guides.user_web_service.User userReponse = new io.spring.guides.user_web_service.User();
+        List<io.spring.guides.user_web_service.UserFull> usersResponse = usuarios.stream().map(userEntity -> {
+            io.spring.guides.user_web_service.UserFull userReponse = new io.spring.guides.user_web_service.UserFull();
+            io.spring.guides.user_web_service.Role roleResponse = new io.spring.guides.user_web_service.Role();
+
+            roleResponse.setIdRole(userEntity.getRole().getIdRole());
+            roleResponse.setRole(userEntity.getRole().getRoleName());
+            userReponse.setRole(roleResponse);
+
+            io.spring.guides.user_web_service.Store storeResponse = new io.spring.guides.user_web_service.Store();
+            storeResponse.setIdStore(userEntity.getStore().getIdStore());
+            storeResponse.setAddress(userEntity.getStore().getAddress());
+            storeResponse.setCity(userEntity.getStore().getCity());
+            storeResponse.setState(userEntity.getStore().getState());
+            storeResponse.setCode(userEntity.getStore().getStoreCode());
+            storeResponse.setStore(userEntity.getStore().getStoreName());
+            storeResponse.setState(userEntity.getStore().getState());
+            userReponse.setStore(storeResponse);
+
             userReponse.setIdUser(userEntity.getIdUser());
             userReponse.setName(userEntity.getName());
             userReponse.setLastname(userEntity.getLastname());
             userReponse.setUsername(userEntity.getUsername());
             userReponse.setPassword(userEntity.getPassword());
-            userReponse.setIdRole(userEntity.getRole().getIdRole());
-            userReponse.setIdStore(userEntity.getStore().getIdStore());
+            userReponse.setStore(storeResponse);
             return userReponse;
         }).collect(Collectors.toList());
         GetAllUsersResponse response = new GetAllUsersResponse();
         response.getUsers().addAll(usersResponse);
+        return response;
+    }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "userLoginRequest")
+    @ResponsePayload
+    public UserLoginResponse loginUser(@RequestPayload UserLoginRequest request) {
+        UserLoginResponse response = new UserLoginResponse();
+        User userEntity = userRepository.validateUser(request.getUsername(), request.getPassword());
+        response.setStatus("login error");
+        if(userEntity != null) {
+            response.setStatus("ok");
+            io.spring.guides.user_web_service.UserFull userReponse = new io.spring.guides.user_web_service.UserFull();
+            io.spring.guides.user_web_service.Role roleResponse = new io.spring.guides.user_web_service.Role();
+
+            roleResponse.setIdRole(userEntity.getRole().getIdRole());
+            roleResponse.setRole(userEntity.getRole().getRoleName());
+            userReponse.setRole(roleResponse);
+
+            io.spring.guides.user_web_service.Store storeResponse = new io.spring.guides.user_web_service.Store();
+            storeResponse.setIdStore(userEntity.getStore().getIdStore());
+            storeResponse.setAddress(userEntity.getStore().getAddress());
+            storeResponse.setCity(userEntity.getStore().getCity());
+            storeResponse.setState(userEntity.getStore().getState());
+            storeResponse.setCode(userEntity.getStore().getStoreCode());
+            storeResponse.setStore(userEntity.getStore().getStoreName());
+            storeResponse.setState(userEntity.getStore().getState());
+            userReponse.setStore(storeResponse);
+            userReponse.setIdUser(userEntity.getIdUser());
+            userReponse.setName(userEntity.getName());
+            userReponse.setLastname(userEntity.getLastname());
+            userReponse.setUsername(userEntity.getUsername());
+            userReponse.setPassword(userEntity.getPassword());
+            response.setUser(userReponse);
+        }
         return response;
     }
 }

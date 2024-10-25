@@ -21,7 +21,7 @@ public class WebServiceConfig extends WsConfigurerAdapter {
         servlet.setApplicationContext(applicationContext);
         servlet.setTransformWsdlLocations(true);
         //return new ServletRegistrationBean<>(servlet, "/ws/*");
-        return new ServletRegistrationBean<>(servlet, "/ws/*", "/wsu/*", "/wsi/*", "/wsc/*");
+        return new ServletRegistrationBean<>(servlet, "/ws/*", "/wsu/*", "/wsi/*", "/wsc/*", "/wsp/*", "/wst/*");
     }
 
     @Bean(name = "catalogos")
@@ -54,6 +54,26 @@ public class WebServiceConfig extends WsConfigurerAdapter {
         return wsdl11Definition;
     }
 
+    @Bean(name = "tiendas")
+    public DefaultWsdl11Definition tiendasWsdl11Definition(XsdSchema tiendasSchema) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("TiendasPort");
+        wsdl11Definition.setLocationUri("/wst");
+        wsdl11Definition.setTargetNamespace("http://spring.io/guides/store-web-service");
+        wsdl11Definition.setSchema(tiendasSchema);
+        return wsdl11Definition;
+    }
+
+    @Bean(name = "productos")
+    public DefaultWsdl11Definition productosWsdl11Definition(XsdSchema productosSchema) {
+        DefaultWsdl11Definition wsdl11Definition = new DefaultWsdl11Definition();
+        wsdl11Definition.setPortTypeName("ProductosPort");
+        wsdl11Definition.setLocationUri("/wsp");
+        wsdl11Definition.setTargetNamespace("http://spring.io/guides/product-web-service");
+        wsdl11Definition.setSchema(productosSchema);
+        return wsdl11Definition;
+    }
+
     @Bean
     public XsdSchema usersSchema() {
         return new SimpleXsdSchema(new ClassPathResource("users.xsd"));
@@ -67,5 +87,15 @@ public class WebServiceConfig extends WsConfigurerAdapter {
     @Bean
     public XsdSchema catalogosSchema() {
         return new SimpleXsdSchema(new ClassPathResource("catalogos.xsd"));
+    }
+
+    @Bean
+    public XsdSchema productosSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("productos.xsd"));
+    }
+
+    @Bean
+    public XsdSchema tiendasSchema() {
+        return new SimpleXsdSchema(new ClassPathResource("tiendas.xsd"));
     }
 }

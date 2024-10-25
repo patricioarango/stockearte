@@ -1,6 +1,35 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://spring.io/guides/catalogos-web-service"
            targetNamespace="http://spring.io/guides/catalogos-web-service" elementFormDefault="qualified">
 
+    <xs:element name="addProductToCatalogRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id_catalog" type="xs:int"/>
+                <xs:element name="id_product" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="removeProductFromCatalogRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id_catalog" type="xs:int"/>
+                <xs:element name="id_product" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="saveCatalogoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id_catalog" type="xs:int" minOccurs="0"/>
+                <xs:element name="catalog" type="xs:string"/>
+                <xs:element name="id_store" type="xs:int"/>
+                <xs:element name="enabled" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
     <xs:element name="getCatalogosRequest">
         <xs:complexType>
             <xs:sequence>
@@ -9,11 +38,52 @@
         </xs:complexType>
     </xs:element>
 
-   
+    <xs:element name="getProductsCatalogoRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id_catalog" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="addProductToCatalogResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="catalogo" type="tns:catalogo" />
+                <xs:element name="productos" type="tns:producto" maxOccurs="unbounded" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="removeProductFromCatalogResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="catalogo" type="tns:catalogo" />
+                <xs:element name="productos" type="tns:producto" maxOccurs="unbounded" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="saveCatalogoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="catalogo" type="tns:catalogo_simple" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="getCatalogosResponse">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="catalogos" type="tns:catalogo_sin_productos" maxOccurs="unbounded" />
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getProductsCatalogoResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="catalogo" type="tns:catalogo" />
+                <xs:element name="productos" type="tns:producto" maxOccurs="unbounded" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -23,6 +93,15 @@
             <xs:element name="id_catalog" type="xs:int"/>
             <xs:element name="catalog" type="xs:string"/>
             <xs:element name="id_store" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="catalogo_simple">
+        <xs:sequence>
+            <xs:element name="id_catalog" type="xs:int"/>
+            <xs:element name="catalog" type="xs:string"/>
+            <xs:element name="id_store" type="xs:int"/>
+            <xs:element name="enabled" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
 
