@@ -83,5 +83,37 @@ def add_catalog(id_store):
     }
     return jsonify(catalogo=respuesta)
 
-@endpoints_tiendas_blueprint.route("/stores/<int:id_store>/catalogs/<int:id_catalog>", methods=["PUT"])
-def add_producto_to_catalog():
+@endpoints_tiendas_blueprint.route("/stores/<int:id_store>/catalogs/<int:id_catalog>/products/<int:id_product>", methods=["PUT"])
+def add_producto_to_catalog(id_store,id_catalog,id_product):
+    wsdl = os.getenv("SOAP_WSDL_CATALOGOS")
+    client = Client(wsdl=wsdl)
+    data = request.get_json()
+    if id_catalog <= 0:
+        return jsonify({"error": "Invalid catalog ID."}), 400
+
+    if id_product <= 0:
+        return jsonify({"error": "Invalid product ID."}), 400
+
+    response = client.service.addProductToCatalog(id_catalog=id_catalog,id_product=id_product)
+    catalogo_productos = []
+    catalogo = None
+    if response.catalogo:
+        catalogo = {
+            'id_catalog': response.catalogo.id_catalog,
+            'name': response.catalogo.catalog,
+            'id_store': response.catalogo.id_store
+        }
+    for producto in response.productos:
+        catalogo_productos.append({
+            'id_product': producto.id_product,
+            'productName': producto.product,
+            'productCode': producto.code,
+            'color': producto.color,
+            'size': producto.size,
+            'img': producto.img
+        })
+    respuesta = {
+        'catalogo': catalogo,
+        'productos': catalogo_productos
+    }
+    return jsonify(catalogoProductos=respuesta)
