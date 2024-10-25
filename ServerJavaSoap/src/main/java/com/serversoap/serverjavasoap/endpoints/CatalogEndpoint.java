@@ -147,4 +147,41 @@ public class CatalogEndpoint {
         response.getProductos().addAll(catalogoResponse);
         return response;
     }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "removeProductFromCatalogRequest")
+    @ResponsePayload
+    public RemoveProductFromCatalogResponse removeProductoDeCatalogo(@RequestPayload RemoveProductFromCatalogRequest request) {
+        Catalog catalogo = catalogRepository.findByIdCatalog(request.getIdCatalog());
+
+        CatalogProducts catalogProducts = catalogProducsRepository.findByCatalog_IdCatalogAndProduct_IdProduct(request.getIdCatalog(),request.getIdProduct());
+        catalogProducsRepository.delete(catalogProducts);
+
+        io.spring.guides.catalogos_web_service.Catalogo catalogoSimple = new io.spring.guides.catalogos_web_service.Catalogo();
+        catalogoSimple.setCatalog(null);
+        catalogoSimple.setIdCatalog(0);
+        catalogoSimple.setIdStore(0);
+        if(catalogo != null){
+            catalogoSimple.setCatalog(catalogo.getCatalog());
+            catalogoSimple.setIdCatalog(catalogo.getIdCatalog());
+            catalogoSimple.setIdStore(catalogo.getStore().getIdStore());
+        }
+        List<CatalogProducts> productosCatalogo = catalogProducsRepository.findByCatalog_IdCatalog(request.getIdCatalog());
+
+        List<io.spring.guides.catalogos_web_service.Producto> catalogoResponse = productosCatalogo.stream().map(product ->
+        {
+            io.spring.guides.catalogos_web_service.Producto productoResponse = new io.spring.guides.catalogos_web_service.Producto();
+            productoResponse.setIdProduct(product.getProduct().getIdProduct());
+            productoResponse.setProduct(product.getProduct().getProductName());
+            productoResponse.setCode(product.getProduct().getProductCode());
+            productoResponse.setColor(product.getProduct().getColor());
+            productoResponse.setSize(product.getProduct().getSize());
+            productoResponse.setImg(product.getProduct().getImg());
+            return productoResponse;
+        }).collect(Collectors.toList());
+
+        RemoveProductFromCatalogResponse response = new RemoveProductFromCatalogResponse();
+        response.setCatalogo(catalogoSimple);
+        response.getProductos().addAll(catalogoResponse);
+        return response;
+    }
 }
