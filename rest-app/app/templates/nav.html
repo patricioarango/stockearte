@@ -17,9 +17,11 @@
           <a class="nav-link" href="/catalogs">Carga Masiva Usuarios</a>
         </li>
         {% endif %}
+        {% if session.get('roleName') == 'manager' %}
         <li class="nav-item">
           <a class="nav-link" href="/catalogs">Catalogos</a>
         </li>
+        {% endif %}
         <li class="nav-item">
           <a class="nav-link" href="/catalogs">Informes</a>
         </li>
