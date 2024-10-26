@@ -155,20 +155,29 @@ def remove_producto_from_catalog(id_store,id_catalog,id_product):
 @endpoints_tiendas_blueprint.route("/stores/<int:id_store>/products", methods=["GET"])
 def productosPorStore(id_store):
     wsdl = os.getenv("SOAP_WSDL_PRODUCTOS")
-    client = Client(wsdl=wsdl)
-    data = request.get_json()
-    productos = []
-    response = client.service.getProductsByStore(id_store=int(id_store))
-    for producto in response:
-        productos.append({
-            'id_product': producto.id_product,
-            'productName': producto.product,
-            'productCode': producto.code,
-            'color': producto.color,
-            'size': producto.size,
-            'img': producto.img,
-            'stock': producto.stock,
-            'id_store': producto.id_store,
-        })
+    
+    if not wsdl:
+        return jsonify({'error': 'WSDL not configured'}), 500
+    try:
+        client = Client(wsdl=wsdl)
+        productos = []
+        
+        response = client.service.getProductsByStore(id_store=id_store)
+        if not response:
+            return jsonify({'error': 'No products found for the store'}), 404
+        
+        for producto in response:
+            productos.append({
+                'id_product': producto.id_product,
+                'productName': producto.product,
+                'productCode': producto.code,
+                'color': producto.color,
+                'size': producto.size,
+                'img': producto.img,
+                'stock': producto.stock,
+                'id_store': producto.id_store,
+            })
 
-    return jsonify(productos=productos)
+        return jsonify(productos=productos), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

@@ -23,7 +23,6 @@ def get_catalogs():
 
     url = f'http://localhost:5005/stores/{id_store}/catalogs'
     response = requests.get(url)
-    print("a ver que trae el intermedio:", response.json())
 
     if response.status_code == 200:
         catalogs = response.json().get("catalogs", [])
@@ -99,42 +98,45 @@ def delete_catalog(id):
     else:
         print(f'Error al eliminar catálogo: {response.status_code}')
         return redirect(url_for('catalogos.get_catalogs'))   
-    
+
+#agregar producto a catalogo
 @catalogos_blueprint.route('/catalogs/<int:id_catalog>/new_product', methods=['GET', 'POST'])
 def add_product_to_catalog(id_catalog): 
     if request.method == 'POST':
         id_product = request.form['id_product']
         catalog = Catalog.query.get(id_catalog)
-        id_store = catalog.id_store if catalog else None
-        
+        id_store = catalog.id_store
+       
         url = f'http://localhost:5005/stores/{id_store}/catalogs/{id_catalog}/products/{id_product}'
+        print(f"URL para agregar producto: {url}")  
         response = requests.put(url, json={'id_product': id_product})
 
-        if response.status_code == 201:
+        if response.status_code == 200:
+            print(f'Producto agregado correctamente al catálogo: {id_product}')
             return redirect(url_for('catalogos.add_product_to_catalog', id_catalog=id_catalog))
         else:
             print(f'Error al agregar producto: {response.status_code}, {response.text}')  
-            return redirect(url_for('catalogos.add_product_to_catalog', id_catalog=id_catalog))
 
     catalog = Catalog.query.get(id_catalog)
-    products = []
 
-    if catalog:
-        id_store = catalog.id_store  
-        url = f'http://localhost:5003/stores/{id_store}/products'
-    
-    headers = {'Content-Type': 'application/json'}
-    response = requests.get(url, headers=headers)
+    id_store = catalog.id_store  
+    if id_store is not None:
+        url = f'http://localhost:5005/stores/{id_store}/products'
+        print(f"URL para obtener productos: {url}")
+        headers = {'Content-Type': 'application/json'}
+        response = requests.get(url, headers=headers)
 
-    if response.status_code == 200:
-        json_response = response.json()
-        if isinstance(json_response, list):
-            products = json_response 
+        print(f"Respuesta de la solicitud GET: {response.status_code} - {response.text}")
+
+        if response.status_code == 200:
+            json_response = response.json()
+            products = json_response.get('productos', []) if isinstance(json_response, dict) else json_response
         else:
-            products = json_response.get('productos', []) 
+            print(f'Error al obtener productos de la tienda: {response.status_code}, {response.text}')
+            products = []  
     else:
-        print(f'Error al obtener productos de la tienda: {response.status_code}, {response.text}')
-        products = []  
+        print("ID de tienda no es válido")
+        products = []
 
     catalog_products = CatalogProducts.query.filter_by(id_catalog=id_catalog).all()
     catalog_product_details = []
@@ -153,7 +155,6 @@ def add_product_to_catalog(id_catalog):
                            id_catalog=id_catalog, 
                            products=products, 
                            catalog_product_details=catalog_product_details)
-
 
 
 @catalogos_blueprint.route('/catalogs/<int:id_catalog>/remove_product', methods=['POST'])

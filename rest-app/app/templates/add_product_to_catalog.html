@@ -17,7 +17,7 @@
                     <option value="">Seleccione un producto</option>
                     {% if products %}
                         {% for product in products %}
-                            <option value="{{ product.idProduct }}">{{ product.productName }}</option>
+                            <option value="{{ product.id_product }}">{{ product.productName }}</option>
                         {% endfor %}
                     {% else %}
                         <option value="" disabled>No hay productos disponibles</option>
