@@ -14,7 +14,8 @@ def catalogos():
         catalogos.append({
             'id_catalog': catalogo.id_catalog,
             'catalog': catalogo.catalog,
-            'id_store': catalogo.id_store
+            'id_store': catalogo.id_store,
+            'enabled': catalogo.enabled
         })
    
     resp = jsonify(catalogos=catalogos)
