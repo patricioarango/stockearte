@@ -1,9 +1,7 @@
 from app import create_app
 from flask import Flask, render_template, request, flash, redirect, session, json, url_for, redirect,jsonify
 import logging
-from app.models import Catalog,CatalogProducts,Product
-from app.models import db
-
+import os,requests
 
 logger = logging.getLogger(__name__)
 
@@ -26,46 +24,30 @@ def nuevohome():
     checkSession()
     return render_template('home.html')
 
-import requests
-
 @app.route("/login", methods=['POST'])
 def login():
-    logger.info("/login  %s", request.form['username'])
-
-    url = 'http://localhost:5003/endpoint_validate_user'
+    url = os.getenv("ENDPOINT_LOGIN")
     
     payload = {
         "username": request.form['username'],
         "password": request.form['password']
     }
-    
-    try:
-        response = requests.post(url, json=payload)
-        response.raise_for_status()  
-    except requests.exceptions.RequestException as e:
-        logger.error("Error en la petición REST: %s", e)
-        flash('Error al comunicarse con el servidor', 'danger')
-        return redirect('/')
-    
-    user = response.json() 
-    
-    logger.info("user : %s", user.get('username'))
-
-    if not user or user == {}:
-        flash('Datos incorrectos', 'danger')
-        return redirect('/')
-    else:
-        session['user_id'] = user.get('idUser')
-        session['username'] = user.get('username')
-        session['roleName'] = user.get('role', {}).get('roleName')
-        session['name'] = user.get('name')
-        session['lastname'] = user.get('lastname')
-        session['user_store_id'] = user.get('store', {}).get('idStore')
-        session['user_store_name'] = user.get('store', {}).get('storeName')
-
-        print("Contenido de la sesión:", session)
-
+    response = requests.post(url, json=payload)
+    response_data = response.json()
+    if response_data["message"]["status"] == "success":
+        session['user_id'] = response_data["user"]["id_user"]
+        session['username'] = response_data["user"]["username"]
+        session['roleName'] = response_data["user"]["role"]
+        session['name'] = response_data["user"]["name"]
+        session['lastname'] = response_data["user"]["lastname"]
+        session['user_store_id'] = response_data["user"]["id_store"]
+        session['user_store_name'] = response_data["user"]["storeName"]
         return redirect('/nuevohome')
+    else:
+        flash(response_data["message"]["status"], 'danger')
+        return redirect('/')
+    
+    
 
 
 

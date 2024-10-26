@@ -64,6 +64,7 @@ public class CatalogEndpoint {
             catalogoSimple.setCatalog(catalog.getCatalog());
             catalogoSimple.setIdCatalog(catalog.getIdCatalog());
             catalogoSimple.setIdStore(request.getIdStore());
+            catalogoSimple.setEnabled(catalog.getEnabled());
             return catalogoSimple;
         }).collect(Collectors.toList());
 

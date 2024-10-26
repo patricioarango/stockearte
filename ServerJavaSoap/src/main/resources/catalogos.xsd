@@ -114,6 +114,7 @@
             <xs:element name="id_catalog" type="xs:int"/>
             <xs:element name="catalog" type="xs:string"/>
             <xs:element name="id_store" type="xs:int"/>
+            <xs:element name="enabled" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>
 

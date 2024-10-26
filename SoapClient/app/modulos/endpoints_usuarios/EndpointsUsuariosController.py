@@ -68,6 +68,7 @@ def login():
                 'username': response.user.username,
                 'storeName': response.user.store.store,
                 'storeCode': response.user.store.code,
+                'id_store': response.user.store.id_store,
                 'id_role': response.user.role.id_role,
                 'role': response.user.role.role,
             }
@@ -76,7 +77,7 @@ def login():
             "message": message,
             "user": user
         }
-        return jsonify(respuesta)
+        return jsonify(respuesta),200
     return {"error": "No data provided"}, 400
     
 @endpoints_usuarios_blueprint.route("/test_login", methods=["GET"])

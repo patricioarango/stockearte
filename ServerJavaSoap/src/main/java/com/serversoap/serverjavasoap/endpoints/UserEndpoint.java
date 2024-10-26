@@ -149,12 +149,12 @@ public class UserEndpoint {
 
             io.spring.guides.user_web_service.Store storeResponse = new io.spring.guides.user_web_service.Store();
             storeResponse.setIdStore(userEntity.getStore().getIdStore());
+            System.out.println(userEntity.getStore().getIdStore());
             storeResponse.setAddress(userEntity.getStore().getAddress());
             storeResponse.setCity(userEntity.getStore().getCity());
             storeResponse.setState(userEntity.getStore().getState());
             storeResponse.setCode(userEntity.getStore().getStoreCode());
             storeResponse.setStore(userEntity.getStore().getStoreName());
-            storeResponse.setState(userEntity.getStore().getState());
             userReponse.setStore(storeResponse);
             userReponse.setIdUser(userEntity.getIdUser());
             userReponse.setName(userEntity.getName());
