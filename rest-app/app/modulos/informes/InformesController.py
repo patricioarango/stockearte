@@ -32,7 +32,7 @@ def informes():
     print('filtro usado:')
     print(id_filter)
 
-    id_user = 1  
+    id_user = 2 
 
     response = requests.get('http://localhost:5003/endpoint_informes')
 
@@ -173,7 +173,7 @@ def add_filtro():
 
 def guardar_filtro_helper(filtro, id_filter=None):
     data = {
-        "id_user": 1,  #TODO: endpoint real
+        "id_user": 2,  #TODO: endpoint real
         "filter": filtro['name'],
         "cod_prod": filtro['productCode'],
         "date_from": filtro['startDate'],
