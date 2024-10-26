@@ -55,8 +55,9 @@ class Catalog(db.Model):
 
 class CatalogProducts(db.Model):
     __tablename__ = 'catalog_products'
-    id_catalog = sa.Column(sa.Integer, primary_key=True) 
-    id_product = sa.Column(sa.Integer)
+    id_catalog_products = sa.Column(sa.Integer, primary_key=True) 
+    id_catalog = sa.Column(sa.Integer)  
+    id_product = sa.Column(sa.Integer)  
 
 class UserFilters(db.Model):
     __tablename__ = 'user_filters'
