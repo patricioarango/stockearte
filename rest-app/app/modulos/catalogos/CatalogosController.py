@@ -138,15 +138,23 @@ def add_product_to_catalog(id_catalog):
         print("ID de tienda no es válido")
         products = []
 
+    # Obtener los productos en el catálogo
     catalog_products = CatalogProducts.query.filter_by(id_catalog=id_catalog).all()
     catalog_product_details = []
 
     for catalog_product in catalog_products:
         product = Product.query.get(catalog_product.id_product)  
         if product:
+            # Aquí podemos agregar más detalles del producto que obtuvimos del endpoint
+            product_info = next((prod for prod in products if prod['id_product'] == catalog_product.id_product), None)
             catalog_product_details.append({
                 'catalog_product': catalog_product,
-                'product_name': product.product  
+                'product_name': product.product,
+                'color': product_info['color'] if product_info else None,
+                'img': product_info['img'] if product_info else None,
+                'size': product_info['size'] if product_info else None,
+                'stock': product_info['stock'] if product_info else None,
+                'product_code': product_info['productCode'] if product_info else None,
             })
 
     print("Detalles de los productos del catálogo:", catalog_product_details)
@@ -155,6 +163,7 @@ def add_product_to_catalog(id_catalog):
                            id_catalog=id_catalog, 
                            products=products, 
                            catalog_product_details=catalog_product_details)
+
 
 
 @catalogos_blueprint.route('/catalogs/<int:id_catalog>/remove_product', methods=['POST'])

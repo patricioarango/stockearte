@@ -35,8 +35,13 @@
             <thead>
                 <tr>
                     <th>ID Producto</th>
-                    <th>Nombre del Producto</th>
-                    <th>Acciones</th> <!-- Nueva columna para las acciones -->
+                    <th>Nombre</th>
+                    <th>Color</th>
+                    <th>Tamaño</th>
+                    <th>Stock</th>
+                    <th>Código</th>
+                    <th>Imagen</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -44,6 +49,11 @@
                 <tr>
                     <td>{{ item.catalog_product.id_product }}</td>
                     <td>{{ item.product_name }}</td>
+                    <td>{{ item.color }}</td>
+                    <td>{{ item.size }}</td>
+                    <td>{{ item.stock }}</td>
+                    <td>{{ item.product_code }}</td>
+                    <td><img src="{{ item.img }}" alt="{{ item.product_name }}" style="width: 50px;"></td>
                     <td>
                         <form action="{{ url_for('catalogos.remove_product_from_catalog_view', id_catalog=id_catalog) }}" method="POST" style="display:inline;">
                             <input type="hidden" name="id_product" value="{{ item.catalog_product.id_product }}">
