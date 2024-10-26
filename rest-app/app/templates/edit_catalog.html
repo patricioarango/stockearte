@@ -19,7 +19,7 @@
         <form action="{{ url_for('catalogos.edit_catalog', id=catalog['id_catalog']) }}" method="POST">
             <div class="mb-3">
                 <label for="catalog" class="form-label">Nombre del Catálogo:</label>
-                <input type="text" id="catalog" name="catalog" class="form-control" value="{{ catalog['catalog'] }}" required>
+                <input type="text" id="catalog" name="catalog" class="form-control" value="{{ catalog['name'] }}" required>
             </div>
 
             <div class="mb-3">
