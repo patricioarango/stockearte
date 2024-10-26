@@ -9,7 +9,7 @@
 <body>
     {% include "nav.html" %}
     <div class="container mt-5">
-        <h1>Agregar Producto al Catálogo #: {{ id_catalog}}</h1>
+        <h1>Agregar Producto al Catálogo #: {{ id_catalog }}</h1>
         <form action="{{ url_for('catalogos.add_product_to_catalog', id_catalog=id_catalog) }}" method="POST">
             <div class="mb-3">
                 <label for="id_product" class="form-label">Seleccionar Producto:</label>
@@ -47,11 +47,11 @@
                     <td>
                         <form action="{{ url_for('catalogos.remove_product_from_catalog_view', id_catalog=id_catalog) }}" method="POST" style="display:inline;">
                             <input type="hidden" name="id_product" value="{{ item.catalog_product.id_product }}">
-                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');">Eliminar</button>
                         </form>
                     </td>
                 </tr>
-            {% endfor %}
+                {% endfor %}
             </tbody>
         </table>
 

@@ -58,22 +58,21 @@ def add_catalog(id_store):
     wsdl = os.getenv("SOAP_WSDL_CATALOGOS")
     client = Client(wsdl=wsdl)
     data = request.get_json()
-    id_catalog = 0
-    catalog = ""
-    id_store = 0
-    enabled = True
-    print(data)
-    if(data['enabled']):
-        enabled = data['enabled']
+    
+    # Valores predeterminados
+    id_catalog = data.get("id_catalog", 0)
+    catalog = data.get("catalog", "")
+    enabled = data.get("enabled", True)
 
-    if(data['catalog'] and data['id_store']):
-        catalog = data['catalog']
-        id_store = int(data['id_store'])
-        
-    if(data["id_catalog"]):
-        id_catalog = data["id_catalog"]
-            
-    response = client.service.saveCatalogo(id_catalog=id_catalog,catalog=catalog,id_store=id_store,enabled=enabled)
+    print("Datos recibidos:", data)
+
+    # Llamada al servicio SOAP
+    response = client.service.saveCatalogo(
+        id_catalog=id_catalog,
+        catalog=catalog,
+        id_store=id_store,
+        enabled=enabled
+    )
 
     respuesta = {
         'id_catalog': response.id_catalog,
