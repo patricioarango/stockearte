@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Catálogos</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+</head>
+<body>
+    {% include "nav.html" %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Lista de Catálogos</h1>
+
+        <!-- Botón para agregar un nuevo catálogo -->
+        <a href="{{ url_for('catalogos.add_catalog') }}" class="btn btn-primary mb-3">Agregar Catálogo</a>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del Catálogo</th>
+                    <th>ID de la Tienda</th>
+                    <th>Acciones</th> <!-- Columna para acciones -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Iterar sobre los catálogos obtenidos desde Flask -->
+                {% for catalog in catalogs %}
+                    <tr>
+                        <td>{{ catalog.id_catalog }}</td>
+                        <td>{{ catalog.name }}</td>
+                        <td>{{ catalog.id_store }}</td>
+                        <td>
+                            <!-- Botón para agregar productos al catálogo -->
+                            <a href="{{ url_for('catalogos.add_product_to_catalog', id_catalog=catalog.id_catalog) }}" class="btn btn-info btn-sm">Agregar Producto</a>
+
+                            <!-- Botón para editar el catálogo -->
+                            <a href="{{ url_for('catalogos.edit_catalog', id=catalog.id_catalog) }}" class="btn btn-warning btn-sm">Editar</a>
+
+                            <!-- Formulario para eliminar el catálogo -->
+                            <form action="{{ url_for('catalogos.delete_catalog', id=catalog.id_catalog) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este catálogo?');">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">No hay catálogos disponibles</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
