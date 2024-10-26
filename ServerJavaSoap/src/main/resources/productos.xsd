@@ -1,0 +1,33 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://spring.io/guides/product-web-service"
+           targetNamespace="http://spring.io/guides/product-web-service" elementFormDefault="qualified">
+
+    <xs:element name="getProductsByStoreRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id_store" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getProductsByStoreResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="products" type="tns:product" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:complexType name="product">
+        <xs:sequence>
+            <xs:element name="id_product" type="xs:int"/>
+            <xs:element name="product" type="xs:string"/>
+            <xs:element name="code" type="xs:string"/>
+            <xs:element name="color" type="xs:string"/>
+            <xs:element name="size" type="xs:string"/>
+            <xs:element name="img" type="xs:string"/>
+            <xs:element name="stock" type="xs:int"/>
+            <xs:element name="id_store" type="xs:int"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>

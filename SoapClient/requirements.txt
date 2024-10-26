@@ -1,0 +1,8 @@
+Flask
+flask_table
+Flask-RESTful
+flask_sqlalchemy
+python-dotenv
+pymysql
+zeep
+python-dotenv

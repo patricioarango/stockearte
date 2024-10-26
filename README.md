@@ -63,3 +63,11 @@ python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --py
 python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --pyi_out=. --grpc_python_out=. ../ServidorJava/src/main/proto/purchaseOrder.proto
 python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --pyi_out=. --grpc_python_out=. ../ServidorJava/src/main/proto/novelty.proto
 python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --pyi_out=. --grpc_python_out=. ../ServidorJava/src/main/proto/dispatchOrder.proto
+
+
+## Soap Server JAVA - WSDLs
+SOAP_WSDL_CATALOGOS='http://localhost:8080/wsc/catalogos.wsdl'
+SOAP_WSDL_USUARIOS='http://localhost:8080/wsu/users.wsdl'
+SOAP_WSDL_INFORMES='http://localhost:8080/wsi/informes.wsdl'
+SOAP_WSDL_PRODUCTOS='http://localhost:8080/wsp/productos.wsdl'
+SOAP_WSDL_TIENDAS='http://localhost:8080/wst/tiendas.wsdl'
