@@ -51,7 +51,7 @@ def add_catalog():
             'enabled': True  
         })
 
-        if response.status_code == 201:
+        if response.status_code == 200:
             return redirect(url_for('catalogos.get_catalogs'))
         else:
             print(f'Error al agregar catálogo: {response.status_code} - {response.text}')
