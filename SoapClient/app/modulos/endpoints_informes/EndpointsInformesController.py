@@ -21,3 +21,27 @@ def informes():
             'store_code': informe.store_code,
         })
     return jsonify(informes),200    
+
+@endpoints_informes_blueprint.route("/informesByStore", methods=["GET"])
+def informesByStore():
+    wsdl = os.getenv("SOAP_WSDL_INFORMES") 
+    client = Client(wsdl=wsdl)
+    
+    id_store = request.args.get('id_store')    
+
+    response = client.service.getAllInformesByStore(store_id=int(id_store)) 
+
+    informes = []
+    for informe in response: 
+        informes.append({
+            'product_code': informe.product_code,
+            'cantidad_pedida': informe.cantidad_pedida,
+            'created_at': informe.created_at,
+            'state': informe.state,
+            'id_store': informe.id_store,
+            'store_code': informe.store_code,
+        })
+    
+    return jsonify(informes), 200
+
+

@@ -5,6 +5,14 @@
         <xs:complexType/>
     </xs:element>
 
+    <xs:element name="getAllInformesByStoreRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="store_id" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>   
+
     <xs:element name="getUserFiltersRequest">
         <xs:complexType>
             <xs:sequence>
@@ -68,6 +76,14 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
+
+    <xs:element name="getAllInformesByStoreResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="informes" type="tns:informe" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>    
 
     <xs:complexType name="user_filter">
         <xs:sequence>

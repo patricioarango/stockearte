@@ -34,13 +34,14 @@ def informes():
 
     id_user = session.get('user_id')
 
-    response = requests.get('http://localhost:5005/informes')
+    if session.get('roleName') == 'admin':
+        response = requests.get('http://localhost:5005/informes')
+    else:
+        id_store = session.get('user_store_id')
+        response = requests.get(f'http://localhost:5005/informesByStore?id_store={id_store}')
 
     if response.status_code != 200:
         return f"Error al obtener las órdenes de compra: {response.status_code}", 500
-
-    print(f'http://localhost:5005/users/{id_user}/filter')
-
 
     responseFiltro = requests.get(f'http://localhost:5005/users/{id_user}/filter')
     

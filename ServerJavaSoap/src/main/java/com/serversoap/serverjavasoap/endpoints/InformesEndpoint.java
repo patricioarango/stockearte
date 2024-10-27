@@ -17,6 +17,8 @@ import com.serversoap.serverjavasoap.repositories.StoreRepository;
 import com.serversoap.serverjavasoap.repositories.UserFilterRepository;
 import com.serversoap.serverjavasoap.repositories.UserRepository;
 
+import io.spring.guides.informes_web_service.GetAllInformesByStoreRequest;
+import io.spring.guides.informes_web_service.GetAllInformesByStoreResponse;
 import io.spring.guides.informes_web_service.GetAllInformesRequest;
 import io.spring.guides.informes_web_service.GetAllInformesResponse;
 import io.spring.guides.informes_web_service.GetUserFilterByIdRequest;
@@ -143,4 +145,26 @@ public class InformesEndpoint {
         response.getInformes().addAll(informesResponse);
         return response;
     }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getAllInformesByStoreRequest")
+    @ResponsePayload
+    public GetAllInformesByStoreResponse AllInformesByStore(@RequestPayload GetAllInformesByStoreRequest request) {
+        List<Object[]> results = orderItemRepository.findAggregatedOrderItemsByStoreId(request.getStoreId());
+        List<io.spring.guides.informes_web_service.Informe> informesResponse = results.stream().map(row -> {
+            io.spring.guides.informes_web_service.Informe informe = new io.spring.guides.informes_web_service.Informe();
+            Store store = storeRepository.findStoreByIdStore(Integer.parseInt(row[5].toString()));
+            informe.setProductCode(row[0].toString());
+            informe.setCantidadPedida(Integer.parseInt(row[1].toString()));
+            informe.setCreatedAt(row[3].toString());
+            informe.setState(row[4].toString());
+            informe.setIdStore(Integer.parseInt(row[5].toString()));
+            informe.setStoreCode(store.getStoreCode());
+            return informe;
+        }).collect(Collectors.toList());
+    
+        GetAllInformesByStoreResponse response = new GetAllInformesByStoreResponse();
+        response.getInformes().addAll(informesResponse);
+        return response;
+    }
+        
 }
