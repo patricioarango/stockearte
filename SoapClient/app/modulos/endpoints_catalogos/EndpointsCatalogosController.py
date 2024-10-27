@@ -26,6 +26,33 @@ def catalogos():
 
 @endpoints_catalogos_blueprint.route("/catalogos/pdf", methods=["GET"])
 def catalogos_pdf():
+    """
+    Obtiene el PDF de un catálogo específico.
+    ---
+    tags:
+      - Catalogos
+    parameters:
+      - name: id_catalog
+        in: query
+        type: integer
+        required: true
+        description: ID del catálogo para el cual se genera el PDF
+    responses:
+      200:
+        description: PDF generado exitosamente
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                pdf_data:
+                  type: string
+                  description: PDF codificado en base64
+      400:
+        description: ID de catálogo requerido
+      500:
+        description: Error interno al obtener el PDF desde el servicio SOAP
+    """
     wsdl = os.getenv("SOAP_WSDL_CATALOGOS")
     client = Client(wsdl=wsdl)
     

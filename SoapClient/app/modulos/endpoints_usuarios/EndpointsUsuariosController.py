@@ -6,6 +6,51 @@ import os,requests
 
 @endpoints_usuarios_blueprint.route("/users", methods=["GET"])
 def endpoint_usuarios():
+    """
+    Obtiene todos los usuarios.
+    ---
+    tags:
+      - Usuarios
+    responses:
+      200:
+        description: Lista de usuarios obtenida exitosamente
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usuarios:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id_user:
+                        type: integer
+                        description: ID del usuario
+                      name:
+                        type: string
+                        description: Nombre del usuario
+                      lastname:
+                        type: string
+                        description: Apellido del usuario
+                      username:
+                        type: string
+                        description: Nombre de usuario
+                      storeName:
+                        type: string
+                        description: Nombre de la tienda
+                      storeCode:
+                        type: string
+                        description: Código de la tienda
+                      id_role:
+                        type: integer
+                        description: ID del rol del usuario
+                      role:
+                        type: string
+                        description: Nombre del rol del usuario
+      500:
+        description: Error interno al obtener los usuarios
+    """
     wsdl = os.getenv("SOAP_WSDL_USUARIOS")
     client = Client(wsdl=wsdl)
     response = client.service.getAllUsers()

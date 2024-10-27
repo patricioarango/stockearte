@@ -2,12 +2,13 @@ from app import create_app
 from flask import render_template
 import logging
 from app.models import db
+from flasgger import Swagger
 
 
 logger = logging.getLogger(__name__)
 
 app = create_app('flask.cfg')
-
+swagger = Swagger(app)
 
 @app.route("/", methods=["GET"])
 def index():
