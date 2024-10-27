@@ -1,0 +1,63 @@
+{% include "doctype.html" %}
+<body class="h-100">
+    {% include "nav.html" %}
+    <div class="container h-100">
+        <div class="row h-100">
+            <div class="col-12">
+                <div class="container mt-4">
+                    <h1 class="mb-4">Carga de Usuarios de Tienda</h1>
+
+                    <form action="{{ url_for('usuarios.upload_file') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Seleccionar archivo CSV:</label>
+                            <input type="file" id="file" name="file" accept=".csv" required class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Subir archivo</button>
+                    </form>
+
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        <div class="alert alert-info">
+                          <ul>
+                            {% for category, message in messages %}
+                              <li class="{{ category }}">{{ message }}</li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                      {% endif %}
+                    {% endwith %}
+
+                    <h2 class="mt-4">Resultados de la Carga de Usuarios</h2>
+
+                    {% if registros_correctos %}
+                        <h3 class="text-success">Registros Correctos</h3>
+                        <ul class="list-group mb-4">
+                            {% for registro in registros_correctos %}
+                                <li class="list-group-item text-success">
+                                    Nombre: {{ registro[0] }}, Apellido: {{ registro[1] }},
+                                    Username: {{ registro[2] }}, Tienda: {{ registro[5] }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No se encontraron registros correctos.</p>
+                    {% endif %}
+
+                    {% if errores %}
+                        <h3 class="text-danger">Errores</h3>
+                        <ul class="list-group mb-4">
+                            {% for error in errores %}
+                                <li class="list-group-item text-danger">
+                                    Línea {{ error.linea }}: {{ error.error }} - Datos: {{ error.data }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No se encontraron errores.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
