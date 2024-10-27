@@ -32,10 +32,9 @@
           <input class="form-control me-2" type="text" name="hasta" placeholder="Hasta" aria-label="Talle" value="{{filtroUsado.endDate}}">
       
           <input class="form-control me-2" type="text" name="estado" placeholder="Buscar por Estado" aria-label="Color" value="{{filtroUsado.state}}">
-
-          <input class="form-control me-2" type="text" name="tienda" placeholder="Buscar por Tienda" aria-label="Color" value="{{filtroUsado.store}}">
+         
+          <input class="form-control me-2" type="text" name="tienda" placeholder="Buscar por Tienda" aria-label="Color" value="{{filtroUsado.store}}" {% if session.get('roleName') != 'admin' %}style="display: none;"{% endif %}>
           
-
           <button class="btn btn-outline-success" type="submit">Buscar</button>
           <button class="btn btn-outline-success" type="button" id="guardarFiltroBtn">Guardar Filtro</button>
         </form>
@@ -45,10 +44,9 @@
               <tr>
                 <th>Producto</th>
                 <th>Cantidad Pedida</th>
-                <th>Tienda</th>
+                <th {% if session.get('roleName') != 'admin' %}style="display: none;"{% endif %}>Tienda</th>
                 <th>Estado</th>
                 <th>Fecha de solicitud</th>
-                <th>Orden de compra</th>
               </tr>
           </thead>
           <tbody>
@@ -56,10 +54,9 @@
               <tr>
                 <td>{{ order.productCode }}</td>
                 <td>{{ order.cantidadPedida }}</td>
-                <td>{{ order.store.storeName }}</td>
+                <td {% if session.get('roleName') != 'admin' %}style="display: none;"{% endif %}>{{ order.store.storeName }}</td>
                 <td>{{ order.state }}</td>
                 <td>{{ order.createdAt }}</td>
-                <td>{{ order.idPurchaseOrder }}</td>
               </tr>
             {% endfor %}
           </tbody>

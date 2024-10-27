@@ -38,17 +38,15 @@
                 <input type="text" class="form-control" id="state" name="state" value="{{filtro.state}}">
             </div>
 
-            <div class="mb-3">
+            <div class="mb-3" {% if session.get('roleName') != 'admin' %}style="display: none;"{% endif %}>
                 <label for="store" class="form-label">Tienda</label>
                 <input type="store" class="form-control" id="store" name="store" value="{{filtro.store}}">
             </div>
 
-            {% if filtro.idFilter %}
-            <div class="mb-3 form-check">
+            <div class="mb-3 form-check" {% if not filtro.idFilter %}style="display: none;"{% endif %}>
                 <input type="checkbox" class="form-check-input" id="enabled" name="enabled" {% if filtro.enabled %}checked{% endif %}>
                 <label class="form-check-label" for="enabled">Habilitado</label>
             </div>
-            {% endif %}
 
             <button type="submit" class="btn btn-primary">Guardar Filtro</button>
         </form>

@@ -16,14 +16,14 @@
     <xs:element name="saveUserFiltersRequest">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="id_user_filter" type="xs:int" minOccurs="0"/>
-                <xs:element name="filter" type="xs:string"/>
-                <xs:element name="id_user" type="xs:int"/>
-                <xs:element name="cod_prod" type="xs:string"/>
-                <xs:element name="date_from" type="xs:string"/>
-                <xs:element name="date_to" type="xs:string"/>
-                <xs:element name="state" type="xs:string"/>
-                <xs:element name="id_store" type="xs:int"/>
+                <xs:element name="id_user_filter" type="xs:int" />
+                <xs:element name="filter" type="xs:string" />
+                <xs:element name="id_user" type="xs:int" />
+                <xs:element name="cod_prod" type="xs:string" minOccurs="0"/>
+                <xs:element name="date_from" type="xs:string" minOccurs="0"/>
+                <xs:element name="date_to" type="xs:string" minOccurs="0"/>
+                <xs:element name="state" type="xs:string" minOccurs="0"/>
+                <xs:element name="id_store" type="xs:int" minOccurs="0"/>
                 <xs:element name="enabled" type="xs:boolean"/>
             </xs:sequence>
         </xs:complexType>
@@ -74,11 +74,11 @@
             <xs:element name="id_user_filter" type="xs:int"/>
             <xs:element name="filter" type="xs:string"/>
             <xs:element name="id_user" type="xs:int"/>
-            <xs:element name="cod_prod" type="xs:string"/>
-            <xs:element name="date_from" type="xs:string"/>
-            <xs:element name="date_to" type="xs:string"/>
-            <xs:element name="state" type="xs:string"/>
-            <xs:element name="id_store" type="xs:int"/>
+            <xs:element name="cod_prod" type="xs:string" minOccurs="0"/>
+            <xs:element name="date_from" type="xs:string" minOccurs="0"/>
+            <xs:element name="date_to" type="xs:string" minOccurs="0"/>
+            <xs:element name="state" type="xs:string" minOccurs="0"/>
+            <xs:element name="id_store" type="xs:int" minOccurs="0"/>
             <xs:element name="enabled" type="xs:boolean"/>
         </xs:sequence>
     </xs:complexType>

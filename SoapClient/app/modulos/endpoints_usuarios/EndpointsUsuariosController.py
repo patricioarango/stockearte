@@ -80,11 +80,10 @@ def login():
         return jsonify(respuesta),200
     return {"error": "No data provided"}, 400
     
-@endpoints_usuarios_blueprint.route("/users/<int:id_user>/filters", methods=["GET"])
+@endpoints_usuarios_blueprint.route("/users/<int:id_user>/filter", methods=["GET"])
 def getUserFilters(id_user):
     wsdl = os.getenv("SOAP_WSDL_INFORMES")
     client = Client(wsdl=wsdl)
-    data = request.get_json()
     filters = []
     response = client.service.getUserFilters(id_user=id_user)
     for filter in response:
@@ -103,7 +102,7 @@ def getUserFilters(id_user):
 
 
 @endpoints_usuarios_blueprint.route("/users/<int:id_user>/filters", methods=["POST"])
-def saveUserFilters():
+def saveUserFilters(id_user):
     wsdl = os.getenv("SOAP_WSDL_INFORMES")
     client = Client(wsdl=wsdl)
     data = request.get_json()
@@ -116,7 +115,7 @@ def saveUserFilters():
     date_to = data.get("date_to", "")
     state = data.get("state", "")
     id_store = data.get("id_store", 0)
-    enabled = data.get("enabled", True)
+    enabled = data.get("enabled", True) if data.get("enabled") is not None else True
 
     response = client.service.saveUserFilters(
         id_user_filter=id_user_filter,

@@ -1,5 +1,14 @@
 package com.serversoap.serverjavasoap.endpoints;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ws.server.endpoint.annotation.Endpoint;
+import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
+import org.springframework.ws.server.endpoint.annotation.RequestPayload;
+import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
+
 import com.serversoap.serverjavasoap.entities.Store;
 import com.serversoap.serverjavasoap.entities.User;
 import com.serversoap.serverjavasoap.entities.UserFilter;
@@ -7,15 +16,15 @@ import com.serversoap.serverjavasoap.repositories.OrderItemRepository;
 import com.serversoap.serverjavasoap.repositories.StoreRepository;
 import com.serversoap.serverjavasoap.repositories.UserFilterRepository;
 import com.serversoap.serverjavasoap.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ws.server.endpoint.annotation.Endpoint;
-import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
-import org.springframework.ws.server.endpoint.annotation.RequestPayload;
-import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
-import io.spring.guides.informes_web_service.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import io.spring.guides.informes_web_service.GetAllInformesRequest;
+import io.spring.guides.informes_web_service.GetAllInformesResponse;
+import io.spring.guides.informes_web_service.GetUserFilterByIdRequest;
+import io.spring.guides.informes_web_service.GetUserFilterByIdResponse;
+import io.spring.guides.informes_web_service.GetUserFiltersRequest;
+import io.spring.guides.informes_web_service.GetUserFiltersResponse;
+import io.spring.guides.informes_web_service.SaveUserFiltersRequest;
+import io.spring.guides.informes_web_service.SaveUserFiltersResponse;
 
 @Endpoint
 public class InformesEndpoint {
@@ -76,6 +85,7 @@ public class InformesEndpoint {
         userFilter.setDateTo(request.getDateTo());
         userFilter.setState(request.getState());
         userFilter.setIdStore(request.getIdStore());
+        userFilter.setEnabled(request.isEnabled());
         UserFilter nuevoUserFilter = userFilterRepository.save(userFilter);
 
         io.spring.guides.informes_web_service.UserFilter userFilterResponse = new io.spring.guides.informes_web_service.UserFilter();

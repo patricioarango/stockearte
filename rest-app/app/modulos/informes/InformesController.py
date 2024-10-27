@@ -32,14 +32,17 @@ def informes():
     print('filtro usado:')
     print(id_filter)
 
-    id_user = 2 
+    id_user = session.get('user_id')
 
-    response = requests.get('http://localhost:5003/endpoint_informes')
+    response = requests.get('http://localhost:5005/informes')
 
     if response.status_code != 200:
         return f"Error al obtener las órdenes de compra: {response.status_code}", 500
 
-    responseFiltro = requests.get(f'http://localhost:5003/endpoint_filtros?id_user={id_user}')
+    print(f'http://localhost:5005/users/{id_user}/filter')
+
+
+    responseFiltro = requests.get(f'http://localhost:5005/users/{id_user}/filter')
     
     if responseFiltro.status_code != 200:
         return f"Error al obtener los filtros: {responseFiltro.status_code}", 500
@@ -51,7 +54,6 @@ def informes():
         purchase_orders.append({
             'cantidadPedida': resp['cantidad_pedida'],
             'createdAt': resp['created_at'],
-            'idPurchaseOrder': resp['id_purchase_order'],
             'productCode': resp['product_code'],
             'state': resp['state'],
             'store': {
@@ -136,8 +138,10 @@ def add_filtro():
         'enabled': True 
     }
 
+    id_user = session.get('user_id')
+
     if id_filter:
-        responseFiltro = requests.get(f'http://localhost:5003/endpoint_filtro?id_user_filter={id_filter}')
+        responseFiltro = requests.get(f'http://localhost:5005/users/{id_user}/filters/{id_filter}')
 
         if responseFiltro.status_code != 200:
             return f"Error al obtener el filtro: {responseFiltro.status_code}", 500
@@ -156,7 +160,7 @@ def add_filtro():
         filtro['endDate'] = request.form['endDate']
         filtro['enabled'] = request.form.get('enabled', 'off') == 'on' 
 
- 
+        print("HABILITADO:")
         print(request.form.get('enabled', 'off') == 'on')
 
         response = guardar_filtro_helper(filtro, id_filter)
@@ -173,7 +177,7 @@ def add_filtro():
 
 def guardar_filtro_helper(filtro, id_filter=None):
     data = {
-        "id_user": 2,  #TODO: endpoint real
+        "id_user": session.get('user_id'),
         "filter": filtro['name'],
         "cod_prod": filtro['productCode'],
         "date_from": filtro['startDate'],
@@ -186,10 +190,13 @@ def guardar_filtro_helper(filtro, id_filter=None):
     if id_filter:
         data["id_user_filter"] = id_filter
 
-    with app.test_request_context():
-        with app.test_client() as client:
-            response = client.post("/guardar_filtro", json=data)
-            print(f"Respuesta de guardar_filtro: {response.data}")  
-            return response
+    response = requests.post(f"http://localhost:5005/users/{data['id_user']}/filters", json=data)
+
+    if response.status_code in (200, 201):
+        print(f"Filtro guardado con éxito: {response.json()}")
+        return response
+    else:
+        print(f"Error al guardar el filtro: {response.status_code}")
+        return None
 
 
