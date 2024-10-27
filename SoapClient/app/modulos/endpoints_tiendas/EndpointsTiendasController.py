@@ -21,6 +21,7 @@ def catalogos_by_store(id_store):
             'id_catalog': catalogo.id_catalog,
             'name': catalogo.catalog,
             'id_store': catalogo.id_store,
+            'enabled': catalogo.enabled
         })
     resp = jsonify(catalogs=catalogos)
     return resp
@@ -81,6 +82,35 @@ def add_catalog(id_store):
         'enabled': response.enabled,
     }
     return jsonify(catalogo=respuesta)
+
+@endpoints_tiendas_blueprint.route("/stores/<int:id_store>/catalogs/<int:id_catalog>", methods=["PUT"])
+def edit_catalog(id_store, id_catalog):
+    wsdl = os.getenv("SOAP_WSDL_CATALOGOS")
+    client = Client(wsdl=wsdl)
+    data = request.get_json()
+
+    # Obtener datos del catálogo a actualizar
+    catalog = data.get("catalog", "")
+    enabled = data.get("enabled", True)
+
+    print("Datos recibidos para editar:", data)
+
+    # Llamada al servicio SOAP para actualizar el catálogo
+    response = client.service.saveCatalogo(  # Suponiendo que tengas un método `updateCatalogo` en tu servicio SOAP
+        id_catalog=id_catalog,
+        catalog=catalog,
+        id_store=id_store,
+        enabled=enabled
+    )
+
+    respuesta = {
+        'id_catalog': response.id_catalog,
+        'catalog': response.catalog,
+        'id_store': response.id_store,
+        'enabled': response.enabled,
+    }
+    return jsonify(catalogo=respuesta)
+
 
 @endpoints_tiendas_blueprint.route("/stores/<int:id_store>/catalogs/<int:id_catalog>/products/<int:id_product>", methods=["PUT"])
 def add_producto_to_catalog(id_store,id_catalog,id_product):

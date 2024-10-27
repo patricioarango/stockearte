@@ -28,16 +28,18 @@
         </div>
     </div>
     {% endif %}
+    {% if session.get('roleName') == 'manager' %}
     <div class="col">
         <div class="card" style="width: 18rem;">
             <img src="{{ url_for('static', filename='catalogos.png') }}" class="card-img-top" alt="..." width="100%" height="200">
             <div class="card-body">
                 <h5 class="card-title">CATÁLOGOS</h5>
                 <p class="card-text">Ver todos los catálogos. Editarlos. Agregar o quitar productos a un catálogo. Generar PDF del catálogo.</p>
-                <a href="/ver_ordenes_de_compra" class="btn btn-danger">VER CATÁLOGOS</a>
+                <a href="/catalogs" class="btn btn-danger">VER CATÁLOGOS</a>
             </div>
         </div>
     </div>
+    {% endif %}
     <div class="col">
         <div class="card" style="width: 18rem;">
             <img src="{{ url_for('static', filename='informes.jpg') }}" class="card-img-top" alt="..." width="100%" height="200">

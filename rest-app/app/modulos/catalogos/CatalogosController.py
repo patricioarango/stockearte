@@ -23,6 +23,7 @@ def get_catalogs():
 
     url = f'http://localhost:5005/stores/{id_store}/catalogs'
     response = requests.get(url)
+    print("respuesta ",response.json())
 
     if response.status_code == 200:
         catalogs = response.json().get("catalogs", [])
@@ -59,45 +60,87 @@ def add_catalog():
     return render_template('add_catalog.html')
 
 
-# Editar un catálogo
 @catalogos_blueprint.route('/catalogs/edit/<int:id>', methods=['GET', 'POST'])
 def edit_catalog(id):
-    url = f'http://localhost:5003/get_catalogs'  
+    id_store = session.get('user_store_id')
+    print("ID de tienda obtenido de la sesión:", id_store)
+
+    if id_store is None:
+        print("Error: no se encontró el id_store en la sesión.")
+        return redirect(url_for('catalogos.get_catalogs'))
+
+    url = f'http://localhost:5005/stores/{id_store}/catalogs'
     response = requests.get(url)
 
     if response.status_code == 200:
-        catalogs = response.json()
+        catalogs = response.json().get("catalogs", [])
         catalog = next((cat for cat in catalogs if cat['id_catalog'] == id), None)
+
+        if catalog is None:
+            print(f"Error: catálogo con id {id} no encontrado.")
+            return redirect(url_for('catalogos.get_catalogs'))
 
         if request.method == 'POST':
             catalog_name = request.form['catalog']
-            id_store = session.get('user_store_id')
-
-            url = f'http://localhost:5003/edit_catalog/{id}'
-            response = requests.put(url, json={'catalog': catalog_name, 'id_store': id_store})
+            update_url = f'http://localhost:5005/stores/{id_store}/catalogs/{id}'
+            response = requests.put(update_url, json={
+                'catalog': catalog_name,
+                'id_catalog': id,
+                'id_store': id_store,
+                'enabled': True  
+            })
 
             if response.status_code == 200:
                 return redirect(url_for('catalogos.get_catalogs'))
             else:
-                print(f'Error al editar catálogo: {response.status_code}')
+                print(f'Error al editar catálogo: {response.status_code} - {response.text}')
                 return redirect(url_for('catalogos.edit_catalog', id=id))
 
         return render_template('edit_catalog.html', catalog=catalog)
+
     else:
-        print(f'Error al obtener catálogo: {response.status_code}')
+        print(f'Error al obtener catálogos: {response.status_code}')
         return redirect(url_for('catalogos.get_catalogs'))
 
-# Eliminar un catálogo
+
 @catalogos_blueprint.route('/catalogs/delete/<int:id>', methods=['POST'])
 def delete_catalog(id):
-    url = f'http://localhost:5003/delete_catalog/{id}'
-    response = requests.delete(url)
+    id_store = session.get('user_store_id')
+    print("ID de tienda obtenido de la sesión:", id_store)
+
+    if id_store is None:
+        print("Error: no se encontró el id_store en la sesión.")
+        return redirect(url_for('catalogos.get_catalogs'))
+
+    url = f'http://localhost:5005/stores/{id_store}/catalogs'
+    response = requests.get(url)
 
     if response.status_code == 200:
-        return redirect(url_for('catalogos.get_catalogs'))
+        catalogs = response.json().get("catalogs", [])
+        catalog = next((cat for cat in catalogs if cat['id_catalog'] == id), None)
+
+        if catalog is None:
+            print(f"Error: catálogo con id {id} no encontrado.")
+            return redirect(url_for('catalogos.get_catalogs'))
+
+        print("Contenido del catálogo:", catalog)
+
+        catalog_name = catalog['name'] 
+
+        update_url = f'http://localhost:5005/stores/{id_store}/catalogs/{id}'
+        response = requests.put(update_url, json={
+            'catalog': catalog_name,  
+            'enabled': False  
+        })
+
+        if response.status_code == 200:
+            return redirect(url_for('catalogos.get_catalogs'))
+        else:
+            print(f'Error al cambiar el estado del catálogo: {response.status_code} - {response.text}')
+            return redirect(url_for('catalogos.get_catalogs'))
     else:
-        print(f'Error al eliminar catálogo: {response.status_code}')
-        return redirect(url_for('catalogos.get_catalogs'))   
+        print(f'Error al obtener catálogos: {response.status_code}')
+        return redirect(url_for('catalogos.get_catalogs'))
 
 #agregar producto a catalogo
 @catalogos_blueprint.route('/catalogs/<int:id_catalog>/new_product', methods=['GET', 'POST'])
