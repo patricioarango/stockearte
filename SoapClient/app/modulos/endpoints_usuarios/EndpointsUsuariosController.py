@@ -80,13 +80,84 @@ def login():
         return jsonify(respuesta),200
     return {"error": "No data provided"}, 400
     
-@endpoints_usuarios_blueprint.route("/test_login", methods=["GET"])
-def test_login():
-    url = "http://localhost:5005/login"
-    data = {
-        "username": "johndoe1234567891011",
-        "password": "securepassword"
+@endpoints_usuarios_blueprint.route("/users/<int:id_user>/filters", methods=["GET"])
+def getUserFilters(id_user):
+    wsdl = os.getenv("SOAP_WSDL_INFORMES")
+    client = Client(wsdl=wsdl)
+    data = request.get_json()
+    filters = []
+    response = client.service.getUserFilters(id_user=id_user)
+    for filter in response:
+        filters.append({
+            'id_user_filter': filter.id_user_filter,
+            'filter': filter.filter,
+            'id_user': filter.id_user,
+            'cod_prod': filter.cod_prod,
+            'date_from': filter.date_from,
+            'date_to': filter.date_to,
+            'state': filter.state,
+            'id_store': filter.id_store,
+            'enabled': filter.enabled,
+        })
+    return jsonify(filters),200
+
+
+@endpoints_usuarios_blueprint.route("/users/<int:id_user>/filters", methods=["POST"])
+def saveUserFilters():
+    wsdl = os.getenv("SOAP_WSDL_INFORMES")
+    client = Client(wsdl=wsdl)
+    data = request.get_json()
+    
+    id_user_filter = data.get("id_user_filter", 0)
+    filter = data.get("filter", "")
+    id_user = data.get("id_user", 0)
+    cod_prod = data.get("cod_prod", "")
+    date_from = data.get("date_from", "")
+    date_to = data.get("date_to", "")
+    state = data.get("state", "")
+    id_store = data.get("id_store", 0)
+    enabled = data.get("enabled", True)
+
+    response = client.service.saveUserFilters(
+        id_user_filter=id_user_filter,
+        filter=filter,
+        id_user=id_user,
+        cod_prod=cod_prod,
+        date_from=date_from,
+        date_to=date_to,
+        state=state,
+        id_store=id_store,
+        enabled=enabled
+    )
+
+    respuesta = {
+        "id_user_filter": response.id_user_filter,
+        "filter": response.filter,
+        "id_user": response.id_user,
+        "cod_prod": response.cod_prod,
+        "date_from": response.date_from,
+        "date_to": response.date_to,
+        "state": response.state,
+        "id_store": response.id_store,
+        "enabled": response.enabled
     }
-    response = requests.post(url, json=data)
-    print(response.json())
-    return response.json()
+    return jsonify(respuesta)
+
+@endpoints_usuarios_blueprint.route("/users/<int:id_user>/filters/<int:id_user_filter>", methods=["GET"])
+def getUserFilter(id_user,id_user_filter):
+    wsdl = os.getenv("SOAP_WSDL_INFORMES")
+    client = Client(wsdl=wsdl)
+    response = client.service.getUserFilterById(id_user_filter=id_user_filter)
+    print(response)
+    user_filter = {
+        'id_user_filter': response.id_user_filter,
+        'filter': response.filter,
+        'id_user': response.id_user,
+        'cod_prod': response.cod_prod,
+        'date_from': response.date_from,
+        'date_to': response.date_to,
+        'state': response.state,
+        'id_store': response.id_store,
+        'enabled': response.enabled,
+    }
+    return jsonify(user_filter),200

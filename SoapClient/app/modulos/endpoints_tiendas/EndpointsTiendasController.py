@@ -4,12 +4,6 @@ from flask import current_app as app
 from zeep import Client
 import os,requests
 
-@endpoints_tiendas_blueprint.route("/stores", methods=["GET"])
-def endpoint_stores():
-   
-    resp = jsonify(usuarios={"stores": "stores"})
-    return resp
-
 @endpoints_tiendas_blueprint.route("/stores/<int:id_store>/catalogs", methods=["GET"])
 def catalogos_by_store(id_store):
     wsdl = os.getenv("SOAP_WSDL_CATALOGOS")
@@ -60,14 +54,10 @@ def add_catalog(id_store):
     client = Client(wsdl=wsdl)
     data = request.get_json()
     
-    # Valores predeterminados
     id_catalog = data.get("id_catalog", 0)
     catalog = data.get("catalog", "")
     enabled = data.get("enabled", True)
 
-    print("Datos recibidos:", data)
-
-    # Llamada al servicio SOAP
     response = client.service.saveCatalogo(
         id_catalog=id_catalog,
         catalog=catalog,

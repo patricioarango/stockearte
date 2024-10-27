@@ -6,5 +6,6 @@ import java.io.Serializable;
 import java.util.List;
 
 public interface UserFilterRepository extends JpaRepository<UserFilter, Serializable>{
-    List<UserFilter> findAllByUser_IdUser(int userId);
+    List<UserFilter> findAllByEnabledTrueAndUser_IdUser(int userId);
+    UserFilter findByIdUserFilter(int idUserFilter);
 }
