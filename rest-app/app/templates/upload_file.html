@@ -4,33 +4,36 @@
     <div class="container h-100">
         <div class="row h-100">
             <div class="col-12">
-                <div class="container">
-                    <h1>Carga Usuarios de Tienda</h1>
+                <div class="container mt-4">
+                    <h1 class="mb-4">Carga de Usuarios de Tienda</h1>
 
-                    <form action="{{ url_for('usuarios.upload_file') }}" method="POST" enctype="multipart/form-data">
-                        <label for="file">Seleccionar archivo CSV:</label>
-                        <input type="file" id="file" name="file" accept=".csv" required>
-                        <br><br>
+                    <form action="{{ url_for('usuarios.upload_file') }}" method="POST" enctype="multipart/form-data" class="mb-4">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Seleccionar archivo CSV:</label>
+                            <input type="file" id="file" name="file" accept=".csv" required class="form-control">
+                        </div>
                         <button type="submit" class="btn btn-primary">Subir archivo</button>
                     </form>
 
                     {% with messages = get_flashed_messages(with_categories=true) %}
                       {% if messages %}
-                        <ul>
-                          {% for category, message in messages %}
-                            <li class="{{ category }}">{{ message }}</li>
-                          {% endfor %}
-                        </ul>
+                        <div class="alert alert-info">
+                          <ul>
+                            {% for category, message in messages %}
+                              <li class="{{ category }}">{{ message }}</li>
+                            {% endfor %}
+                          </ul>
+                        </div>
                       {% endif %}
                     {% endwith %}
 
-                    <!-- Sección para mostrar resultados -->
-                    <h2>Resultados de la Carga de Usuarios</h2>
+                    <h2 class="mt-4">Resultados de la Carga de Usuarios</h2>
+
                     {% if registros_correctos %}
-                        <h3>Registros Correctos</h3>
-                        <ul>
+                        <h3 class="text-success">Registros Correctos</h3>
+                        <ul class="list-group mb-4">
                             {% for registro in registros_correctos %}
-                                <li>
+                                <li class="list-group-item text-success">
                                     Nombre: {{ registro[0] }}, Apellido: {{ registro[1] }},
                                     Username: {{ registro[2] }}, Tienda: {{ registro[5] }}
                                 </li>
@@ -41,10 +44,10 @@
                     {% endif %}
 
                     {% if errores %}
-                        <h3>Errores</h3>
-                        <ul>
+                        <h3 class="text-danger">Errores</h3>
+                        <ul class="list-group mb-4">
                             {% for error in errores %}
-                                <li>
+                                <li class="list-group-item text-danger">
                                     Línea {{ error.linea }}: {{ error.error }} - Datos: {{ error.data }}
                                 </li>
                             {% endfor %}
@@ -52,63 +55,9 @@
                     {% else %}
                         <p>No se encontraron errores.</p>
                     {% endif %}
-                    
-                    <!-- Sección para mostrar todos los usuarios -->
-                    <h2>Lista de Usuarios</h2>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>Username</th>
-                                <th>ID Role</th>
-                                <th>ID Store</th>
-                                <th>Enabled</th>
-                            </tr>
-                        </thead>
-                        <tbody id="user-table-body">
-                            <!-- Aquí se agregarán los usuarios mediante JavaScript -->
-                        </tbody>
-                    </table>
                 </div>
             </div>
         </div>
     </div>
-
-    <script>
-        // Función para cargar los usuarios
-        async function loadUsers() {
-            const response = await fetch('/get_users');  // Asegúrate de que el endpoint sea correcto
-            const users = await response.json();
-
-            const tableBody = document.getElementById('user-table-body');
-            tableBody.innerHTML = ''; // Limpia la tabla
-
-            if (users.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="7">No hay usuarios disponibles.</td></tr>';
-                return;
-            }
-
-            users.forEach(user => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${user.id_user}</td>
-                    <td>${user.name}</td>
-                    <td>${user.lastname}</td>
-                    <td>${user.username}</td>
-                    <td>${user.id_role}</td>
-                    <td>${user.id_store}</td>
-                    <td>${user.enabled}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-
-        // Cargar usuarios al cargar la página
-        window.onload = loadUsers;
-    </script>
 </body>
-</html>
-
 
