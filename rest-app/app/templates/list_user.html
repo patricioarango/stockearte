@@ -1,0 +1,51 @@
+{% include "doctype.html" %} 
+<body class="h-100">
+    {% include "nav.html" %}
+    <div class="container h-100">
+        <div class="row h-100">
+            <div class="col-12">
+                <div class="container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2>Lista de Usuarios</h2>
+                        <a href="/upload_file" class="btn btn-primary">Subir nuevos usuarios</a>
+                    </div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Username</th>
+                                <th>Rol</th>
+                                <th>ID Rol</th>
+                                <th>Tienda</th>
+                                <th>Código Tienda</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-table-body">
+                            {% if usuarios %}
+                                {% for user in usuarios %}
+                                    <tr>
+                                        <td>{{ user.id_user }}</td>
+                                        <td>{{ user.name }}</td>
+                                        <td>{{ user.lastname }}</td>
+                                        <td>{{ user.username }}</td>
+                                        <td>{{ user.role }}</td>
+                                        <td>{{ user.id_role }}</td>
+                                        <td>{{ user.storeName }}</td>
+                                        <td>{{ user.storeCode }}</td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="8">No hay usuarios disponibles.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
