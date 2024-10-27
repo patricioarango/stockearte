@@ -142,16 +142,17 @@ def delete_catalog(id):
         print(f'Error al obtener catálogos: {response.status_code}')
         return redirect(url_for('catalogos.get_catalogs'))
 
-#agregar producto a catalogo
 @catalogos_blueprint.route('/catalogs/<int:id_catalog>/new_product', methods=['GET', 'POST'])
-def add_product_to_catalog(id_catalog): 
+def add_product_to_catalog(id_catalog):
+    id_store = session.get('user_store_id')
     if request.method == 'POST':
         id_product = request.form['id_product']
-        catalog = Catalog.query.get(id_catalog)
-        id_store = catalog.id_store
-       
+        
+        if not id_store:
+            flash('No se pudo obtener el ID de la tienda.', 'danger')
+            return redirect(url_for('catalogos.some_route'))
+
         url = f'http://localhost:5005/stores/{id_store}/catalogs/{id_catalog}/products/{id_product}'
-        print(f"URL para agregar producto: {url}")  
         response = requests.put(url, json={'id_product': id_product})
 
         if response.status_code == 200:
@@ -159,53 +160,32 @@ def add_product_to_catalog(id_catalog):
             return redirect(url_for('catalogos.add_product_to_catalog', id_catalog=id_catalog))
         else:
             print(f'Error al agregar producto: {response.status_code}, {response.text}')  
+            flash('Error al agregar producto al catálogo.', 'danger')
 
-    catalog = Catalog.query.get(id_catalog)
+    products_url = f'http://localhost:5005/stores/{id_store}/products'
+    products_response = requests.get(products_url)
 
-    id_store = catalog.id_store  
-    if id_store is not None:
-        url = f'http://localhost:5005/stores/{id_store}/products'
-        print(f"URL para obtener productos: {url}")
-        headers = {'Content-Type': 'application/json'}
-        response = requests.get(url, headers=headers)
-
-        print(f"Respuesta de la solicitud GET: {response.status_code} - {response.text}")
-
-        if response.status_code == 200:
-            json_response = response.json()
-            products = json_response.get('productos', []) if isinstance(json_response, dict) else json_response
-        else:
-            print(f'Error al obtener productos de la tienda: {response.status_code}, {response.text}')
-            products = []  
+    if products_response.status_code == 200:
+        all_products = products_response.json().get('productos', [])  
     else:
-        print("ID de tienda no es válido")
-        products = []
+        print(f'Error al obtener productos de la tienda: {products_response.status_code}, {products_response.text}')
+        all_products = []  
 
-    # Obtener los productos en el catálogo
-    catalog_products = CatalogProducts.query.filter_by(id_catalog=id_catalog).all()
-    catalog_product_details = []
+    catalog_products_url = f'http://localhost:5005/stores/{id_store}/catalogs/{id_catalog}/products'
+    catalog_products_response = requests.get(catalog_products_url)
 
-    for catalog_product in catalog_products:
-        product = Product.query.get(catalog_product.id_product)  
-        if product:
-            # Aquí podemos agregar más detalles del producto que obtuvimos del endpoint
-            product_info = next((prod for prod in products if prod['id_product'] == catalog_product.id_product), None)
-            catalog_product_details.append({
-                'catalog_product': catalog_product,
-                'product_name': product.product,
-                'color': product_info['color'] if product_info else None,
-                'img': product_info['img'] if product_info else None,
-                'size': product_info['size'] if product_info else None,
-                'stock': product_info['stock'] if product_info else None,
-                'product_code': product_info['productCode'] if product_info else None,
-            })
+    if catalog_products_response.status_code == 200:
+        catalog_products = catalog_products_response.json().get('catalogoProductos', {}).get('productos', [])
+    else:
+        print(f'Error al obtener productos del catálogo: {catalog_products_response.status_code}, {catalog_products_response.text}')
+        catalog_products = []  
 
-    print("Detalles de los productos del catálogo:", catalog_product_details)
+    print("Productos obtenidos del catálogo:", catalog_products)
 
     return render_template('add_product_to_catalog.html', 
                            id_catalog=id_catalog, 
-                           products=products, 
-                           catalog_product_details=catalog_product_details)
+                           products=all_products,         
+                           catalog_products=catalog_products)  
 
 
 
@@ -213,10 +193,7 @@ def add_product_to_catalog(id_catalog):
 def remove_product_from_catalog_view(id_catalog):
     data = request.form  
     id_product = data.get('id_product')
-
-    catalog = Catalog.query.get(id_catalog)
-    id_store = catalog.id_store if catalog else None
-
+    id_store = session.get('user_store_id')
     url = f'http://localhost:5005/stores/{id_store}/catalogs/{id_catalog}/products/{id_product}'
 
     headers = {'Content-Type': 'application/json'}
