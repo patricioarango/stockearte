@@ -1,6 +1,10 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://spring.io/guides/informes-web-service"
            targetNamespace="http://spring.io/guides/informes-web-service" elementFormDefault="qualified">
 
+    <xs:element name="getAllInformesRequest">
+        <xs:complexType/>
+    </xs:element>
+
     <xs:element name="getUserFiltersRequest">
         <xs:complexType>
             <xs:sequence>
@@ -12,7 +16,31 @@
     <xs:element name="saveUserFiltersRequest">
         <xs:complexType>
             <xs:sequence>
+                <xs:element name="id_user_filter" type="xs:int" minOccurs="0"/>
+                <xs:element name="filter" type="xs:string"/>
                 <xs:element name="id_user" type="xs:int"/>
+                <xs:element name="cod_prod" type="xs:string"/>
+                <xs:element name="date_from" type="xs:string"/>
+                <xs:element name="date_to" type="xs:string"/>
+                <xs:element name="state" type="xs:string"/>
+                <xs:element name="id_store" type="xs:int"/>
+                <xs:element name="enabled" type="xs:boolean"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getUserFilterByIdRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="id_user_filter" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getUserFilterByIdResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="user_filter" type="tns:user_filter" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -20,7 +48,7 @@
     <xs:element name="saveUserFiltersResponse">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="id_user" type="xs:int"/>
+                <xs:element name="user_filter" type="tns:user_filter" />
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -29,6 +57,14 @@
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="user_filters" type="tns:user_filter" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="getAllInformesResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="informes" type="tns:informe" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>
@@ -43,6 +79,18 @@
             <xs:element name="date_to" type="xs:string"/>
             <xs:element name="state" type="xs:string"/>
             <xs:element name="id_store" type="xs:int"/>
+            <xs:element name="enabled" type="xs:boolean"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="informe">
+        <xs:sequence>
+            <xs:element name="product_code" type="xs:string"/>
+            <xs:element name="cantidad_pedida" type="xs:int"/>
+            <xs:element name="created_at" type="xs:string"/>
+            <xs:element name="state" type="xs:string"/>
+            <xs:element name="id_store" type="xs:int"/>
+            <xs:element name="store_code" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 </xs:schema>
