@@ -5,11 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agregar Producto al Catálogo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* Estilo adicional para mejorar la apariencia */
+        .table img {
+            width: 50px;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
     {% include "nav.html" %}
     <div class="container mt-5">
         <h1>Agregar Producto al Catálogo #: {{ id_catalog }}</h1>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alert alert-info" role="alert">
+                    {% for message in messages %}
+                        {{ message }}<br>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
         <form action="{{ url_for('catalogos.add_product_to_catalog', id_catalog=id_catalog) }}" method="POST">
             <div class="mb-3">
                 <label for="id_product" class="form-label">Seleccionar Producto:</label>
@@ -38,25 +56,23 @@
                     <th>Nombre</th>
                     <th>Color</th>
                     <th>Tamaño</th>
-                    <th>Stock</th>
                     <th>Código</th>
                     <th>Imagen</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                {% for item in catalog_product_details %}
+                {% for product in catalog_products %}
                 <tr>
-                    <td>{{ item.catalog_product.id_product }}</td>
-                    <td>{{ item.product_name }}</td>
-                    <td>{{ item.color }}</td>
-                    <td>{{ item.size }}</td>
-                    <td>{{ item.stock }}</td>
-                    <td>{{ item.product_code }}</td>
-                    <td><img src="{{ item.img }}" alt="{{ item.product_name }}" style="width: 50px;"></td>
+                    <td>{{ product.id_product }}</td>
+                    <td>{{ product.productName }}</td>
+                    <td>{{ product.color }}</td>
+                    <td>{{ product.size }}</td>
+                    <td>{{ product.productCode }}</td>
+                    <td><img src="{{ product.img }}" alt="{{ product.productName }}" class="img-thumbnail"></td>
                     <td>
                         <form action="{{ url_for('catalogos.remove_product_from_catalog_view', id_catalog=id_catalog) }}" method="POST" style="display:inline;">
-                            <input type="hidden" name="id_product" value="{{ item.catalog_product.id_product }}">
+                            <input type="hidden" name="id_product" value="{{ product.id_product }}">
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');">Eliminar</button>
                         </form>
                     </td>
@@ -67,5 +83,7 @@
 
         <a href="{{ url_for('catalogos.get_catalogs') }}" class="btn btn-secondary">Volver a la lista de catálogos</a>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
