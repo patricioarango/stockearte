@@ -24,6 +24,51 @@ def informes():
 
 @endpoints_informes_blueprint.route("/informesByStore", methods=["GET"])
 def informesByStore():
+    """
+    Obtiene los informes de una tienda específica.
+    ---
+    tags:
+      - Informes
+    parameters:
+      - name: id_store
+        in: query
+        type: integer
+        required: true
+        description: ID de la tienda para la cual se obtienen los informes
+    responses:
+      200:
+        description: Lista de informes obtenida exitosamente
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  product_code:
+                    type: string
+                    description: Código del producto en el informe
+                  cantidad_pedida:
+                    type: integer
+                    description: Cantidad pedida en el informe
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: Fecha de creación del informe
+                  state:
+                    type: string
+                    description: Estado del informe
+                  id_store:
+                    type: integer
+                    description: ID de la tienda del informe
+                  store_code:
+                    type: string
+                    description: Código de la tienda del informe
+      400:
+        description: ID de tienda requerido
+      500:
+        description: Error interno al obtener los informes desde el servicio SOAP
+    """
     wsdl = os.getenv("SOAP_WSDL_INFORMES") 
     client = Client(wsdl=wsdl)
     
@@ -43,5 +88,6 @@ def informesByStore():
         })
     
     return jsonify(informes), 200
+
 
 
