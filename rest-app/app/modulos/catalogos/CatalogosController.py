@@ -228,6 +228,23 @@ def remove_product_from_catalog_view(id_catalog):
         print(f'Error al eliminar producto: {response.status_code}, {response.text}') 
         return redirect(url_for('catalogos.add_product_to_catalog', id_catalog=id_catalog))
 
+    
+@catalogos_blueprint.route('/catalogs/pdf/<int:id_catalog>', methods=['GET'])
+def show_catalog_pdf(id_catalog):
+    url = f'http://localhost:5005/catalogos/pdf?id_catalog={id_catalog}'
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        pdf_data = response.json().get('pdf_data')
+        if pdf_data:
+            return render_template('show_pdf.html', pdf_data=pdf_data)
+        else:
+            return jsonify(error="No se encontró el PDF en la respuesta.")
+    else:
+        print(f'Error al obtener el PDF: {response.status_code}')
+        return jsonify(error="No se pudo obtener el PDF.")
+
+
 
 
 

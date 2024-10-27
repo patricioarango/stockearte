@@ -1,5 +1,16 @@
 package com.serversoap.serverjavasoap.endpoints;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ws.server.endpoint.annotation.Endpoint;
+import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
+import org.springframework.ws.server.endpoint.annotation.RequestPayload;
+import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
+
+import com.lowagie.text.DocumentException;
 import com.serversoap.serverjavasoap.entities.Catalog;
 import com.serversoap.serverjavasoap.entities.CatalogProducts;
 import com.serversoap.serverjavasoap.entities.Product;
@@ -8,15 +19,20 @@ import com.serversoap.serverjavasoap.repositories.CatalogProducsRepository;
 import com.serversoap.serverjavasoap.repositories.CatalogRepository;
 import com.serversoap.serverjavasoap.repositories.ProductRepository;
 import com.serversoap.serverjavasoap.repositories.StoreRepository;
-import io.spring.guides.catalogos_web_service.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ws.server.endpoint.annotation.Endpoint;
-import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
-import org.springframework.ws.server.endpoint.annotation.RequestPayload;
-import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
+import com.serversoap.serverjavasoap.util.PdfGenerator;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import io.spring.guides.catalogos_web_service.AddProductToCatalogRequest;
+import io.spring.guides.catalogos_web_service.AddProductToCatalogResponse;
+import io.spring.guides.catalogos_web_service.GetCatalogoPdfRequest;
+import io.spring.guides.catalogos_web_service.GetCatalogoPdfResponse;
+import io.spring.guides.catalogos_web_service.GetCatalogosRequest;
+import io.spring.guides.catalogos_web_service.GetCatalogosResponse;
+import io.spring.guides.catalogos_web_service.GetProductsCatalogoRequest;
+import io.spring.guides.catalogos_web_service.GetProductsCatalogoResponse;
+import io.spring.guides.catalogos_web_service.RemoveProductFromCatalogRequest;
+import io.spring.guides.catalogos_web_service.RemoveProductFromCatalogResponse;
+import io.spring.guides.catalogos_web_service.SaveCatalogoRequest;
+import io.spring.guides.catalogos_web_service.SaveCatalogoResponse;
 
 @Endpoint
 public class CatalogEndpoint {
@@ -26,6 +42,9 @@ public class CatalogEndpoint {
     private CatalogProducsRepository catalogProducsRepository;
     private StoreRepository storeRepository;
     private ProductRepository productRepository;
+
+    @Autowired
+    private PdfGenerator pdfGenerator; 
 
     @Autowired
     public CatalogEndpoint(CatalogRepository catalogRepository,CatalogProducsRepository catalogProducsRepository,StoreRepository storeRepository, ProductRepository productRepository) {
@@ -185,4 +204,23 @@ public class CatalogEndpoint {
         response.getProductos().addAll(catalogoResponse);
         return response;
     }
+
+    @PayloadRoot(namespace = NAMESPACE_URI, localPart = "getCatalogoPdfRequest")
+    @ResponsePayload
+    public GetCatalogoPdfResponse getCatalogoPdf(@RequestPayload GetCatalogoPdfRequest request) {
+        GetCatalogoPdfResponse response = new GetCatalogoPdfResponse();
+        
+        try {
+            List<CatalogProducts> catalogProductsList = catalogProducsRepository.findByCatalog_IdCatalog(request.getIdCatalog());
+
+            byte[] pdfBytes = pdfGenerator.createCatalogProductsPdf(catalogProductsList);
+
+            response.setPdf(pdfBytes);
+        } catch (DocumentException | IOException e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }    
+
 }
