@@ -7,6 +7,43 @@ from zeep import Client
 
 @endpoints_informes_blueprint.route("/informes", methods=["GET"])
 def informes():
+    """
+    Obtiene todos los informes disponibles.
+    ---
+    tags:
+      - Informes
+    responses:
+      200:
+        description: Lista de informes obtenida exitosamente.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  product_code:
+                    type: string
+                    description: "Código del producto"
+                  cantidad_pedida:
+                    type: integer
+                    description: "Cantidad pedida del producto"
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: "Fecha de creación del informe"
+                  state:
+                    type: string
+                    description: "Estado del informe"
+                  id_store:
+                    type: integer
+                    description: "ID de la tienda asociada"
+                  store_code:
+                    type: string
+                    description: "Código de la tienda asociada"
+      500:
+        description: "Error interno al obtener los informes desde el servicio SOAP."
+    """
     wsdl = os.getenv("SOAP_WSDL_INFORMES")
     client = Client(wsdl=wsdl)
     informes = []
@@ -20,7 +57,7 @@ def informes():
             'id_store': informe.id_store,
             'store_code': informe.store_code,
         })
-    return jsonify(informes),200    
+    return jsonify(informes), 200
 
 @endpoints_informes_blueprint.route("/informesByStore", methods=["GET"])
 def informesByStore():
