@@ -6,3 +6,4 @@ python-dotenv
 pymysql
 zeep
 python-dotenv
+flasgger
