@@ -4,17 +4,29 @@ DSSD-Stockearte-Grupo16
 ## Conexión db remota
 https://trello.com/c/6kH1vAE0/11-conexi%C3%B3n-a-base-de-datos-remota
 
-## Estrategia de desarrollo GRPC
+## Entrega 1
+
+### Estrategia de desarrollo GRPC
 https://docs.google.com/document/d/1vtV1L3HOr8xi34foe9OASbyZ5cb5SSquEIJoxBqp1YM/edit
 
-## Maqueta inicial de frontend GRPC:
+### Maqueta inicial de frontend GRPC:
 https://excalidraw.com/#room=428675ecde542f67de6a,N7tYjxZP9RnOSL-sh6Vvjg
 
-## Estrategia de desarrollo Kafka
+## Entrega 2
+
+### Estrategia de desarrollo Kafka
 https://docs.google.com/document/d/e/2PACX-1vRSbuvCN5qZc2lvL4Et7pj8By-ZfR61shJFlSaC3YoRgJqn2YrHrYVaU8WU2HKXSYljHhK-w4IBfL-r/pub
 
-## Diagrama Kafka:
+### Diagrama Kafka:
 https://excalidraw.com/#json=AaTG1XGfNlNHoFIDMhfdH,dPwy_5mtEXqTs7rMdMOr_A
+
+## Entrega 3
+
+### Estrategia de desarrollo WebServices
+https://docs.google.com/document/d/e/2PACX-1vTwrdefQ_geAxCuUMLRW0DC1xOGGg39YreSnhMWAO0BvScbODqbLDB-OrFV14mEqszFu_ol3HDemkFn/pub
+
+### Diagrama:
+https://excalidraw.com/#json=CdQEabYBcDjykyJkvH3Ui,l7aNNveZFLaXStAPFx7iRA
 
 ## Ambiente
 - Visual Studio Code
