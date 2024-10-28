@@ -1,16 +1,8 @@
 from . import catalogos_blueprint
 from flask import Flask, render_template, request, flash, redirect, session, json, url_for, redirect,jsonify
-import os,json
 from app.models import Catalog,CatalogProducts,Product,ProductStock
 from flask import current_app as app
-import datetime
-from app.models import db
 import requests
-
-@catalogos_blueprint.route("/catalogos", methods=["GET"])
-def catalogos():
-    resp = jsonify(message="hello catalogos world")
-    return resp
 
 @catalogos_blueprint.route('/catalogs', methods=['GET'])
 def get_catalogs():
