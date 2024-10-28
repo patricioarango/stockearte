@@ -22,22 +22,28 @@ https://excalidraw.com/#json=AaTG1XGfNlNHoFIDMhfdH,dPwy_5mtEXqTs7rMdMOr_A
 - Cliente Python con Flask
 - MySQL
 
-# Inicio proyecto ServerJavaSoap
+# Inicio proyecto ServerJavaSoap - localhost:8080
 Ingresar los siguientes comandos en la terminal:
 1. cd ServerJavaSoap 
 2. mvn clean install -DskipTests
 3. mvn spring-boot:run
+## WSDLs
+SOAP_WSDL_CATALOGOS='http://localhost:8080/wsc/catalogos.wsdl'
+SOAP_WSDL_USUARIOS='http://localhost:8080/wsu/users.wsdl'
+SOAP_WSDL_INFORMES='http://localhost:8080/wsi/informes.wsdl'
+SOAP_WSDL_PRODUCTOS='http://localhost:8080/wsp/productos.wsdl'
+SOAP_WSDL_TIENDAS='http://localhost:8080/wst/tiendas.wsdl'
 
-## Inicio SoapClient
+## Inicio SoapClient - localhost:5005
 4. cd SoapClient 
 5. pip install -r requirements.txt
 6. python main.py
+## Swagger http://localhost:5005/apidocs/
 
-## Inicio Rest-app
+## Inicio Rest-app - localhost:5003
 7. cd rest-app 
 8. pip install -r requirements.txt
 9. python main.py
-
 
 # Inicio proyecto ServerJava (GRPC + Kafka)
 Ingresar los siguientes comandos en la terminal:
@@ -56,20 +62,19 @@ En otra terminal:
 ### Listar todos los topics que existen dentro del broker:
 .\bin\windows\kafka-console-consumer.bat --topic orden-de-compra --bootstrap-server localhost:9092
 
-## Inicio ClientePy
-7. cd ClientePy 
-8. pip install -r requirements.txt
-9. python main.py
-10. ejecutar inserts.sql en MySQL para tener usuarios creados.
-11. acceder a http://localhost:5000/ 
-
-## Inicio ProveedorPy
+## Inicio ProveedorPy - localhost:5001
 12. cd proveedorPy 
 13. pip install -r requirements.txt
 14. python main.py
 15. acceder a http://localhost:5001/ 
 
-## Comandos para la modificación de los stubs de python
+## Inicio ClientePy - localhost:5000
+7. cd ClientePy 
+8. pip install -r requirements.txt
+9. python main.py
+10. ejecutar inserts.sql en MySQL para tener usuarios creados.
+11. acceder a http://localhost:5000/ 
+### Comandos para la modificación de los stubs de python
    
 python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --pyi_out=. --grpc_python_out=. ../ServidorJava/src/main/proto/user.proto
 python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --pyi_out=. --grpc_python_out=. ../ServidorJava/src/main/proto/product.proto
@@ -81,10 +86,3 @@ python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --py
 python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --pyi_out=. --grpc_python_out=. ../ServidorJava/src/main/proto/novelty.proto
 python -m grpc_tools.protoc -I../ServidorJava/src/main/proto --python_out=. --pyi_out=. --grpc_python_out=. ../ServidorJava/src/main/proto/dispatchOrder.proto
 
-
-## Soap Server JAVA - WSDLs
-SOAP_WSDL_CATALOGOS='http://localhost:8080/wsc/catalogos.wsdl'
-SOAP_WSDL_USUARIOS='http://localhost:8080/wsu/users.wsdl'
-SOAP_WSDL_INFORMES='http://localhost:8080/wsi/informes.wsdl'
-SOAP_WSDL_PRODUCTOS='http://localhost:8080/wsp/productos.wsdl'
-SOAP_WSDL_TIENDAS='http://localhost:8080/wst/tiendas.wsdl'

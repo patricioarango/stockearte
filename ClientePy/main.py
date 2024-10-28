@@ -878,7 +878,7 @@ def insertNovelty(new_novelty, novelty_stub):
     
     novelty = Novelty(
         date=datetime.now().strftime('%Y-%m-%d'),
-        novelty="test",
+        novelty=new_novelty["producto_nombre"],
         code=new_novelty["producto"],  
         color=new_novelty["color"], 
         size=new_novelty["talle"], 
@@ -925,7 +925,7 @@ def agregar_novedad(id):
                 return redirect(url_for('listado_novedades'))
             
             nuevo_producto = Product(
-                product="producto del proveedor",
+                product=novelty_response.novelty,
                 code=novelty_response.code,
                 img=novelty_response.img,
                 color=novelty_response.color,
