@@ -22,17 +22,17 @@ https://excalidraw.com/#json=AaTG1XGfNlNHoFIDMhfdH,dPwy_5mtEXqTs7rMdMOr_A
 - Cliente Python con Flask
 - MySQL
 
-# Inicio proyecto ServerJavaSoap - localhost:8080
+# Inicio proyecto ServerJavaSoap - localhost:8089
 Ingresar los siguientes comandos en la terminal:
 1. cd ServerJavaSoap 
 2. mvn clean install -DskipTests
 3. mvn spring-boot:run
 ## WSDLs
-SOAP_WSDL_CATALOGOS='http://localhost:8080/wsc/catalogos.wsdl'
-SOAP_WSDL_USUARIOS='http://localhost:8080/wsu/users.wsdl'
-SOAP_WSDL_INFORMES='http://localhost:8080/wsi/informes.wsdl'
-SOAP_WSDL_PRODUCTOS='http://localhost:8080/wsp/productos.wsdl'
-SOAP_WSDL_TIENDAS='http://localhost:8080/wst/tiendas.wsdl'
+SOAP_WSDL_CATALOGOS='http://localhost:8089/wsc/catalogos.wsdl'
+SOAP_WSDL_USUARIOS='http://localhost:8089/wsu/users.wsdl'
+SOAP_WSDL_INFORMES='http://localhost:8089/wsi/informes.wsdl'
+SOAP_WSDL_PRODUCTOS='http://localhost:8089/wsp/productos.wsdl'
+SOAP_WSDL_TIENDAS='http://localhost:8089/wst/tiendas.wsdl'
 
 ## Inicio SoapClient - localhost:5005
 4. cd SoapClient 
