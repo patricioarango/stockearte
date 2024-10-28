@@ -57,12 +57,12 @@ def process_csv(file_data):
 
     for linea_num, row in enumerate(csv_reader, start=1):
         try:
-            nombre, apellido, username, password, id_role, id_store = row
+            nombre, apellido, username, password, id_role, code= row
         except ValueError:
             errores.append({'linea': linea_num, 'error': 'Formato incorrecto de la línea', 'data': row})
             continue
 
-        if not nombre or not apellido or not username or not password or not id_role or not id_store:
+        if not nombre or not apellido or not username or not password or not id_role or not code:
             errores.append({'linea': linea_num, 'error': 'Campos vacíos', 'data': row})
             continue
 
@@ -70,9 +70,9 @@ def process_csv(file_data):
             errores.append({'linea': linea_num, 'error': 'Usuario duplicado', 'data': row})
             continue
         
-        store = get_store_by_idStore(id_store)
+        store = get_store_by_code(code)
         if not store:
-            errores.append({'linea': linea_num, 'error': 'ID de tienda inválido', 'data': row})
+            errores.append({'linea': linea_num, 'error': 'Codigo de tienda inválido', 'data': row})
             continue
 
         if not store['enabled']:
