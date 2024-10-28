@@ -22,7 +22,24 @@ https://excalidraw.com/#json=AaTG1XGfNlNHoFIDMhfdH,dPwy_5mtEXqTs7rMdMOr_A
 - Cliente Python con Flask
 - MySQL
 
-## Inicio proyecto ServerJava
+# Inicio proyecto ServerJavaSoap
+Ingresar los siguientes comandos en la terminal:
+1. cd ServerJavaSoap 
+2. mvn clean install -DskipTests
+3. mvn spring-boot:run
+
+## Inicio SoapClient
+4. cd SoapClient 
+5. pip install -r requirements.txt
+6. python main.py
+
+## Inicio Rest-app
+7. cd rest-app 
+8. pip install -r requirements.txt
+9. python main.py
+
+
+# Inicio proyecto ServerJava (GRPC + Kafka)
 Ingresar los siguientes comandos en la terminal:
 1. cd ServidorJava 
 2. mvn clean install -DskipTests
@@ -46,7 +63,7 @@ En otra terminal:
 10. ejecutar inserts.sql en MySQL para tener usuarios creados.
 11. acceder a http://localhost:5000/ 
 
-## Inicio Proveedor App
+## Inicio ProveedorPy
 12. cd proveedorPy 
 13. pip install -r requirements.txt
 14. python main.py
